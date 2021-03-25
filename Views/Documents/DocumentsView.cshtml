@@ -1,0 +1,817 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Syncfusion.EJ2.DropDowns
+@using Syncfusion.EJ2
+@using ProyectoAlmaInicio.Models;
+
+<div class="main-content e-responsive" id="main-text">
+    <div class="sidebar-content sidebar" style="display:flow-root; min-height:600px;">
+
+        <div class="control-section col-lg-12" style="height: 1000px;">
+
+            <h4 class="h4 tr" key="documentosComercial">INFORMES DE CALIDAD</h4>
+            <hr style="border-width: medium;" />
+
+            <div align="right">
+                <button onclick="btnSubirArchivo()" class="btn" data-toggle="modal" data-target="#exampleModal" style="display:initial; margin: 0px 0px 0px 0px;">
+                    <p style="display:inline;">
+                        Subir Archivo&nbsp;
+                    </p>
+                    <span style="font-size: 2em; color: rgb(74, 185, 115);">
+                        <i class="fa fa-cloud-upload icono"></i>
+                    </span>
+                </button>
+            </div>
+
+            <br />
+            <div>
+                @{
+                    List<object> cols = new List<object>();
+                    //cols.Add(new { field = "FechaControlador", direction = "Descending" });
+                }
+
+                @(Html.EJS().Grid<Clases.Documento>("TablaDocumentos").DataSource((IEnumerable<Clases.Documento>)ViewBag.Documentos).FilterSettings(filter => filter.Type(Syncfusion.EJ2.Grids.FilterType.Excel)).AllowSelection().DetailTemplate("#detalleTablaDocumentos").Columns(col =>
+                {
+                    col.Field("").HeaderText("Contenedores").Template("#templateVerDetalle").Width("130").Add();
+                    col.Field("").HeaderText("Acciones").Template("#templateAcciones").Width("150").Add();
+                    col.Field("").HeaderText("Nombre Archivo").Template("#templateNombreArchivo").Width("300").Add();
+                    col.Field(p => p.Destinatario).HeaderText("Destinatario").Width("150").Add();
+                    col.Field(p => p.Commodity).HeaderText("Commodity").Width("150").Add();
+                    col.Field(p => p.TipoRevision).HeaderText("Tipo Revisión").Width("150").Add();
+                    col.Field(p => p.LugarRevision).HeaderText("Lugar Revisión").Width("150").Add();
+                    col.Field(p => p.FechaRevision).HeaderText("Fecha Revisión").Width("150").Format(new { type = "datetime", format = "dd/MM/yyyy" }).Add();
+                    col.Field(p => p.Empresa).HeaderText("Empresa Control Calidad").Width("150").Add();
+                    col.Field(p => p.Notas).HeaderText("Notas").Width("150").Add();
+
+                }).SortSettings(sort => sort.Columns(cols)).AllowResizing(true).AllowReordering().AllowSorting(true).EnablePersistence(true).AllowPaging(true).PageSettings(page => page.PageCount(5)).AllowFiltering(true).SelectionSettings(select => select.CellSelectionMode(Syncfusion.EJ2.Grids.CellSelectionMode.Flow).Mode(Syncfusion.EJ2.Grids.SelectionMode.Cell).Type(Syncfusion.EJ2.Grids.SelectionType.Single)).CellSelected("onCellSelected").Render())
+
+                <script id="templateAcciones" type="text/x-template">
+                    <button onclick="clickBotonDescargarArchivo()" id="botonDescargarArchivo" value="${IdDocumento}-${NombreDocumento}" title="Descargar Archivo" class="btn fa fa-cloud-download" style="background:white; border:1px gray solid; padding: 2px 10px 2px 10px;"></button>
+                    <button onclick="clickBotonBorrarArchivo()" id="botonBorrarArchivo" value="${IdDocumento}-${NombreDocumento}" title="Borrar Archivo" class="btn fa fa-trash" style="background:white; border:1px gray solid; padding: 2px 10px 2px 10px;"></button>
+                    <button onclick="clickBotonVerArchivo()" id="botonVerArchivo" value="${IdDocumento}-${NombreDocumento}" title="Ver PDF" class="btn fa fa-file-pdf-o" style="background:white; border:1px gray solid; padding: 2px 10px 2px 10px;"></button>
+                </script>
+
+                <script id="templateNombreArchivo" type="text/x-template">
+                    <span style="font-size: 2em; color: rgb(74, 185, 115); margin-right:10px;">
+                        <i class="fa fa-${TipoIcono} icono"></i>
+                    </span>
+                    ${NombreDocumento}
+                </script>
+
+                <script id="templateVerDetalle" type="text/x-template">
+                    <p class="texto1">Ver</p>
+                </script>
+
+                <script type="text/x-template" id="detalleTablaDocumentos">
+                    <table class="detailtable" width="100%" style="margin: 10px 0px 10px 20px;">
+                        <tbody>
+                            @*<tr>
+                                    <td>
+                                        <span style="font-weight: 500;">Nombre Archivo: </span> ${NombreDocumento}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="font-weight: 500;">Destinatario: </span> ${Destinatario}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="font-weight: 500;">Commodity: </span> ${Commodity}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="font-weight: 500;">Tipo Revisión: </span> ${TipoRevision}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="font-weight: 500;">Lugar Revisión: </span> ${LugarRevision}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="font-weight: 500;">Fecha Revisión: </span> ${FechaRevision}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <span style="font-weight: 500;">Empresa Control de Calidad: </span> ${Empresa}
+                                    </td>
+                                </tr>*@
+                            <tr>
+                                <td>
+                                    <span style="font-weight: 500;">Contenedores: </span> ${Contenedores}
+                                </td>
+                            </tr>
+                        </tbody>
+
+
+                        @*<tbody>
+                                @if (ViewBag.Documentos != null)
+                                {
+                                    foreach (var documento in ViewBag.Documentos)
+                                    {
+                                        string nombre = documento.NombreDocumento.ToString();
+                                        string path = documento.Path.ToString();
+                                        <tr>
+                                            <td> @nombre </td>
+                                            <td>@Html.ActionLink(" ", "Download", "Documents", new { filePath = path, fileName = nombre }, new { @class = "fa fa-2x fa-download" })</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>*@
+                    </table>
+
+                </script>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+<script>
+
+    var contenedores = [];
+
+    function clickBotonDescargarArchivo() {
+
+        var split = event.target.value.split('-');
+        var nombre_archivo = '';
+        for (var i = 0; i < split.length; i++) {
+            if (i != 0) {
+                if (i == 1) {
+                    nombre_archivo = nombre_archivo + split[i];
+                }
+                else {
+                    nombre_archivo = nombre_archivo + '-' + split[i];
+                }
+            }
+        }
+
+        window.location.href = "/ProyectoAlma/Documents/Download?fileName=" + nombre_archivo;
+        console.log("descargar: " + event.target.value);
+    }
+
+
+    function clickBotonBorrarArchivo() {
+
+
+        var split = event.target.value.split('-');
+        var nombre_archivo = '';
+        var id_archivo = split[0];
+        for (var i = 0; i < split.length; i++) {
+            if (i != 0) {
+                if (i == 1) {
+                    nombre_archivo = nombre_archivo + split[i];
+                }
+                else {
+                    nombre_archivo = nombre_archivo + '-' + split[i];
+                }
+            }
+        }
+
+        var titulo = '¡Advertencia!';
+        var texto = '¿Desea eliminar el archivo ' + nombre_archivo + '?';
+
+        Swal.fire({
+            title: titulo,
+            text: texto,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#4ab973',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si'
+        }).then((result) => {
+            if (result.value) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "DeleteFile",
+                    data: { fileName: nombre_archivo },
+                    success: function (result) {
+                        if (result = "Se eliminó el archivo con éxito") {
+
+                            console.log('paso: ' + id_archivo);
+
+                            $.ajax({
+                                type: "POST",
+                                url: "BorrarDocumento",
+                                data: { id_doc: id_archivo },
+                                success: function (result) {
+                                    Swal.fire({
+                                        position: 'top-end',
+                                        icon: 'success',
+                                        title: 'El archivo se ha eliminado con éxito',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    })
+
+                                    location.reload();
+                                },
+                                error: function (req, status, error) {
+                                    alert("Sorry! Problemas en AJAX BorrarDocumento");
+                                    console.log(req);
+                                    console.log(status);
+                                    console.log(error);
+                                }
+                            });
+                        }
+                        else {
+
+                        }
+                    },
+                    error: function (req, status, error) {
+                        alert("Sorry! We could not receive your feedback at this time.");
+                    }
+                });
+
+
+            }
+        })
+
+        console.log("borrar: " + event.target.value );
+    }
+
+    function clickBotonVerArchivo() {
+
+        var split = event.target.value.split('-');
+        var nombre_archivo = '';
+        var id_archivo = split[0];
+        for (var i = 0; i < split.length; i++) {
+            if (i != 0) {
+                if (i == 1) {
+                    nombre_archivo = nombre_archivo + split[i];
+                }
+                else {
+                    nombre_archivo = nombre_archivo + '-' + split[i];
+                }
+            }
+        }
+
+        var ruta1 = window.location.protocol;
+        var ruta2 = window.location.hostname;
+        var ruta3 = window.location.port;
+        var ruta = ruta1 + "//" + ruta2 + ":" + ruta3 + "/ProyectoAlma/Documents/PDFView?archivo=" + nombre_archivo;
+
+        console.log(ruta);
+
+        window.open(ruta);
+        console.log("Ver: " + event.target.value);
+    }
+
+    // CONSTRUCCION MODAL
+    function btnSubirArchivo()
+    {
+        // TITULO
+        var titulo_modal = document.getElementById('modal-title');
+
+        titulo_modal.innerHTML = 'Subir Archivo';
+
+        // DESARROLLO
+        var desarrollo_modal = document.getElementById('modal-body');
+
+        desarrollo_modal.innerHTML = '<div><input type="text" id="inputDestinatario"/></div>'
+            + '<br />'
+            + '<div id="divInputCommodity"><input type="text" id="inputCommodity"/></div>'
+            + '<br />'
+            + '<div><input type="text" id="inputTipoRevision"/></div>'
+            + '<br />'
+            + '<div><input type="text" id="inputLugarRevision"/></div>'
+            + '<br />'
+            + '<div><input type="text" id="inputFechaRevision"/></div>'
+            + '<br />'
+            + '<div><input type="text" id="inputEmpresaControlCalidad"/></div>'
+            + '<br />'
+            + '<div><textarea rows="2" id="inputNotas"></textarea></div>'
+            + '<br />'
+            + '<div><input type="text" id="inputContenedor"/></div>'
+
+            + '<div id="div-tabla-contendores" style="display:none">'
+            + '<div class="container col-lg-6" style="margin: 10px 0px 10px 0px">'
+            + '<p style="margin: 5px 5px 0px 0px; text-align: right;">Contenedores</p>'
+            + '<p style="text-align: right;">Seleccionados:</p>'
+            + '</div>'
+            + '<div class="col-lg-6" style="overflow-y: auto; height: 100px; margin-bottom: 10px;">'
+            + '<table id="tableContenedores" style="margin: 10px 0px 10px 0px;"></table>'
+            + '</div>'
+            + '</div>'
+            + '<br />'
+            + '<input type="file" class="file" id="archivo_usuario" onchange="changeArchivo()" />';
+
+
+        var lista_destinatarios = @Html.Raw(
+            Json.Encode(
+                (ViewBag.lista_destinatarios)
+            )
+        );
+        var lista_commodities = @Html.Raw(
+            Json.Encode(
+                (ViewBag.lista_commodities)
+            )
+        );
+        var lista_tipos_revisiones = @Html.Raw(
+            Json.Encode(
+                (ViewBag.lista_tipos_revisiones)
+            )
+        );
+        var lista_contenedores = @Html.Raw(
+            Json.Encode(
+                (ViewBag.lista_contenedores)
+            )
+        );
+
+        var comboBox_destinatarios = new ej.dropdowns.ComboBox({
+            dataSource: lista_destinatarios,
+            fields: { text: 'Name', value: 'Code' },
+            placeholder: 'Destinatario',
+            popupHeight: '300px',
+            allowFiltering: true,
+            filtering: function (e) {
+                var query = new ej.data.Query();
+                query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+                e.updateData(lista_destinatarios, query);
+                if (document.getElementById('nodata_comboBox_destinatarios')) {
+                    document.getElementById('btn_comboBox_destinatarios').onclick = function () {
+                        var customValue = document.getElementById('inputDestinatario').value;
+                        var newItem = { 'Name': customValue, 'Code': customValue };
+                        comboBox_destinatarios.dataSource.push(newItem);
+                        comboBox_destinatarios.hidePopup();
+                        comboBox_destinatarios.addItem(newItem);
+                        comboBox_destinatarios.value = customValue;
+                    };
+                }
+            },
+            noRecordsTemplate: '<div><div id="nodata_comboBox_destinatarios" style="padding-bottom:10px"> El destinatario no se encuentra en la lista, ¿desea agregarlo?</div><button id="btn_comboBox_destinatarios" class="e-control e-btn">Agregar</button></div>',
+        });
+        comboBox_destinatarios.appendTo('#inputDestinatario');
+
+        var dropdown_commodities = new ej.dropdowns.DropDownList({
+            dataSource: lista_commodities,
+            query: new ej.data.Query(),
+            fields: { text: 'Name', value: 'Code' },
+            sortOrder: 'Ascending',
+            placeholder: 'Commodity (*)',
+            popupHeight: '300px',
+            change: function () { changeCommodity(); },
+        });
+        dropdown_commodities.appendTo('#inputCommodity');
+
+        var dropdown_tipo_revision = new ej.dropdowns.DropDownList({
+            dataSource: lista_tipos_revisiones,
+            query: new ej.data.Query(),
+            fields: { text: 'Name', value: 'Code' },
+            sortOrder: 'Ascending',
+            placeholder: 'Tipo de Revisión',
+            popupHeight: '300px',
+        });
+        dropdown_tipo_revision.appendTo('#inputTipoRevision');
+
+        var textBox_lugar_revision = new ej.inputs.TextBox({
+            placeholder: 'Lugar de Revisión',
+        });
+        textBox_lugar_revision.appendTo('#inputLugarRevision');
+
+        var datepicker_fecha_revision = new ej.calendars.DatePicker({
+            placeholder: 'Fecha de Revisión',
+            format: 'dd-MM-yyyy',
+        });
+        datepicker_fecha_revision.appendTo('#inputFechaRevision');
+
+        var textBox_empresa = new ej.inputs.TextBox({
+            placeholder: 'Empresa de Control de Calidad',
+        });
+        textBox_empresa.appendTo('#inputEmpresaControlCalidad');
+
+        var textBox_notas = new ej.inputs.TextBox({
+            placeholder: 'Notas',
+        });
+        textBox_notas.appendTo('#inputNotas');
+
+        var comboBox_contenedores = new ej.dropdowns.ComboBox({
+            dataSource: lista_contenedores,
+            fields: { text: 'Name', value: 'Code' },
+            placeholder: 'Contenedor',
+            popupHeight: '300px',
+            allowFiltering: true,
+            filtering: function (e) {
+                document.getElementById('inputContenedor').value = document.getElementById('inputContenedor').value.toUpperCase();
+                var query = new ej.data.Query();
+                query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+                e.updateData(lista_contenedores, query);
+                if (document.getElementById('nodata_comboBox_contenedores')) {
+                    document.getElementById('btn_comboBox_contenedores').onclick = function () {
+                        var customValue = document.getElementById('inputContenedor').value;
+                        var newItem = { 'Name': customValue, 'Code': customValue };
+                        comboBox_contenedores.dataSource.push(newItem);
+                        comboBox_contenedores.hidePopup();
+                        comboBox_contenedores.addItem(newItem);
+                        comboBox_contenedores.value = customValue;
+                    };
+                }
+            },
+            change: function (e) {
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("ValidarNumeroContenedor", "Servicio")',
+                    data: { containerNumberToCheck: $("#inputContenedor").val() },
+                    success: function (response) {
+                        if (response == "False") {
+                            var texto = '¡Número contenedor inválido!';
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                confirmButtonColor: '#4ab973',
+                                text: texto,
+                            });
+                            return false;
+                        }
+                        else {
+                            var div_tabla_contendores = document.getElementById('div-tabla-contendores');
+                            div_tabla_contendores.style.display = "block";
+                            var tabla_contenedores = document.getElementById('tableContenedores');
+                            tabla_contenedores.innerHTML = tabla_contenedores.innerHTML
+                                + "<tr>"
+                                + "<td>"
+                                + $("#inputContenedor").val()
+                                + "</td>"
+                                + "<td><button onclick=\"borrarContenedor('" + $("#inputContenedor").val() +"')\" class=\"close\"><span style=\"margin-left: 5px\">&times;</span></button></td>"
+                                + "</tr>";
+                            return false;
+                        }
+                    }
+                });
+
+            },
+            noRecordsTemplate: '<div><div id="nodata_comboBox_contenedores" style="padding-bottom:10px"> El contenedor no se encuentra en la lista, ¿desea agregarlo?</div><button id="btn_comboBox_contenedores" class="e-control e-btn">Agregar</button></div>',
+        });
+        comboBox_contenedores.appendTo('#inputContenedor');
+
+
+
+
+        // FINAL
+        var fin_modal = document.getElementById('modal-footer');
+
+        fin_modal.innerHTML = '<button onclick="guardarModal()" class="btn-success btn2">Guardar</button>';
+    }
+
+
+
+    function guardarModal() {
+
+        var respuesta = validarCamposAgregarArchivo();
+        if (respuesta == 1) {
+
+            var destinatario = document.getElementById('inputDestinatario').value;
+            var commodity = document.getElementById('inputCommodity').value;
+            var tipo_revision = document.getElementById('inputTipoRevision').value;
+            var lugar_revision = document.getElementById('inputLugarRevision').value;
+            var fecha_revision = document.getElementById('inputFechaRevision').value;
+            var empresa = document.getElementById('inputEmpresaControlCalidad').value;
+            var notas = document.getElementById('inputNotas').value;
+
+
+            // PASAR CONTENEDORES A BACKEND
+            var tabla_contenedores = document.getElementById('tableContenedores');
+
+            var str = tabla_contenedores.innerHTML;
+            var res = str.split("tr");
+            contador_contenedores = 0;
+            contenedores = [];
+            res.forEach(recorrerTablaContenedores2);
+
+            // DATOS DE ARCHIVO
+            var archivo = document.getElementById('archivo_usuario');
+
+            var nombre_doc = archivo.files[0].name;
+            var tipo_doc = archivo.files[0].type;
+            var peso_doc = archivo.files[0].size;
+
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GuardarDocumento", "Documents")',
+                dataType: 'json',
+                dataSrc: '',
+                async: false,
+                data: {
+                    nombre_doc: nombre_doc,
+                    tipo_doc: tipo_doc,
+                    ruta_doc: '',
+                    peso_doc: peso_doc,
+                    destinatario: destinatario,
+                    commodity: commodity,
+                    tipo_revision: tipo_revision,
+                    lugar_revision: lugar_revision,
+                    fecha_revision: fecha_revision,
+                    empresa: empresa,
+                    notas: notas,
+                    contenedores: contenedores
+                },
+                success: function (response) {
+                    if (response > 0) {
+
+                        var archivo = document.getElementById('archivo_usuario');
+                        var formdata = new FormData();
+
+                        for (i = 0; i < archivo.files.length; i++) {
+                            formdata.append(archivo.files[i].name, archivo.files[i]);
+                        }
+
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', '../Documents/Upload');
+                        xhr.send(formdata);
+                        xhr.onreadystatechange = function () {
+                            if (xhr.readyState == 4 && xhr.status == 200) {
+
+                                Swal.fire({
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: 'El archivo se ha guardado con éxito',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                })
+                            }
+                        }
+
+                        location.reload();
+
+                    }
+                }
+            });
+        }
+        else {
+            if (respuesta == 2) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Debe seleccionar un archivo',
+                    confirmButtonColor: '#4ab973',
+                });
+                var archivo = document.getElementById('archivo_usuario');
+                archivo.style.borderColor = 'red';
+            }
+            else if (respuesta == 3) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Debe seleccionar un Commodity',
+                    confirmButtonColor: '#4ab973',
+                });
+                var commodity = document.getElementById('divInputCommodity').childNodes;
+                commodity[0].style.borderColor = 'red';
+            }
+            else if (respuesta == 4) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'El archivo no puede sobrepasar los 5MB',
+                    confirmButtonColor: '#4ab973',
+                });
+                var archivo = document.getElementById('archivo_usuario');
+                archivo.style.borderColor = 'red';
+            }
+            else if (respuesta == 5) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Al menos debe seleccionar un archivo y un Commodity',
+                    confirmButtonColor: '#4ab973',
+                });
+                var commodity = document.getElementById('divInputCommodity').childNodes;
+                commodity[0].style.borderColor = 'red';
+                var archivo = document.getElementById('archivo_usuario');
+                archivo.style.borderColor = 'red';
+            }
+            else if (respuesta == 6) {
+                var archivo = document.getElementById('archivo_usuario');
+                var nombre_archivo = archivo.files[0].name;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ya existe un archivo con el nombre ' + nombre_archivo,
+                    confirmButtonColor: '#4ab973',
+                });
+                archivo.style.borderColor = 'red';
+            }
+        }
+
+
+    }
+
+    function validarCamposAgregarArchivo() {
+        var respuesta = 0;
+        var archivo = document.getElementById('archivo_usuario');
+        var commodity = document.getElementById('inputCommodity');
+
+        if (archivo.files.length > 0) {
+
+            if (archivo.files[0].size <= 5242880) {
+
+                var existe_archivo = validarArchivoExistente(archivo.files[0].name);
+                if (existe_archivo == 1) {
+                    respuesta = 6;
+                }
+                else {
+                    if (commodity.value != "") {
+                        respuesta = 1;
+                    }
+                    else {
+                        respuesta = 3;
+                    }
+                }
+            }
+            else {
+                respuesta = 4;
+            }
+        }
+        else {
+            if (commodity.value != "") {
+                respuesta = 2;
+            }
+            else {
+                respuesta = 5;
+            }
+        }
+        return respuesta;
+    }
+
+    function validarArchivoExistente(nombre_archivo){
+        var respuesta = 0;
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ValidarArchivoExistente", "Documents")',
+            dataType: 'json',
+            dataSrc: '',
+            async: false,
+            data: {
+                nombre_archivo: nombre_archivo
+            },
+            success: function (response) {
+                if (response > 0) {
+                    respuesta = 1;
+                }
+            }
+        });
+
+        return respuesta;
+    }
+
+
+
+    var contenido_nuevo_tabla_contenedores = "<tbody>";
+    var contenedor_a_borrar = "";
+    var contador_contenedores = 0;
+
+    function borrarContenedor(contenedor) {
+        contenedor_a_borrar = contenedor;
+        var tabla_contenedores = document.getElementById('tableContenedores');
+
+        var str = tabla_contenedores.innerHTML;
+        var res = str.split("tr");
+        contenido_nuevo_tabla_contenedores = "<tbody>";
+        contador_contenedores = 0;
+        res.forEach(recorrerTablaContenedores);
+
+        if (contador_contenedores == 1) {
+            var div_tabla_contendores = document.getElementById('div-tabla-contendores');
+            div_tabla_contendores.style.display = "none";
+        }
+        contenido_nuevo_tabla_contenedores = contenido_nuevo_tabla_contenedores + "</tbody>";
+        tabla_contenedores.innerHTML = contenido_nuevo_tabla_contenedores;
+    }
+
+
+    function recorrerTablaContenedores(element, index, array) {
+        var res = element.substring(0, 5);
+        if (res == '><td>') {
+            contador_contenedores++;
+            var res2 = element.split("<td>");
+            var res3 = res2[1].split("</td>");
+            if (res3[0] != contenedor_a_borrar) {
+                if (contador_contenedores > 1) {
+                    contenido_nuevo_tabla_contenedores = contenido_nuevo_tabla_contenedores + "</tbody><tbody>";
+                }
+                contenido_nuevo_tabla_contenedores = contenido_nuevo_tabla_contenedores + "<tr" + element + "tr>";
+            }
+        }
+    }
+
+    function recorrerTablaContenedores2(element, index, array) {
+        var res = element.substring(0, 5);
+        if (res == '><td>') {
+            contador_contenedores++;
+            var res2 = element.split("<td>");
+            var res3 = res2[1].split("</td>");
+            contenedores.push(res3[0]);
+        }
+    }
+
+
+
+
+    function onCellSelected(args) {
+        /*var cellIndex = args.cellIndex.cellIndex;
+        if (cellIndex == 0) {
+            var NombreDocumento = args.data["NombreDocumento"];
+            var Path = args.data["Path"];
+            console.log('NombreDocumento: ' + NombreDocumento);
+            console.log('Path: ' + Path);
+        }*/
+
+
+    }
+
+    function changeArchivo() {
+        var archivo = document.getElementById('archivo_usuario');
+        archivo.style.borderColor = '#ced4da';
+    }
+    function changeCommodity() {
+        var commodity = document.getElementById('divInputCommodity').childNodes;
+        commodity[0].style.borderColor = '#ced4da';
+    }
+
+
+
+</script>
+
+<script type="text/x-jsrender" id="progessTemplate">
+    <div id="myProgress" class="pbar">
+        <div id="myBar" class="bar">
+            <div id="label" class="barlabel"></div>
+        </div>
+    </div>
+</script>
+
+<script src="~/build/js/Perfiles.js"></script>
+
+
+<style>
+    .file {
+        width: 100%;
+        border: 1px solid #ced4da;
+        border-radius: 5px;
+        padding: 5px 5px 5px 5px;
+    }
+
+    input[type="file"]:focus {
+        outline: none;
+        border: 3px solid #a6ddba;
+        border-radius: 5px;
+    }
+
+
+
+
+    p {
+        margin: 0 0 0px;
+        margin-bottom: 0px;
+    }
+
+    .h4 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .h5 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .main-content {
+        background: #F7F7F7 !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .btn, .btn:focus, .btn:active:focus {
+        outline: none;
+        background: white;
+        padding-top: 0px;
+    }
+
+    .btn2 {
+        padding: 6px 10px 6px 10px;
+        border-radius: 3px;
+    }
+
+    .icono {
+        color: rgb(74, 185, 115);
+    }
+
+    .icono:hover, .icono:focus {
+        color: forestgreen;
+    }
+
+    .texto1 {
+        font-family: Gotham Light !important;
+        font-size: 14px;
+        text-align: justify;
+    }
+
+</style>

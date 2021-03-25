@@ -1,0 +1,129 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Syncfusion.EJ2;
+@using ProyectoAlmaInicio.Models;
+@using Syncfusion.EJ2.DropDowns;
+@using Syncfusion.EJ2.Navigations;
+
+
+<div class="main-content e-responsive" id="main-text">
+    <div class="sidebar-content">
+        <h4 class="h4 tr" key="formularioContacto">FORMULARIO DE CONTACTO</h4>
+        <hr style="border-width: medium;" />
+        <br />
+
+        <div class="row">
+
+            <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label id="Email" class="tr" key="correo">Correo:</label>
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <label>soportealma@liventusglobal.com</label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label for="Comentario" class="tr" key="comentarios">Comentarios:</label>
+                            <textarea id="Comentario" class="form-control" style="resize:none;" rows="10"></textarea>
+                        </div>
+                    </div>
+                        <br />
+                        <div class="controls row">
+                            <div class="col-lg-6" style="text-align:center;">
+                                <button id="EnvioEmailContacto" type="submit" class="btn btn-success submit tr" key="botonEnviar">Enviar</button>
+                            </div>
+                        </div>
+            </div>
+        </div>
+        <div class="row" style="height: 300px"></div>
+
+    </div>
+</div>
+
+<style>
+    .h3,
+    .row {
+        color: black !important;
+    }
+</style>
+<script>
+
+    $(document).ready(function () {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 5,
+                NombreVista: 'CorreoSoporte'
+            }
+
+        });
+    });
+
+
+    $("#EnvioEmailContacto").on('click', function () {
+
+        if ($("#Comentario").val() != '') {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("EmailContactoComercial", "Email")',
+                dataType: 'json',
+                dataSrc: '',
+                data: {
+                    Comentario: $("#Comentario").val()
+                }
+
+            });
+            alertaComentario.hide();
+            alertaEnvioOK.show();
+            $("#Comentario").val('');
+            $("#Comentario").selectpicker('refresh');
+            //$('#myModal1').modal('hide');
+
+        } else {
+            alertaEnvioOK.hide();
+            alertaComentario.show();
+        }
+    });
+</script>
+
+<style>
+    .h3
+    {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-card{
+        font-family: Gotham Medium !important;
+    }
+    .e-tab{
+        font-family: Gotham Medium !important;
+    }
+    .e-tab-text{
+        font-family: Gotham Medium !important;
+    }
+    .e-control{
+        font-family: Gotham Medium !important;
+    }
+    .e-treeview.e-list-text{
+        color:white !important;
+        font-family: Gotham Medium !important;
+    } 
+
+    .h4
+    {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .main-content {
+        background: #F7F7F7 !important;
+        font-family: Gotham Medium !important;
+    }
+</style>

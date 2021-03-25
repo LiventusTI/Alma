@@ -1,0 +1,682 @@
+﻿
+@{
+    ViewBag.Title = "HistoricosView";
+    Layout = "~/Views/MasterPage.cshtml";
+
+    int PerfilInterior = Convert.ToInt32(Session["PerfilInterior"]);
+    int Perfil = Convert.ToInt32(Session["Perfil"]);
+
+    //    string Usuario = Session["User"].ToString().ToUpper();
+
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript"></script>
+
+    <!-- <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> -->
+    <!-- <meta charset="utf-8" /> -->
+    <title>@ViewBag.Title</title>
+
+</head>
+<body>
+
+    <!--Inicio Modal de Servicios-->
+
+    <div class="col-sm-12">
+        <div class="x_panel" align="center">
+            <div class="x_title">
+                <div class="row">
+                    <h4 align="left" class="tr" key="serviciosHISTORICOS">SERVICIOS HISTORICOS<small></small></h4>
+                </div>
+            </div>
+            <br>
+            <div class="alert alert-danger" id="alertaSemanas">
+                <!--<button type="button" class="hidden" >&times;</button>-->
+                <strong>¡ </strong><label class="tr" key="FechaSemanas">Es importante que selecciones ambas fechas para realizar un filtro de semanas</label><strong> !</strong>
+                <br><label class="tr" key="msjeEliminarFiltros">Si deseas visualizar todos tus servicios selecciona el botón "Eliminar Filtros".</label>
+            </div>
+            <div class="x_panel">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <label for="FechaInicioLiventus" key="FechaInicioLiventus" class="tr control-label col-lg-2">Semana inicio servicio: </label>
+                        <label for="FechaDesde" key="FechaDesde" class="tr control-label col-lg-1"> Desde </label>
+                        <div class="col-lg-2">
+                            <input class="form-control" type="week" name="FechaDesde" id="FechaDesde" min="1" max="53">
+                        </div>
+                        <label for="FechaHasta" key="FechaHasta" class="tr control-label col-lg-1"> Hasta </label>
+                        <div class="col-lg-2">
+                            <input class="form-control" type="week" name="FechaHasta" id="FechaHasta" min="1" max="53">
+                        </div>
+                        <div class="col-lg-1"><button type="button" class="btn btn-primary tr btn-sm" id="FiltroSemanas" key="FiltroSemanas">Filtrar</button></div>
+                        <div class="col-lg-1"><button type="button" class="btn btn-primary tr btn-sm" id="EliminarFiltros" key="EliminarFiltros">Eliminar Filtros</button></div>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+            <div class="x_panel" style="width: 80%"> <!--<div class="x_panel" style="border-radius: 56px 56px 56px 56px; -moz-border-radius: 56px 56px 56px 56px; -webkit-border-radius: 56px 56px 56px 56px; border: 5px solid #000000;" >-->
+                <div class="row">
+                    <h5 class="tr" key="TotalizadorServicios">TOTALIZADOR SERVICIOS</h5>
+                    <table id="Tb_Servicios_Totalizador" style="text-align:center" class="table table-striped table-bordered display nowrap">
+                        <thead>
+                            <tr>
+                                <th id="totalModem" key="totalModem" class="tr"><b>C/MODEM ALMA</b></th>
+                                <th id="totalControlador" key="totalControlador" class="tr"><b>C/CONTROLADOR LIVENTUS</b></th>
+                                <th id="totalCO2" key="totalCO2" class="tr"><b>C/SENSOR CO2 EXT</b></th>
+                                <th id="totalTemp" key="totalTemp" class="tr"><b>C/SENSOR T° EXT</b></th>
+                                <th id="totalLuz" key="totalLuz" class="tr"><b>C/SENSOR APERTURA PUERTA EXT</b></th>
+                                <th id="totalServicios" key="totalServicios" class="tr"><b>TOTAL SERVICIOS</b></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <br><br>
+            <div class="x_panel">
+                <div class="row">
+                    <table id="Tb_Servicios" class="table table-striped table-bordered display nowrap">
+                        <thead>
+                            <tr>
+                                <th class="tr" key="idservicio">ID SERVICIO <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="detalleservicio">DETALLE <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="contenedorservicio">CONTENEDOR <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="bookingservicio">BOOKING <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="commodityservicio">COMMODITY <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="navieraservicio">NAVIERA <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="naveservicio">NAVE <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="puertoorigenservicio">PUERTO ORIGEN <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="puertodestinoservicio">PUERTO DESTINO <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="fechainicioservicio">FECHA INICIO AC LIVENTUS <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="etapodservicio">ETA POD <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="setpointacservicio">SETPOINT CO2 <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="setpointservicio">SETPOINT T° <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="modemservicio">C/MODEM ALMA <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="co2externo">C/SENSOR CO2 EXT <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="tempexterna">C/SENSOR T° EXT <i align="right " class="fa fa-fw fa-sort"></i></th>
+                                <th class="tr" key="sensorluz">C/SENSOR APERTURA PUERTA EXT <i align="right " class="fa fa-fw fa-sort"></i></th>
+                            </tr>
+                            <tr>
+                                <th class="tr" key="idservicio"></th>
+                                <th></th>
+                                <th class="tr" key="contenedorservicio">CONTENEDOR</th>
+                                <th class="tr" key="bookingservicio">BOOKING</th>
+                                <th class="tr" key="commodityservicio">COMMODITY</th>
+                                <th class="tr" key="navieraservicio">NAVIERA</th>
+                                <th class="tr" key="naveservicio">NAVE</th>
+                                <th class="tr" key="puertoorigenservicio">PUERTO ORIGEN</th>
+                                <th class="tr" key="puertodestinoservicio">PUERTO DESTINO</th>
+                                <th class="tr" key="fechainicioservicio">FECHA INICIO AC LIVENTUS</th>
+                                <th class="tr" key="etapodservicio">ETA POD</th>
+                                <th class="tr" key="setpointacservicio">SETPOINT AC</th>
+                                <th class="tr" key="setpointservicio">SETPOINT TEMPERATURA</th>
+                                <th class="tr" key="modemservicio">MODEM ALMA</th>
+                                <th class="tr" key="co2externo">CO2 EXTERNO</th>
+                                <th class="tr" key="tempexterna">TEMPERATURA EXTERNA</th>
+                                <th class="tr" key="sensorluz">SENSOR APERTURA PUERTA</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="x_panel">
+            <div class="row">
+                <i key="PieHistoricos">
+                    <b> <label class="tr" key="AvisoConfidencialidad">Aviso de Confidencialidad: </label> </b>
+                    <label class="tr" key="MensajeConfidencialidadHistoricos">
+                        La información aquí contenida es preliminar, obtenida en base a un sistema de interconexión remoto vía 3G, y que puede sufrir modificaciones. Toda la información y los datos que la presente plataforma proporciona tienen carácter meramente informativo. Los autores no se hacen responsables de su exactitud, actualización o validez, y por tanto están exentos de toda responsabilidad derivada de su incorrección, omisión, falta de actualización o retraso, así como de cualquier pérdida, o daño que pudiera causar su uso o exposición por parte de terceros (autorizados o no). Toda la información se proporciona en los términos en que se visualiza, pudiendo no ser exactamente correcta, acertada o definitiva. Cualquier forma no autorizada de distribución, copia, duplicación, reproducción, o venta (total o parcial) del contenido de esta web, tanto para uso personal como comercial, constituirá una infracción de los derechos de propiedad de los autores. El Usuario se compromete a no utilizar cualquiera de los Contenidos que la plataforma ponga a su disposición para desarrollar actividades contrarias a las leyes, a la moral o al orden público y, en general, a hacer un uso conforme a las presentes condiciones generales. En cualquier caso, el usuario se compromete a mantener la estricta confidencialidad de la información técnica a la que pudiera acceder, gestionando su uso de manera interna, y no utilizando dicha información para afectar derechos o fundar reclamos en contra de terceros.    
+                    </label>
+                </i>
+            </div>
+        </div>
+    </div>
+    <!--Fin Modal de Servicios-->
+    <!--Modal datos [CalidadAlertaAzul] -->
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="margin-left:80px; margin-right:10px;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="width:50%">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel1">ALERTA DE CALIDAD</h5>
+                </div>
+                <div class="modal-body">
+                    <h5> Las alertas de CO2 son desencadenadas solo si el 80% de las muestras analizadas en el último día están fuera de rango </h5>
+                    <table id="Tb_AlertaCalidad" class="table table-striped table-bordered display nowrap">
+                        <thead>
+                            <tr>
+                                <td class="tr" align="center" key="tipoalerta"><b>TIPO ALERTA</b></td>
+                                <td class="tr" align="center" key="fechaalerta"><b>FECHA ALERTA</b></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="td" align="center">CO2 alto</td>
+                                <td class="td" align="center">30/07/2019 08:45:00</td>
+                            </tr>
+                            <tr>
+                                <td class="td" align="center">CO2 bajo</td>
+                                <td class="td" align="center">31/07/2019 10:23:00</td>
+                            </tr>
+                            <tr>
+                                <td class="td" align="center">CO2 alto</td>
+                                <td class="td" align="center">30/08/2019 08:45:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal datos-->
+    <!--Modal datos [LogisticaAlertaAzul] -->
+    <div class="modal fade" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="margin-left:80px; margin-right:10px;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="width:50%">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h5 class="modal-title" id="myModalLabel2">ALERTAS LOGÍSTICAS</h5>
+                </div>
+                <div class="modal-body">
+                    <table id="Tb_AlertaLogistica" class="table table-striped table-bordered display nowrap">
+                        <thead>
+                            <tr>
+                                <td class="tr" align="center" key="tipoalerta"><b>TIPO ALERTA</b></td>
+                                <td class="tr" align="center" key="tipoalerta"><b>DETALLE ALERTA</b></td>
+                                <td class="tr" align="center" key="fechaalerta"><b>FECHA ALERTA</b></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="td" align="center">Cambio ETA</td>
+                                <td class="td" align="center">Retraso de 2 días</td>
+                                <td class="td" align="center">30/07/2019 08:45:00</td>
+                            </tr>
+                            <tr>
+                                <td class="td" align="center">Cambio ETA</td>
+                                <td class="td" align="center">Retraso de 1 día</td>
+                                <td class="td" align="center">05/08/2019 08:45:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal datos-->
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal1" id="CalidadAlertaAzul" style="display:none;"></button>
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal2" id="LogisticaAlertaAzul" style="display:none;"></button>
+
+</body>
+</html>
+
+<script type="text/javascript">
+    var lenguaje = getCookie("Lenguaje");
+
+    var alertaSemanas = $('#alertaSemanas').hide();
+
+    function ocultoIdServicio() {
+        $('#Tb_Servicios thead tr:eq(0) th:eq(0)').hide();
+        $('#Tb_Servicios thead tr:eq(1) th:eq(0)').hide();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    function eliminoTablasHitoricas() {
+        var table1 = $('#Tb_Servicios').DataTable();
+        table1.destroy();
+
+        var table2 = $('#Tb_Servicios_Totalizador').DataTable();
+        table2.destroy();
+    }
+
+    function cargaTablasHistoricas() {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetContadoresHistorico", "Servicio")',
+            success: function (response) {
+                var data = [];
+                //var json = JSON.parse(response);
+                data.push([response.ContadorModem,
+                            response.ContadorControlador,
+                            response.ContadorCO2,
+                            response.ContadorTemperatura,
+                            response.ContadorLuz,
+                            response.ContadorTotal]);
+
+                var table = $('#Tb_Servicios_Totalizador').DataTable({
+                    data: data,
+                    dom: 't',
+                    scrollY: false,
+                    scrollX: false,
+                    scrollCollapse: false,
+                    paging: false,
+                    orderCellsTop: true
+                });
+
+                $(table.table().container()).on('keyup', 'thead input', function () {
+                    table
+                        .column($(this).data('index'))
+                        .search(this.value)
+                        .draw();
+                });
+
+            }
+        });
+
+
+        $('#Tb_Servicios thead tr:eq(1) th:gt(1)').each(function (i) {
+            var title = $('#example thead tr:eq(0) th:gt(1)').eq($(this).index()).text();
+            $(this).html('<input type="text" class="form-control" data-index="' + i + '"/>');
+        });
+
+        if (lenguaje == "es") {
+            var table = $("#Tb_Servicios").DataTable({
+                orderCellsTop: true,
+                fixedColumns: {
+                    leftColumns: 2
+                },
+                scrollX: true,
+                pageLength: 15,
+                language: {
+                    "url": "",
+                    "infoThousands": ",",
+                    "emptyTable": "No hay datos disponibles en la tabla.",
+                    "info": "Del _START_ al _END_ de _TOTAL_ ",
+                    "infoEmpty": "Mostrando 0 registros de un total de 0.",
+                    "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "infoPostFix": "(actualizados)",
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "searchPlaceholder": "Dato para buscar",
+                    "zeroRecords": "No se han encontrado coincidencias.",
+                    "paginate": {
+                        "first": "Primera",
+                        "last": "Última",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                //dom: '<il<t>pf>',  //'<"wrapper"fltip><"clear">',
+                ajax: {
+                    metodo: 'POST',
+                    url: '@Url.Action("GetHistoricoServicios", "Servicio")',
+                    dataType: 'json',
+                    dataSrc: ''
+                },
+                columns: [
+                {
+                    data: "IdServicio",
+                    className: "hidden",
+                },
+                {
+                    targets: -1,
+                    data: null,
+                    className: "center",
+                    defaultContent: '<i id="DetailServicio" class="fa fa-search fa-2x"></i>'
+                },
+                { "data": "Contenedor" },
+                { "data": "Booking" },
+                { "data": "Commodity" },
+                { "data": "Naviera" },
+                { "data": "Nave" },
+                { "data": "PuertoOrigen" },
+                { "data": "PuertoDestino" },
+                {
+                    "data": "FechaControlador",
+                    "render":
+                    function (data, type, row, meta) {
+                        if (data != null) {
+                            var fecha = FormatDate(data);
+                            return fecha;
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    "data": "EtaPuerto",
+                    "render":
+                    function (data, type, row, meta) {
+                        if (data != null) {
+                            var fecha = FormatDate(data);
+                            return fecha;
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                { "data": "SetpointAC" },
+                { "data": "SetpointT" },
+                { "data": "Modem" },
+                { "data": "CO2Ext" },
+                { "data": "TemperaturaExt" },
+                { "data": "AperturaPuerta" }
+                ],
+            });
+        } else {
+            var table = $("#Tb_Servicios").DataTable({
+                orderCellsTop: true,
+                fixedColumns: {
+                    leftColumns: 2
+                },
+                scrollX: true,
+                pageLength: 15,
+                ajax: {
+                    metodo: 'POST',
+                    url: '@Url.Action("GetHistoricoServicios", "Servicio")',
+                    dataType: 'json',
+                    dataSrc: ''
+                },
+                columns: [
+                {
+                    data: "IdServicio",
+                    className: "hidden",
+                },
+                {
+                    targets: -1,
+                    data: null,
+                    className: "center",
+                    defaultContent: '<i id="DetailServicio" class="fa fa-search fa-2x"></i>'
+                },
+                { "data": "Contenedor" },
+                { "data": "Booking" },
+                { "data": "Commodity" },
+                { "data": "Naviera" },
+                { "data": "Nave" },
+                { "data": "PuertoOrigen" },
+                { "data": "PuertoDestino" },
+                { 
+                    "data": "FechaControlador",
+                    "render":
+                    function (data, type, row, meta) {
+                        if (data != null) {
+                            var fecha = FormatDate(data);
+                            return fecha;
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    "data": "EtaPuerto",
+                    "render":
+                    function (data, type, row, meta) {
+                        if (data != null) {
+                            var fecha = FormatDate(data);
+                            return fecha;
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                { "data": "SetpointAC" },
+                { "data": "SetpointT" },
+                { "data": "Modem" },
+                { "data": "CO2Ext" },
+                { "data": "TemperaturaExt" },
+                { "data": "AperturaPuerta" }
+                ],
+            });
+        }
+
+        $(table.table().container()).on('keyup', 'thead input', function () {
+            table
+           .column(($(this).data('index')) + 2)
+           .search(this.value)
+           .draw();
+        });
+    }
+
+    $(document).ready(function () {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 3,
+                NombreVista: 'HISTORICOSVIEW'
+            }
+
+        });
+
+        cargaTablasHistoricas();
+
+    });
+    
+    function FormatDate(data) {
+        var dateString = data.substr(6);
+        var currentTime = new Date(parseInt(dateString));
+        var month = currentTime.getMonth() + 1;
+        var day = currentTime.getDate();
+        var year = currentTime.getFullYear();
+
+        if (month < 10) {
+            month = "0" + month;
+        } else {
+            month;
+        }
+
+        if (day < 10) {
+            day = "0" + day;
+        } else {
+            day;
+        }
+
+        var date = day + "-" + month + "-" + year;
+        return date;
+    }
+
+
+    function init() {
+
+        // Pop-up  CalidadAlertaAmarilla
+        $('#Tb_Servicios tbody').on('click', '#AlertBlueCalidad', function () {
+            //var data = table.row($(this).parents('tr')).data();
+
+            $('#CalidadAlertaAzul').trigger('click');
+        });
+
+        // Pop-up  LogisticaAlertaAmarilla
+        $('#Tb_Servicios tbody').on('click', '#AlertBlueLogistica', function () {
+            //var data = table.row($(this).parents('tr')).data();
+
+            $('#LogisticaAlertaAzul').trigger('click');
+        });
+
+        // DetalleServicio -> href
+        $('#Tb_Servicios tbody').on('click', '#DetailServicio', function (e) {  //replicar para todos los llamados
+            e.preventDefault();
+            var valor = $(this).parents("tr").find("td").html();
+            var url = '@Url.Action("DetalleServicioView", "Servicio")?IdServicio=' + valor;
+            window.location.href = url;
+        });
+
+    }
+
+    ocultoIdServicio();
+    /*$('#Tb_Servicios thead tr:eq(1) th').each(function (i) {
+        var title = $('#Tb_Servicios thead tr:eq(0) th').eq($(this).index()).text();
+        if ($(this).index() != 0) {
+            $(this).html('<input type="text" class="form-control"  data-index="' + i + '"/>');
+        }
+    });*/
+
+    $("#EliminarFiltros").on('click', function () {
+
+        alertaSemanas.hide();
+
+        $("#FechaDesde").val("");
+        $("#FechaHasta").val("");
+
+        $("#FechaDesde").selectpicker('refresh');
+        $("#FechaHasta").selectpicker('refresh');
+
+        eliminoTablasHitoricas();
+        cargaTablasHistoricas();
+    });
+
+    $("#FiltroSemanas").click(function () {
+
+        alertaSemanas.hide();
+
+        var semanaInicio = $("#FechaDesde").val();
+        var semanaFin = $("#FechaHasta").val();
+
+        if ((semanaInicio != "") && (semanaFin != "")) {
+            var table1 = $('#Tb_Servicios').DataTable();
+            table1.destroy();
+
+            $('#Tb_Servicios thead tr:eq(1) th:gt(1)').each(function (i) {
+                var title = $('#example thead tr:eq(0) th:gt(1)').eq($(this).index()).text();
+                $(this).html('<input type="text" class="form-control" data-index="' + i + '"/>');
+            });
+
+            var table = $("#Tb_Servicios").DataTable({
+                orderCellsTop: true,
+                fixedColumns: {
+                    leftColumns: 2
+                },
+                pageLength: 15,
+                language: {
+                    "url": "",
+                    "infoThousands": ",",
+                    "emptyTable": "No hay datos disponibles en la tabla.",
+                    "info": "Del _START_ al _END_ de _TOTAL_ ",
+                    "infoEmpty": "Mostrando 0 registros de un total de 0.",
+                    "infoFiltered": "(filtrado de un total de _MAX_ registros)",
+                    "infoPostFix": "(actualizados)",
+                    "lengthMenu": "Mostrar _MENU_ registros",
+                    "loadingRecords": "Cargando...",
+                    "processing": "Procesando...",
+                    "search": "Buscar:",
+                    "searchPlaceholder": "Dato para buscar",
+                    "zeroRecords": "No se han encontrado coincidencias.",
+                    "paginate": {
+                        "first": "Primera",
+                        "last": "Última",
+                        "next": "Siguiente",
+                        "previous": "Anterior"
+                    }
+                },
+                //dom: '<il<t>pf>',  //'<"wrapper"fltip><"clear">',
+                ajax: {
+                    metodo: 'POST',
+                    url: '@Url.Action("GetHistoricoServiciosFiltrados", "Servicio")',
+                    dataType: 'json',
+                    dataSrc: '',
+                    data: {
+                        fechaInicio: semanaInicio,
+                        fechaTermino: semanaFin
+                    }
+                },
+                columns: [
+                {
+                    data: "IdServicio",
+                    className: "hidden",
+                },
+                {
+                    //targets: -1,
+                    data: null,
+                    className: "center",
+                    defaultContent: '<i id="DetailServicio" class="fa fa-search fa-2x"></i>'
+                },
+                { "data": "Contenedor" },
+                { "data": "Booking" },
+                { "data": "Commodity" },
+                { "data": "Naviera" },
+                { "data": "Nave" },
+                { "data": "PuertoOrigen" },
+                { "data": "PuertoDestino" },
+                {
+                    "data": "FechaControlador",
+                    "render":
+                    function (data, type, row, meta) {
+                        if (data != null) {
+                            var fecha = FormatDate(data);
+                            return fecha;
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                {
+                    "data": "EtaPuerto",
+                    "render":
+                    function (data, type, row, meta) {
+                        if (data != null) {
+                            var fecha = FormatDate(data);
+                            return fecha;
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+                { "data": "SetpointAC" },
+                { "data": "SetpointT" },
+                { "data": "Modem" },
+                { "data": "CO2Ext" },
+                { "data": "TemperaturaExt" },
+                { "data": "AperturaPuerta" }
+                ],
+            });
+
+            $(table.table().container()).on('keyup', 'thead input', function () {
+                table
+               .column(($(this).data('index')) + 2)
+               .search(this.value)
+               .draw();
+            });
+
+            var table2 = $('#Tb_Servicios_Totalizador').DataTable();
+            table2.destroy();
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetContadoresHistoricoFiltrados", "Servicio")',
+                data: {
+                    fechaInicio: semanaInicio,
+                    fechaTermino: semanaFin
+                },
+                success: function (response) {
+                    var data = [];
+                    //var json = JSON.parse(response);
+                    data.push([response.ContadorModem,
+                                response.ContadorControlador,
+                                response.ContadorCO2,
+                                response.ContadorTemperatura,
+                                response.ContadorLuz,
+                                response.ContadorTotal]);
+
+                    var table = $('#Tb_Servicios_Totalizador').DataTable({
+                        data: data,
+                        dom: 't',
+                        scrollY: false,
+                        scrollX: false,
+                        scrollCollapse: false,
+                        paging: false,
+                        orderCellsTop: true
+                    });
+
+                    $(table.table().container()).on('keyup', 'thead input', function () {
+                        table
+                            .column($(this).data('index'))
+                            .search(this.value)
+                            .draw();
+                    });
+
+                }
+            });
+        } else {
+            alertaSemanas.show();
+        }
+    });
+
+</script>

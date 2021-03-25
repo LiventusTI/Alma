@@ -1,0 +1,817 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Syncfusion.EJ2;
+@using ProyectoAlmaInicio.Models;
+
+
+<div class="main-content e-responsive" id="main-text">
+    <div class="sidebar-content sidebar" style="display:flow-root; min-height:600px;">
+
+        <div class="control-section col-lg-12" style="height: 1000px;">
+
+
+            <div class="col-lg-12 control-section toast-default-section" hidden>
+                <div class="control_wrapper">
+                    @Html.EJS().Toast("toast_type").Position(p => p.X("Right")).TimeOut(5000).Close("onclose").Created("created").BeforeOpen("onBeforeOpen").Render()
+                    <div id="toast_types">
+                        <div>
+                            @Html.EJS().Button("info_Toast").CssClass("e-btn e-control e-info").Content("Info Message").Render()
+                            @Html.EJS().Button("success_Toast").CssClass("e-btn e-contro e-success").Content("Success Message").Render()
+                            @Html.EJS().Button("warning_Toast").CssClass("e-btn e-control e-warning").Content("Warning Message").Render()
+                            @Html.EJS().Button("error_Toast").CssClass("e-btn e-control e-danger").Content("Danger Message").Render()
+                        </div>
+                        <div style="padding-top: 15px">
+                            @Html.EJS().Button("hideToast").CssClass("e-btn e-control").Content("Hide All").Render()
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h4 class="h4 tr" key="documentosComercial">LIBRETA DE DESTINATARIOS</h4>
+            <hr style="border-width: medium;" />
+
+            <div class="row">
+                <div class="control-section col-lg-12">
+                    <span id='msg'></span>
+                    @*{
+                            List<object> cols = new List<object>();
+                            cols.Add(new { field = "FechaControlador", direction = "Descending" });
+                        }*@
+
+                    @(Html.EJS().Grid<Clases.Destinatario>("AgendaDestintario").DataSource((IEnumerable<Clases.Destinatario>)ViewBag.listaDestinatarios).FilterSettings(filter => filter.Type(Syncfusion.EJ2.Grids.FilterType.Excel)).AllowSelection()
+                            .DetailTemplate("#detailtemplate").Columns(col =>
+                            {
+                                col.Field("").HeaderText("Commodities").Template("#templateVerDetalle").Width("130").Add();
+                                col.Field("").HeaderText("Acciones").Template("#templateAcciones").Width("150").Add();
+                                col.Field(p => p.empresa_destinatario).HeaderText("Empresa Destinatario").Width("200").Add();
+                                col.Field(p => p.nombre_actividad_empresa).HeaderText("Actividad Empresa").Width("200").Add();
+                                col.Field(p => p.nombre_pais_contacto).HeaderText("País Contacto").Width("200").Add();
+                                col.Field(p => p.nombre_puerto_contacto).HeaderText("Puerto Contacto").Width("200").Add();
+                                col.Field(p => p.nombre_contacto).HeaderText("Nombre Contacto").Width("200").Add();
+                                col.Field(p => p.email_contacto).HeaderText("Email Contacto").Width("200").Add();
+                                col.Field(p => p.telefono_contacto).HeaderText("Teléfono Contacto").Width("200").Add();
+                            }).AllowResizing(true).AllowReordering().AllowSorting(true).EnablePersistence(true).AllowPaging(true).PageSettings(page => page.PageCount(5)).AllowFiltering(true).SelectionSettings(select => select.CellSelectionMode(Syncfusion.EJ2.Grids.CellSelectionMode.Flow).Mode(Syncfusion.EJ2.Grids.SelectionMode.Cell).Type(Syncfusion.EJ2.Grids.SelectionType.Single)).CellSelected("onCellSelected").Render())
+                </div>
+            </div>
+
+            @**** SECCIONES TABLA ****@
+            <script id="templateVerDetalle" type="text/x-template">
+                <p class="texto1">Ver</p>
+            </script>
+
+            <script id="templateAcciones" type="text/x-template">
+                <button onclick="clickBotonEditar()" id="botonEditar" data-toggle="modal" data-target="#exampleModal" value="${id_destinatario}" title="Editar Destinatario" class="btn fa fa-edit" style="background:white; border:1px gray solid; padding: 2px 10px 2px 10px;"></button>
+                <button onclick="clickBotonBorrar()" id="botonBorrar" value="${id_destinatario}" title="Borrar Destinatario" class="btn fa fa-trash" style="background:white; border:1px gray solid; padding: 2px 10px 2px 10px;"></button>
+                <button onclick="clickBotonNuevoEmbarque()" id="botonNuevoEmbarque" value="${id_destinatario}" title="Nuevo Embarque" class="btn fa fa-ship" style="background:white; border:1px gray solid; padding: 2px 10px 2px 10px;"></button>
+            </script>
+
+
+
+            <script type="text/x-template" id="detailtemplate">
+                <table class="detailtable" width="100%">
+                    <colgroup>
+                        <col width="35%" />
+                        <col width="35%" />
+                        <col width="30%" />
+                    </colgroup>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span style="font-weight: 500;">Commodities: </span>${lista_commodities}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </script>
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    // TOAS FUNCTIONS
+    var toast_titulo1 = '¡Advertencia!';
+    var toast_titulo2 = '¡Muy bien!';
+    var toast_titulo3 = '¡Error!';
+    var toast_titulo4 = '¡Información!';
+    var toast_content1 = 'El destinatario fue creado exitosamente.';
+    var toast_content2 = 'El destinatario fue editado exitosamente.';
+    var toast_content3 = 'El destinatario fue eliminado exitosamente.';
+    var toast_content4 = 'Error al asignar/programar destinatario.';
+    var toast_content5 = 'El destinatario no pudo ser creado.';
+
+    if (lang === 'en') {
+        toast_titulo1 = 'Warnings!';
+        toast_titulo2 = 'Well done!';
+        toast_titulo3 = 'Error!';
+        toast_titulo4 = 'Information';
+        toast_content1 = 'The addressee was created successfully.';
+        toast_content2 = 'The addressee was edited successfully.';
+        toast_content3 = 'The addressee was deleted successfully.';
+        toast_content4 = 'Error assigning / programming sensor to the container, the possible reasons for the error are: Serial number wrongly typed, there is no connection to Emerson servers, the sensor has an active trip created from another application, or an unidentified error.';
+        toast_content5 = 'The addressee could not be created.';
+    }
+
+    var toasts = [
+        { title: toast_titulo1, content: 'Advertencia.', cssClass: 'e-toast-warning', icon: 'e-warning toast-icons' },
+        { title: toast_titulo2, content: toast_content1, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo2, content: toast_content2, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo2, content: toast_content3, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo3, content: toast_content4, cssClass: 'e-toast-danger', icon: 'e-error toast-icons' },
+        { title: toast_titulo3, content: toast_content5, cssClass: 'e-toast-danger', icon: 'e-error toast-icons' },
+        { title: toast_titulo4, content: 'Información.', cssClass: 'e-toast-info', icon: 'e-error toast-icons' }];
+
+    var btnEleHide = document.getElementById('hideToast');
+    var toastObj;
+    var infoBtn = document.getElementById('info_Toast');
+    var warnBtn = document.getElementById('warning_Toast');
+    var successBtn = document.getElementById('success_Toast');
+    var errorBtn = document.getElementById('error_Toast');
+
+    document.onclick = function (e) {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        if (e.target !== infoBtn && e.target !== warnBtn && e.target !== successBtn && e.target !== errorBtn) {
+            toastObj.hide('All');
+        }
+    };
+
+    document.getElementById('hideToast').onclick = function () {
+        toastObj.hide('All');
+    };
+    infoBtn.onclick = function () {
+        toastObj.show(toasts[1]);
+        toastObj.show(toasts[2]);
+        toastObj.show(toasts[3]);
+        toastObj.show(toasts[4]);
+        toastObj.show(toasts[5]);
+    };
+    warnBtn.onclick = function () {
+        toastObj.show(toasts[0]);
+    };
+    successBtn.onclick = function () {
+        toastObj.show(toasts[1]);
+    };
+    errorBtn.onclick = function () {
+        toastObj.show(toasts[2]);
+    };
+
+    var toastObj;
+    function created() {
+        toastObj = this;
+    }
+    function onclose(e) {
+        if (e.toastContainer.childElementCount === 0) {
+            btnEleHide.style.display = 'none';
+        }
+    }
+    function onBeforeOpen() {
+        btnEleHide.style.display = 'inline-block';
+    }
+
+    $(document).ready(function () {
+
+        var urlString = window.location.href;
+        let url = new URL(urlString);
+        let searchString = url.search.slice(1);
+        let searchParams = new URLSearchParams(searchString);
+        let inputParam = 'desplegarMensaje';
+
+        if (searchParams.has(inputParam)) {
+            if (searchParams.get(inputParam) == 1) {
+                desplegarMensaje();
+            }
+            else if (searchParams.get(inputParam) == 2) {
+                desplegarMensajeEditar();
+            }
+            else if (searchParams.get(inputParam) == 3) {
+                desplegarMensajeEliminar();
+            } else if (searchParams.get(inputParam) == 4) {
+                desplegarMensajeError();
+            }
+        }
+    });
+
+    function desplegarMensaje() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[1]);
+        }, 500);
+    }
+    function desplegarMensajeEditar() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[2]);
+        }, 500);
+    }
+    function desplegarMensajeEliminar() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[3]);
+        }, 500);
+    }
+    function desplegarMensajeError() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[4]);
+        }, 500);
+    }
+    // TOAS FUNCTIONS
+
+
+
+
+
+
+    function onCellSelected(args) {
+        var idServicio = args.data["IdServicio"];
+        var idBDServicio = args.data["BDOrigen"];
+        var elemento;
+
+        $.each($('.div-opciones'), function (i, v) {
+            if (document.getElementById(v.id)) {
+                elemento = 'divOpcionesServicio-' + idBDServicio + '-' + idServicio;
+                if (elemento != v.id) {
+                    document.getElementById(v.id).style.display = 'none';
+                }
+            }
+        })
+
+        var cellIndex = args.cellIndex.cellIndex;
+        if (cellIndex == 0) {
+            if (document.getElementById('divOpcionesServicio-' + idBDServicio + '-' + idServicio)) {
+                var div = document.getElementById('divOpcionesServicio-' + idBDServicio + '-' + idServicio);
+                if (div.style.display == 'none') {
+                    div.style.display = 'block';
+                }
+                else {
+                    div.style.display = 'none';
+                }
+            }
+        }
+    }
+
+
+    function clickBotonEditar() {
+        var id_destinatario = event.target.value;
+        console.log('id_destinatario: ' + id_destinatario);
+
+        $.ajax({
+            type: "POST",
+            url: "ObtenerDatosDestinatario",
+            data: { id_destinatario: id_destinatario },
+            success: function (result) {
+
+                // TITULO
+                var titulo_modal = document.getElementById('modal-title');
+
+                titulo_modal.innerHTML = 'Editar Destinatario';
+
+                // DESARROLLO
+                var desarrollo_modal = document.getElementById('modal-body');
+
+                desarrollo_modal.innerHTML = '<div>'
+
+                    + '<input type="hidden" id="id_destinatario" value="' + id_destinatario + '"/>'
+
+                    + '<div id="divInputEmpresa">'
+                    + '<input type="text" id="inputEmpresa"/>'
+                    + '</div>'
+                    + '<br />'
+
+                    + '<div id="divInputActividad">'
+                    + '<input type="text" id="inputActividad"/>'
+                    + '</div>'
+                    + '<br />'
+
+                    + '<div id="divInputPais">'
+                    + '<input type="text" id="inputPais"/>'
+                    + '</div>'
+                    + '<br />'
+
+                    + '<div id="divInputPuerto">'
+                    + '<input type="text" id="inputPuerto"/>'
+                    + '</div>'
+                    + '<br />'
+
+                    + '<div><input type="text" id="inputCommodity"/></div>'
+                    + '<div id="div-tabla-commodities" style="display:none">'
+                    + '<div class="container col-lg-6" style="margin: 10px 0px 10px 0px">'
+                    + '<p style="margin: 5px 5px 0px 0px; text-align: right;">Commodities</p>'
+                    + '<p style="text-align: right;">Seleccionados:</p>'
+                    + '</div>'
+                    + '<div class="col-lg-6" style="overflow-y: auto; height: 100px; margin-bottom: 10px;">'
+                    + '<table id="tableCommodities" style="margin: 10px 0px 10px 0px;"></table>'
+                    + '</div>'
+                    + '</div>'
+                    + '<br />'
+
+                    + '<div id="divInputNombreContacto">'
+                    + '<input type="text" id="inputNombreContacto"/>'
+                    + '</div>'
+                    + '<br />'
+
+                    + '<div id="divInputEmailContacto">'
+                    + '<input type="text" id="inputEmailContacto"/>'
+                    + '</div>'
+                    + '<br />'
+
+                    + '<div id="divInputTelefonoContacto">'
+                    + '<input type="text" id="inputTelefonoContacto"/>'
+                    + '</div>'
+
+                    + '</div>'
+                    ;
+
+                var textBox_empresa = new ej.inputs.TextBox({
+                    placeholder: 'Empresa Destinatario (*)',
+                    value: result.empresa_destinatario
+                });
+                textBox_empresa.appendTo('#inputEmpresa');
+
+                var lista_actividades = @Html.Raw(
+                    Json.Encode(
+                        (ViewBag.lista_actividades_empresa)
+                    )
+                );
+
+                var lista_paises = @Html.Raw(
+                    Json.Encode(
+                        (ViewBag.lista_paises)
+                    )
+                );
+
+                var lista_puertos = @Html.Raw(
+                    Json.Encode(
+                        (ViewBag.lista_puertos)
+                    )
+                );
+
+                var lista_commodities = @Html.Raw(
+                    Json.Encode(
+                        (ViewBag.lista_commodities)
+                    )
+                );
+
+                var comboBox_actividades = new ej.dropdowns.ComboBox({
+                    dataSource: lista_actividades,
+                    fields: { text: 'Name', value: 'Code' },
+                    placeholder: 'Actividad (*)',
+                    value: result.nombre_actividad_empresa,
+                    popupHeight: '300px',
+                    allowFiltering: true,
+                    filtering: function (e) {
+                        var query = new ej.data.Query();
+                        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+                        e.updateData(lista_actividades, query);
+                    },
+                    noRecordsTemplate: '<div><div id="nodata_comboBox_actividades" style="padding-bottom:10px"> La actividad no se encuentra en la lista</div></div>',
+                });
+                comboBox_actividades.appendTo('#inputActividad');
+
+                var comboBox_paises = new ej.dropdowns.ComboBox({
+                    dataSource: lista_paises,
+                    fields: { text: 'Name', value: 'Code' },
+                    placeholder: 'País Destino (*)',
+                    value: result.nombre_pais_contacto,
+                    popupHeight: '300px',
+                    allowFiltering: true,
+                    filtering: function (e) {
+                        var query = new ej.data.Query();
+                        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+                        e.updateData(lista_paises, query);
+                    },
+                    noRecordsTemplate: '<div><div id="nodata_comboBox_paises" style="padding-bottom:10px"> El pais no se encuentra en la lista</div></div>',
+                });
+                comboBox_paises.appendTo('#inputPais');
+
+                var comboBox_puertos = new ej.dropdowns.ComboBox({
+                    dataSource: lista_puertos,
+                    fields: { text: 'Name', value: 'Code' },
+                    placeholder: 'Puerto Destino (*)',
+                    value: result.nombre_puerto_contacto,
+                    popupHeight: '300px',
+                    allowFiltering: true,
+                    filtering: function (e) {
+                        var query = new ej.data.Query();
+                        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+                        e.updateData(lista_puertos, query);
+                    },
+                    noRecordsTemplate: '<div><div id="nodata_comboBox_puertos" style="padding-bottom:10px"> La actividad no se encuentra en la lista</div></div>',
+                });
+                comboBox_puertos.appendTo('#inputPuerto');
+
+                var comboBox_commodities = new ej.dropdowns.ComboBox({
+                    dataSource: lista_commodities,
+                    fields: { text: 'Name', value: 'Code' },
+                    placeholder: 'Commodity que Trabaja',
+                    popupHeight: '300px',
+                    allowFiltering: true,
+                    filtering: function (e) {
+                        var query = new ej.data.Query();
+                        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+                        e.updateData(lista_commodities, query);
+                    },
+                    change: function (e) {
+
+                        var div_tabla_commodities = document.getElementById('div-tabla-commodities');
+                        div_tabla_commodities.style.display = "block";
+                        var tabla_commodities = document.getElementById('tableCommodities');
+                        tabla_commodities.innerHTML = tabla_commodities.innerHTML
+                            + "<tr>"
+                            + "<td>"
+                            + $("#inputCommodity").val()
+                            + "</td>"
+                            + "<td><button onclick=\"borrarCommodity('" + $("#inputCommodity").val() +"')\" class=\"close\"><span style=\"margin-left: 5px\">&times;</span></button></td>"
+                            + "</tr>";
+                        return false;
+
+                    },
+                    noRecordsTemplate: '<div><div id="nodata_comboBox_commodities" style="padding-bottom:10px"> El commodity no se encuentra en la lista</div></div>',
+                });
+                comboBox_commodities.appendTo('#inputCommodity');
+
+
+                $.ajax({
+                    type: "POST",
+                    url: "ObtenerCommoditiesDestinatario",
+                    data: { id_destinatario: id_destinatario },
+                    async: false,
+                    success: function (response) {
+                        var div_tabla_commodities = document.getElementById('div-tabla-commodities');
+                        div_tabla_commodities.style.display = "block";
+                        var tabla_commodities = document.getElementById('tableCommodities');
+
+                        if (response.length > 0) {
+                            response.forEach(function (commodity) {
+
+                                tabla_commodities.innerHTML = tabla_commodities.innerHTML
+                                    + "<tr>"
+                                    + "<td>"
+                                    + commodity.Nombre
+                                    + "</td>"
+                                    + "<td><button onclick=\"borrarCommodity('" + commodity.Nombre + "')\" class=\"close\"><span style=\"margin-left: 5px\">&times;</span></button></td>"
+                                    + "</tr>";
+                            });
+                        }
+
+                    },
+                    error: function (req, status, error) {
+                        alert("Sorry! Problemas en AJAX ObtenerCommoditiesDestinatario");
+                        console.log(req);
+                        console.log(status);
+                        console.log(error);
+                    }
+                });
+
+
+                var textBox_nombreContacto = new ej.inputs.TextBox({
+                    placeholder: 'Nombre Contacto Destino',
+                    value: result.nombre_contacto,
+                });
+                textBox_nombreContacto.appendTo('#inputNombreContacto');
+
+                var textBox_emailContacto = new ej.inputs.TextBox({
+                    placeholder: 'Email Contacto Destino',
+                    value: result.email_contacto,
+                });
+                textBox_emailContacto.appendTo('#inputEmailContacto');
+
+                var textBox_telefonoContacto = new ej.inputs.TextBox({
+                    placeholder: 'Telefono Contacto Destino',
+                    value: result.telefono_contacto,
+                });
+                textBox_telefonoContacto.appendTo('#inputTelefonoContacto');
+
+
+
+                // FINAL
+                var fin_modal = document.getElementById('modal-footer');
+
+                fin_modal.innerHTML = '<button onclick="guardarModal()" class="btn-success btn2">Editar</button>';
+
+
+
+            },
+            error: function (req, status, error) {
+                alert("Sorry! Problemas en AJAX ObtenerDatosDestinatario");
+                console.log(req);
+                console.log(status);
+                console.log(error);
+            }
+        });
+
+    }
+
+    var contenido_nuevo_tabla_commodities = "<tbody>";
+    var commodity_a_borrar = "";
+    var contador_commodities = 0;
+
+    function borrarCommodity(commodity) {
+
+        console.log('borrarCommodity');
+        commodity_a_borrar = commodity;
+        var tabla_commodities = document.getElementById('tableCommodities');
+
+        var str = tabla_commodities.innerHTML;
+        var res = str.split("tr");
+        contenido_nuevo_tabla_commodities = "<tbody>";
+        contador_commodities = 0;
+        res.forEach(recorrerTablaCommodities);
+
+        if (contador_commodities == 1) {
+            var div_tabla_commodities = document.getElementById('div-tabla-commodities');
+            div_tabla_commodities.style.display = "none";
+        }
+        contenido_nuevo_tabla_commodities = contenido_nuevo_tabla_commodities + "</tbody>";
+        tabla_commodities.innerHTML = contenido_nuevo_tabla_commodities;
+    }
+
+    function recorrerTablaCommodities(element, index, array) {
+        var res = element.substring(0, 5);
+        if (res == '><td>') {
+            contador_commodities++;
+            var res2 = element.split("<td>");
+            var res3 = res2[1].split("</td>");
+            if (res3[0] != commodity_a_borrar) {
+                if (contador_commodities > 1) {
+                    contenido_nuevo_tabla_commodities = contenido_nuevo_tabla_commodities + "</tbody><tbody>";
+                }
+                contenido_nuevo_tabla_commodities = contenido_nuevo_tabla_commodities + "<tr" + element + "tr>";
+            }
+        }
+    }
+
+    var contador_commodities = 0;
+    var commodities = [];
+    var texto_commodities = '';
+
+    function guardarModal()
+    {
+        var id_destinatario = document.getElementById("id_destinatario");
+        var empresa_destinatario = document.getElementById("inputEmpresa").ej2_instances[0];
+        var actividad_empresa = document.getElementById("inputActividad").ej2_instances[0];
+        var pais_contacto = document.getElementById("inputPais").ej2_instances[0];
+        var puerto_contacto = document.getElementById("inputPuerto").ej2_instances[0];
+        var nombre_contacto = document.getElementById("inputNombreContacto").ej2_instances[0];
+        var email_contacto = document.getElementById("inputEmailContacto").ej2_instances[0];
+        var telefono_contacto = document.getElementById("inputTelefonoContacto").ej2_instances[0];
+
+
+        var tabla_commodities = document.getElementById('tableCommodities');
+
+        var str = tabla_commodities.innerHTML;
+        var res = str.split("tr");
+        contador_commodities = 0;
+        commodities = [];
+        texto_commodities = '';
+        res.forEach(recorrerTablaCommodities2);
+
+        /*console.log(texto_commodities);
+        console.log(id_destinatario.value);
+        console.log(empresa_destinatario.value);
+        console.log(actividad_empresa.value);
+        console.log(pais_contacto.value);
+        console.log(puerto_contacto.value);
+        console.log(nombre_contacto.value);
+        console.log(email_contacto.value);
+        console.log(telefono_contacto.value);*/
+
+        if ((empresa_destinatario.value == null || empresa_destinatario.value == "")
+            || (actividad_empresa.value == null || actividad_empresa.value == "")
+            || (pais_contacto.value == null || pais_contacto.value == "")
+            || (puerto_contacto.value == null || puerto_contacto.value == "")
+        ) {
+
+            if (empresa_destinatario.value == null || empresa_destinatario.value == "") {
+                $("#inputEmpresa").css("border", "1px solid red");
+            }
+            if (actividad_empresa.value == null || actividad_empresa.value == "") {
+                $("#inputActividad").css("border", "1px solid red");
+            }
+            if (pais_contacto.value == null || pais_contacto.value == "") {
+                $("#inputPais").css("border", "1px solid red");
+            }
+            if (puerto_contacto.value == null || puerto_contacto.value == "") {
+                $("#inputPuerto").css("border", "1px solid red");
+            }
+
+            var texto = '¡Faltan algunos campos obligatorios!';
+            if (lang === 'en') {
+                texto = '¡Some mandatory fields are missing!';
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: texto,
+                confirmButtonColor: '#4ab973',
+            });
+        }
+        else {
+            var titulo = '¿Seguro que deseas editar el destinatario?';
+            var boton1 = 'Sí';
+            var boton2 = 'No';
+            if (lang === 'en') {
+                titulo = 'Are you sure you want to edit the addressee?';
+                boton1 = 'Yes';
+                boton2 = 'No';
+            }
+
+            Swal.fire({
+                title: titulo,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4ab973',
+                cancelButtonColor: '#d33',
+                confirmButtonText: boton1,
+                cancelButtonText: boton2
+            }).then((result) => {
+                if (result.value) {
+
+
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("EditarDestinatario", "Destinatarios")',
+                        dataType: 'json',
+                        dataSrc: '',
+                        async: false,
+                        data: {
+                            id_destinatario: id_destinatario.value,
+                            empresa: empresa_destinatario.value,
+                            actividad: actividad_empresa.value,
+                            pais: pais_contacto.value,
+                            puerto: puerto_contacto.value,
+                            nombre_contacto: nombre_contacto.value,
+                            email: email_contacto.value,
+                            telefono: telefono_contacto.value,
+                            commodities: texto_commodities
+                        },
+                        success: function (result) {
+
+                            if (result > 0) {
+                                var ruta1 = window.location.protocol;
+                                var ruta2 = window.location.hostname;
+                                var ruta3 = window.location.port;
+                                var ruta = ruta1 + "//" + ruta2 + ":" + ruta3 + "/ProyectoAlma/Destinatarios/DestinatariosView?desplegarMensaje=2";
+
+                                window.location.href = ruta;
+
+                            }
+                        },
+                        error: function (req, status, error) {
+                            alert("Sorry! Problemas en AJAX EditarDestinatario");
+                        }
+                    });
+                }
+            });
+        }
+
+    }
+
+    function recorrerTablaCommodities2(element, index, array) {
+        var res = element.substring(0, 5);
+        if (res == '><td>') {
+            contador_commodities++;
+            var res2 = element.split("<td>");
+            var res3 = res2[1].split("</td>");
+            commodities.push(res3[0]);
+
+            if (contador_commodities == 1) {
+                texto_commodities = res3[0];
+            } else {
+                texto_commodities = texto_commodities + ', ' + res3[0];
+            }
+        }
+    }
+
+
+    function clickBotonBorrar() {
+
+        var id_destinatario = event.target.value;
+
+        var titulo = '¡Advertencia!';
+        var texto = '¿Desea eliminar el destinastario?';
+
+        Swal.fire({
+            title: titulo,
+            text: texto,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#4ab973',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Si'
+        }).then((result) => {
+            if (result.value) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "BorrarDestinatario",
+                    data: { id_destinatario: id_destinatario },
+                    success: function (result) {
+                        console.log('result: ' + result);
+
+                        var ruta1 = window.location.protocol;
+                        var ruta2 = window.location.hostname;
+                        var ruta3 = window.location.port;
+                        var ruta = ruta1 + "//" + ruta2 + ":" + ruta3 + "/ProyectoAlma/Destinatarios/DestinatariosView?desplegarMensaje=3";
+
+                        window.location.href = ruta;
+                    },
+                    error: function (req, status, error) {
+                        alert("Sorry! Problemas en AJAX BorrarDestinatario");
+                        console.log(req);
+                        console.log(status);
+                        console.log(error);
+                    }
+                });
+            }
+        })
+    }
+
+    function clickBotonNuevoEmbarque() {
+        var id_destinatario = event.target.value;
+        $.ajax({
+            type: "POST",
+            url: "ObtenerDatosDestinatario",
+            data: { id_destinatario: id_destinatario },
+            success: function (result) {
+                var ruta1 = window.location.protocol;
+                var ruta2 = window.location.hostname;
+                var ruta3 = window.location.port;
+                var ruta = ruta1 + "//" + ruta2 + ":" + ruta3 + "/ProyectoAlma/AgregarContenedor/AgregarContenedorView?destinatario=" + result.empresa_destinatario;
+                window.location.href = ruta;
+
+            },
+            error: function (req, status, error) {
+                alert("Sorry! Problemas en AJAX ObtenerDatosDestinatario");
+            }
+        });
+    }
+
+
+</script>
+
+
+
+<style>
+    .e-card {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab-text {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-control {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-treeview.e-list-text {
+        color: white !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .e-float-text {
+        font-family: Gotham Medium !important;
+    }
+
+    p {
+        margin: 0 0 0px;
+        margin-bottom: 0px;
+    }
+
+    .h4 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .h5 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .main-content {
+        background: #F7F7F7 !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .btn2 {
+        padding: 6px 10px 6px 10px;
+        border-radius: 3px;
+    }
+</style>

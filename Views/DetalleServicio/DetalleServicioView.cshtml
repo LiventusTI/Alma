@@ -1,0 +1,1722 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Syncfusion.EJ2;
+@using ProyectoAlmaInicio.Models;
+@using Syncfusion.EJ2.DropDowns;
+@using Syncfusion.EJ2.Navigations;
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmFthGxyCA9bKVIfiTXuRCEYls3hpm6Zs"></script>
+
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/series-label.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="js/sb-admin.min.js"></script>
+
+
+<div id="rango_beneficio_sup" style="display:none;">@ViewBag.rango_beneficio_sup</div>
+<div id="rango_beneficio_inf" style="display:none;">@ViewBag.rango_beneficio_inf</div>
+<div id="verDivGraficos" style="display:none;">@ViewBag.verDivGraficos</div>
+<div id="poseeMedicionesCO2Alma" style="display:none;">@ViewBag.poseeMedicionesCO2Alma</div>
+<div id="poseeMedicionesTemp" style="display:none;">@ViewBag.poseeMedicionesTemp</div>
+<div id="poseeMedicionesCO2" style="display:none;">@ViewBag.poseeMedicionesCO2</div>
+<div id="poseeMedicionesLuz" style="display:none;">@ViewBag.poseeMedicionesLuz</div>
+
+<div class="main-content e-responsive" id="main-text">
+    <div class="sidebar-content" style="display:flow-root">
+
+        <h4 class="h4 tr" key="detalleContenedor">DETALLE DEL CONTENEDOR</h4>
+        <hr style="border-width: medium;" />
+        <span style="margin: 3px;"></span>
+        <span style="float:right"><input id="btn-finalizar-viaje" class="btn btn-success" key="botonFinalizar" type="button" value="Finalizar Viaje"></span>
+
+        <div class="col-lg-12" style="padding-bottom: 20px">
+            <h5 class="h5 tr" key="datosViaje">DATOS DEL VIAJE</h5>
+            <div class="table-responsive">
+                <table id="DetalleServicio" class="table table-striped table-bordered" style="margin: 0px 0px 0px 0px;">
+                    <thead>
+                        <tr>
+                            <th class="tr" key="contenedor_M">CONTENEDOR</th>
+                            <th class="tr" key="commodity_M">COMMODITY</th>
+                            <th class="tr" key="fechaProgSensores_M" style="min-width:110px">FECHA PROGRAMACIÓN DE SENSORES</th>
+                            <th class="tr" key="fechaEstimadaSalida_M" style="min-width:74px">FECHA ESTIMADA DE SALIDA</th>
+                            <th class="tr" key="fechaEstimadaArribo_M" style="min-width:74px">FECHA ESTIMADA DE ARRIBO</th>
+                            <th class="tr" key="puertoOrigen_M">PUERTO ORIGEN</th>
+                            <th class="tr" key="puertoDestino_M">PUERTO DESTINO</th>
+                            <th class="tr" key="booking_M">BOOKING</th>
+                            <th class="tr" key="naviera_M">NAVIERA</th>
+                            <th class="tr" key="nave_M">NAVE</th>
+                            <th class="tr" key="setpointCO2_M">SETPOINT CO2</th>
+                            <th class="tr" key="setpointTemp_M">SETPOINT T°</th>
+                            <th class="tr" key="conSensorCO2_M">C/SENSOR CO2</th>
+                            <th class="tr" key="conSensorTemp_M">C/SENSOR T°</th>
+                            <th class="tr" key="conSensorLuz_M">C/SENSOR APERTURA PUERTA</th>
+                            <th class="tr" key="descripcion_M">DESCRIPCIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="div_sensores_servicio" class="col-lg-12" hidden="hidden" style="padding-bottom: 20px">
+            <h5 class="h5" key="sensoresAsociados">SENSORES ASOCIADOS</h5>
+            <div class="col-lg-12 row table-responsive">
+                <table id="DetalleSensores" class="table table-striped table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="tr" key="numeroSensor_M">N° SENSOR</th>
+                            <th class="tr" key="tipo_M">TIPO</th>
+                            <th class="tr" key="usuarioProgramador_M">USUARIO PROGRAMADOR</th>
+                            <th class="tr" key="fechaProgramacion_M">FECHA PROGRAMACIÓN</th>
+                            <th class="tr" key="seHanRecibidoDatosSensor_M">SE HAN RECIBIDO DATOS DEL SENSOR</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <div id="div-pestanas-graficos" class="col-lg-12 e-tab-section" style="display:none; padding-bottom: 30px;">
+
+            <h5 class="h5 tr" key="graficosComportamientoContenedor">GRÁFICOS DE COMPORTAMIENTO DEL CONTENEDOR &nbsp; <i class="fa fa-info-circle fa-lg" class="tooltips" style="color: #4AB973" title="- Rango de Beneficio: Si el valor medido se encuentra en este intervalo esto podría influir positivamente en el producto final.  - El 99,9% de los casos en que se produce una baja brusca de CO2 a niveles cercanos a 0 es debido a que el contenedor ha sido abierto. - El tiempo/hora es de zona horaria Santiago, Chile."> </i> </h5>
+
+            @{
+                var template = "<div><div class='name' style='padding-bottom:5px'>${Name}</div><div class='role'>${Role}</div></div>";
+            }
+
+            <div class="e-tab-section">
+                <div class="col-lg-12 content-wrapper row">
+                    <div class="e-sample-resize-container">
+                        <div class="control-section" id="div-co2" style="display: none">
+
+                            <div id="graficoCO2" class="col-lg-12" style="width:100%; height:100%; display:none; padding-bottom:20px;">
+                                @Html.EJS().Chart("ChartCO2").Series(series =>
+                           {
+                               series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.RangeArea).Fill("#088A08").EnableTooltip(false).Opacity(0.3).XName("x").High("high").Low("low").Name("Rango de Beneficio").Add();
+                               
+                               if (ViewBag.sensor_co2_1 != null && ViewBag.sensor_co2_1 != "")
+                               {
+                                   series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                   .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("red").DashArray("5,1").Name("Sensor 1: " + ViewBag.sensor_co2_1).Add();
+                               }
+                               if (ViewBag.sensor_co2_2 != null && ViewBag.sensor_co2_2 != "")
+                               {
+                                   series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                   .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("gray").DashArray("5,1").Name("Sensor 2: " + ViewBag.sensor_co2_2).Add();
+                               }
+                               if (ViewBag.sensor_co2_3 != null && ViewBag.sensor_co2_3 != "")
+                               {
+                                   series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                   .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("orange").DashArray("5,1").Name("Sensor 3: " + ViewBag.sensor_co2_3).Add();
+                               }
+                               if (ViewBag.sensor_co2_4 != null && ViewBag.sensor_co2_4 != "")
+                               {
+                                   series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                   .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("green").DashArray("5,1").Name("Sensor 4: " + ViewBag.sensor_co2_4).Add();
+                               }
+                               if (ViewBag.sensor_co2_5 != null && ViewBag.sensor_co2_5 != "")
+                               {
+                                   series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                   .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("deepskyblue").DashArray("5,1").Name("Sensor 5: " + ViewBag.sensor_co2_5).Add();
+                               }
+
+                           }
+
+                              ).PrimaryXAxis(px => px.Title("Tiempo").ValueType(Syncfusion.EJ2.Charts.ValueType.DateTime)
+                                .LabelFormat("dd-MM-y hh:mm") //.LabelFormat("dd-MM-y hh:mm")
+                                .Maximum(new DateTime(ViewBag.year, ViewBag.month, ViewBag.day))
+                                .IntervalType(Syncfusion.EJ2.Charts.IntervalType.Days)
+                                .MajorGridLines(mg => mg.Width(0)).MinorGridLines(mg => mg.Width(0))
+                                .MajorTickLines(mt => mt.Width(0)).MinorTickLines(mt => mt.Width(0))
+                                .LineStyle(ls => ls.Width(0))
+
+
+                              ).PrimaryYAxis(py => py.Title("CO2 (%)")
+                                .LabelFormat("{value} %")
+                                .Maximum(30) //25
+                                .Minimum(0)
+                                .Interval(5)
+                                .LineStyle(ly => ly.Width(0))
+                              /*.StripLines(sl =>
+                              {
+                                  //sl.Start("4.5").End("10").Color("#49eb34").Opacity(0.2).Visible(true).Border(br => br.Width(0.2)).Text("Rango de Beneficio").TextStyle(tx => tx.Size("18px").Color("#ffffff").FontWeight("600")).Add();
+                                  sl.Size(10).Color("#49eb34").Opacity(0.2).Visible(true).Border(br => br.Width(0.2)).Text("Rango de Beneficio").TextStyle(tx => tx.Size("18px").Color("#ffffff").FontWeight("600")).Add();
+                              })*/
+                              .MajorTickLines(mt => mt.Width(0))
+                              ).ZoomSettings(z => z.EnableMouseWheelZooming(true).EnablePinchZooming(true)
+                              .EnableSelectionZooming(true).Mode(Syncfusion.EJ2.Charts.ZoomMode.X)
+                              .EnableScrollbar(true)).Title("CO2").Tooltip(tt => tt.Enable(true)).Load("chartCO2").Render()
+                            </div>
+
+
+                            <!--<div id="graficoCO2-2" class="col-lg-12" style="display:none;">
+
+                                <iframe id="Grafico" style="display:block; overflow:hidden;" scrolling="no" width="100%" height="320px"></iframe>
+
+                            </div>-->
+
+                            <div id="div-infoSensoresCO2" class="col-lg-12" style="display:none">
+                                @Html.EJS().ListView("co2ListView").Template(template).DataSource(ViewBag.pestana3Data).Render()
+                            </div>
+
+                        </div>
+                        <div id="div-temp" style="display: none">
+
+                            <div id="graficoTemp" class="col-lg-12" style="width:100%; height:100%; display:none;">
+                                @Html.EJS().Chart("ChartTemp").Series(series =>
+                               {
+                                    if (ViewBag.sensor_temp_1 != null && ViewBag.sensor_temp_1 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("green").DashArray("5,1").Name("Sensor 1: " + ViewBag.sensor_temp_1).Add();
+                                    }
+                                    if (ViewBag.sensor_temp_2 != null && ViewBag.sensor_temp_2 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("gray").DashArray("5,1").Name("Sensor 2: " + ViewBag.sensor_temp_2).Add();
+                                    }
+                                    if (ViewBag.sensor_temp_3 != null && ViewBag.sensor_temp_3 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("orange").DashArray("5,1").Name("Sensor 3: " + ViewBag.sensor_temp_3).Add();
+                                    }
+                                    if (ViewBag.sensor_temp_4 != null && ViewBag.sensor_temp_4 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("red").DashArray("5,1").Name("Sensor 4: " + ViewBag.sensor_temp_4).Add();
+                                    }
+                                    if (ViewBag.sensor_temp_5 != null && ViewBag.sensor_temp_5 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("deepskyblue").DashArray("5,1").Name("Sensor 5: " + ViewBag.sensor_temp_5).Add();
+                                    }
+                                }
+                                  ).PrimaryXAxis(px => px.Title("Tiempo")
+                                  .ValueType(Syncfusion.EJ2.Charts.ValueType.DateTime)
+                                  .LabelFormat("dd-MM-y hh:mm") //.LabelFormat("dd-MM-y hh:mm")
+                                  .IntervalType(Syncfusion.EJ2.Charts.IntervalType.Days)
+                                  .MajorGridLines(mg => mg.Width(0)).MinorGridLines(mg => mg.Width(0))
+                                  .MajorTickLines(mt => mt.Width(0)).MinorTickLines(mt => mt.Width(0))
+                                  .EdgeLabelPlacement(Syncfusion.EJ2.Charts.EdgeLabelPlacement.Shift)
+                                  .LineStyle(ls => ls.Width(0))
+                                  ).PrimaryYAxis(py => py.Title("Temperatura (°C)")
+                                    .LabelFormat("{value}°C")
+                                    .Maximum(40)
+                                    .Minimum(-10)
+                                    .Interval(10)
+                                    .LineStyle(ly => ly.Width(0))
+                                    .MajorTickLines(mt => mt.Width(0))
+                                  ).ZoomSettings(z => z.EnableMouseWheelZooming(true).EnablePinchZooming(true)
+                                  .EnableSelectionZooming(true).Mode(Syncfusion.EJ2.Charts.ZoomMode.X)
+                                  .EnableScrollbar(true)).Title("Temperatura Emerson").ChartArea(area => area.Border(br => br.Width(0))).Tooltip(tt => tt.Enable(true)).Load("chartTemp").Render()
+                            </div>
+
+                            <div id="div-infoSensoresTemp" class="col-lg-12" style="display:none">
+                                @Html.EJS().ListView("tempListView").Template(template).DataSource(ViewBag.pestana1Data).Render()
+                            </div>
+
+                        </div>
+                        <div id="div-luz" style="display:none">
+
+                            <div id="graficoLuz" class="col-lg-12" style="width:100%; height:100%; display:none;">
+                                @Html.EJS().Chart("ChartLuz").Series(series =>
+                               {
+                                    if (ViewBag.sensor_luz_1 != null && ViewBag.sensor_luz_1 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("green").DashArray("5,1").Name("Sensor 1: " + ViewBag.sensor_co2_1).Add();
+                                    }
+                                    if (ViewBag.sensor_luz_2 != null && ViewBag.sensor_luz_2 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("gray").DashArray("5,1").Name("Sensor 2: " + ViewBag.sensor_co2_2).Add();
+                                    }
+                                    if (ViewBag.sensor_luz_3 != null && ViewBag.sensor_luz_3 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("orange").DashArray("5,1").Name("Sensor 3: " + ViewBag.sensor_co2_3).Add();
+                                    }
+                                    if (ViewBag.sensor_luz_4 != null && ViewBag.sensor_luz_4 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("red").DashArray("5,1").Name("Sensor 4: " + ViewBag.sensor_co2_4).Add();
+                                    }
+                                    if (ViewBag.sensor_luz_5 != null && ViewBag.sensor_luz_5 != "")
+                                    {
+                                        series.Type(Syncfusion.EJ2.Charts.ChartSeriesType.Line)
+                                        .Marker(mkr => mkr.Visible(true)).XName("x").YName("y").Fill("deepskyblue").DashArray("5,1").Name("Sensor 5: " + ViewBag.sensor_co2_5).Add();
+                                    }
+                                }
+                                  ).PrimaryXAxis(px => px.Title("Tiempo").ValueType(Syncfusion.EJ2.Charts.ValueType.DateTime)
+                                .LabelFormat("dd-MM-y hh:mm") //.LabelFormat("dd-MM-y hh:mm")
+                                  .MajorGridLines(mg => mg.Width(0)).MinorGridLines(mg => mg.Width(0))
+                                  .MajorTickLines(mt => mt.Width(0)).MinorTickLines(mt => mt.Width(0))
+                                  .LineStyle(ls => ls.Width(0))
+                                  ).PrimaryYAxis(py => py.Title("Aperturó Puertas (1: SI) (0: NO)")
+                                    .LabelFormat("{value}")
+                                    .Maximum(1)
+                                    .Minimum(0)
+                                    .Interval(1)
+                                    .LineStyle(ly => ly.Width(0))
+                                    .MajorTickLines(mt => mt.Width(0))
+                                  ).ZoomSettings(z => z.EnableMouseWheelZooming(true).EnablePinchZooming(true)
+                                  .EnableSelectionZooming(true).Mode(Syncfusion.EJ2.Charts.ZoomMode.X)
+                                  .EnableScrollbar(true)).Title("Apertura de Puertas").ChartArea(area => area.Border(br => br.Width(0))).Tooltip(tt => tt.Enable(true)).Load("chartLuz").Render()
+                            </div>
+
+                            <div id="div-infoSensoresLuz" class="col-lg-12" style="display:none">
+                                @Html.EJS().ListView("luzListView").Template(template).DataSource(ViewBag.pestana4Data).Render()
+                            </div>
+
+                        </div>
+                        <div id="div-o2" style="display: none">
+                            <div id="div-infoSensoresO2" class="col-lg-12" style="display:none">
+                                @Html.EJS().ListView("o2ListView").Template(template).DataSource(ViewBag.pestana2Data).Render()
+                            </div>
+                        </div>
+                        @Html.EJS().Tab("orientationTab").Selected("tabSelected").Height("320").ShowCloseButton(false).Created("tabCreated").Items(ViewBag.orientationItems).Render()
+                    </div>
+                </div>
+
+                @*<div class="col-lg-4 property-section">
+                        <table id="property" title="Properties">
+                            <tbody>
+                                <tr>
+                                    <td style="width: 50%;">
+                                        <div>Header Placement</div>
+                                    </td>
+                                    <td style="width: 50%;">
+                                        <div>
+                                            @Html.EJS().DropDownList("orientation").Width("90%").DataSource(ViewBag.orientationData).Value("Top").Change("changeHeaderPosition").Render()
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="width: 50%;">
+                                        <div>Header Styles</div>
+                                    </td>
+                                    <td style="width: 50%;">
+                                        <div>
+                                            @Html.EJS().DropDownList("headerStyles").Width("90%").DataSource(ViewBag.styleData).Value("Default").Change("changeHeaderStyle").Render()
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>*@
+
+            </div>
+
+        </div>
+
+
+        <div class="divmapaLogistico x_title col-lg-12">
+            <h5 class="h5 tr" key="trazabilidadLogisticaServicio">TRAZABILIDAD LOGÍSTICA DEL SERVICIO</h5>
+            @(Html.EJS().Tab("ej2Tab").ContentTemplate( @<div>
+                <div class="e-tab-header">
+                    <!--<div><label id="sensorEmerson2"></label></div>-->
+                    <div><label id="sensorAlma2">Ubicación</label></div>
+                </div>
+                <div class="e-content">
+                    <!--<div>
+                        <div class="col-lg-12" id="TrazabilidadMapaEmerson" style="display:block;">
+
+                            <div id="googleMapEmerson" style="width:100%;height:500px;border:2px solid #999999;"></div>
+                        </div>
+                        <div class="col-lg-12" id="EmersonInactivoMapa" style="display:none; text-align:center;">
+
+                            <div>
+                                <br />
+                                <br />
+                                <br />
+                                <br />
+                                <p class="tr" key="viajeNoRegistraMedicionesEmerson"> Este viaje no registra mediciones de Sensor Emerson. </p>
+                                <br />
+                                <br />
+                                <br />
+                                <br />
+                            </div>
+                        </div>
+                    </div>-->
+                    <div>
+                        <div class="col-lg-12" id="TrazabilidadMapa" style="display:block;">
+
+                            <div id="googleMap" style="width:100%;height:500px;border:2px solid #999999;"></div>
+
+                            <p class="tr"></p>
+                            <p class="tr" key="mensajeMapaUnificado">    Las ubicaciones contenidas en el Mapa se han construido en base da los registros capturados desde el sensor CO2 Generico y sensor Emerson. </p>
+                               
+                        </div>
+                        <div class="col-lg-12" id="ModemInactivoMapa" style="display:none; text-align:center;">
+
+                            <div>
+                                <br />
+                                <br />
+                                <br />
+                                <br />
+                                <p class="tr" key="contactaLiventusVerGrafico"> Solicita a tu contacto habitual de Liventus S.A un modem Alma para la visualización del gráfico. </p>
+                                <br />
+                                <br />
+                                <br />
+                                <br />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>).HeightAdjustMode(HeightStyles.Content).OverflowMode(OverflowMode.Scrollable).Selecting("tabSelecting").Render())
+            <div id="OculteMapa" style="display: none;">
+                <h5 class="h5 tr" key="trazabilidadLogisticaServicio">TRAZABILIDAD LOGÍSTICA DEL SERVICIO</h5>
+                <br>
+                <p class="tr" key="noSeLogroObtenerDatosTrazabilidadLogistica"> No se logró obtener datos para generar la trazabilidad logística del servicio.</p>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <hr />
+                    <b class="tr" key="avisoConfidencialidad">
+                        Aviso de Confidencialidad:
+                    </b>
+                    <p class="tr aviso1" key="MensajeConfidencialidadOngoing">
+                        <i>
+                            La información aquí contenida es provista por un sistema de geolocalización. Pueden existir errores o distorsiones de ubicación que no necesariamente impliquen movimientos reales. Mientras la Aplicación Alma® se mantenga en periodo de pruebas, recomendamos validar mediante la utilización de su sistema de tracking habitual. En caso de dudas, solicitar mayor información a su contacto habitual de Liventus S.A. La información aquí contenida es preliminar, obtenida en base a un sistema de interconexión remoto vía 3G, y que puede sufrir modificaciones. Toda la información y los datos que la presente plataforma proporciona tienen carácter meramente informativo. Los autores no se hacen responsables de su exactitud, actualización o validez, y por tanto están exentos de toda responsabilidad derivada de su incorrección, omisión, falta de actualización o retraso, así como de cualquier pérdida, o daño que pudiera causar su uso o exposición por parte de terceros (autorizados o no). Toda la información se proporciona en los términos en que se visualiza, pudiendo no ser exactamente correcta, acertada o definitiva. Cualquier forma no autorizada de distribución, copia, duplicación, reproducción, o venta (total o parcial) del contenido de esta web, tanto para uso personal como comercial, constituirá una infracción de los derechos de propiedad de los autores. El Usuario se compromete a no utilizar cualquiera de los Contenidos que la plataforma ponga a su disposición para desarrollar actividades contrarias a las leyes, a la moral o al orden público y, en general, a hacer un uso conforme a las presentes condiciones generales. En cualquier caso, el usuario se compromete a mantener la estricta confidencialidad de la información técnica a la que pudiera acceder, gestionando su uso de manera interna, y no utilizando dicha información para afectar derechos o fundar reclamos en contra de terceros.
+                        </i>
+                    </p>
+                    <hr />
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+<script id="index" type="text/x-template">
+    <div id="templateWrap" style="background-color: ${point.text}; border-radius: 3px;">
+        <div class='des' style="color:black; font-family:Roboto; font-style: normal; font-size:16px;padding-right:6px">
+            <span style="color:white;">${point.y}</span>
+        </div>
+    </div>
+</script>
+<script>
+    var dataManager = new ej.data.DataManager({
+        url: 'http://localhost:54290/api/Values',
+        adaptor: new ej.data.WebApiAdaptor
+    });
+    var query = new ej.data.Query();
+</script>
+
+
+<script>
+
+
+    var lang = getCookie("Lenguaje");
+
+    function traducirTextosGraficos() {
+        if (lang === 'en') {
+            $("text").each(function (index) {
+
+                if ($(this).text() === 'CO2 Emerson') {
+                    $(this).text('Emerson CO2');
+                }
+                else if ($(this).text() === 'Tiempo') {
+                    $(this).text('Time');
+                }
+                else if ($(this).text() === 'Temperatura Emerson') {
+                    $(this).text('Emerson Temperature');
+                }
+                else if ($(this).text() === 'Temperatura (°C)') {
+                    $(this).text('Temperature (°C)');
+                }
+                else if ($(this).text() === 'Apertura de Puertas') {
+                    $(this).text('Door opening');
+                }
+                else if ($(this).text() === 'Aperturó Puertas (1: SI) (0: NO)') {
+                    $(this).text('Opened Doors (1: YES) (0: NO)');
+                }
+            });
+        }
+    }
+
+
+
+</script>
+
+<style type="text/css">
+    .h4 {
+        font-family: Gotham Medium !important;
+    }
+
+    .h4,
+    .row {
+        color: black !important;
+    }
+
+    .divgraficoCO2,
+    .divmapaLogistico,
+    .h5 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .main-content {
+        background: #F7F7F7 !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .table {
+        border: 1px solid #dddddd;
+        border-radius: 5px 5px 5px 5px;
+        font-family: Gotham Medium !important;
+        color: black !important;
+    }
+
+    th {
+        width: auto !important;
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    td {
+        width: auto !important;
+        font-size: 10px;
+        font-weight: initial;
+    }
+
+    .borde-tabulador {
+        border-bottom: 1px solid #dee2e6;
+        border-left: 1px solid #dee2e6;
+        border-right: 1px solid #dee2e6;
+    }
+
+    .borde-completo {
+        border: 1px solid #dee2e6;
+    }
+</style>
+<script>
+    //var lenguaje = getCookie("Lenguaje");
+    function tabSelecting(e) {
+        if (e.isSwiped) {
+            e.cancel = true;
+        }
+    }
+
+
+    var ubicacion = { IdModem: "0", Latitud: "0", Longitud: "0" };
+    var ubicacionesLista = [], ubicacionesEmerson = [];
+    var IdControlador;
+    var FechaControlador;
+    var cuenta = 0, cuenta2 = 0;
+
+    $(document).ready(function () {
+
+
+        $("#btn-finalizar-viaje").on('click', function (args) {
+
+            var titulo = '¿Deseas finalizar el viaje del contenedor y sus respectivos sensores, esto provocará que el contenedor se vaya a históricos?';
+            var boton1 = 'Sí';
+            var boton2 = 'No';
+            if (lang === 'en') {
+                titulo = 'Do you want to end the journey of the container and its respective sensors, this will cause the container to go to historical?';
+                boton1 = 'Yes';
+                boton2 = 'No';
+            }
+
+            Swal.fire({
+                title: titulo,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: boton1,
+                cancelButtonText: boton2
+            }).then((result) => {
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                    dataType: 'json',
+                    dataSrc: '',
+                    data: {
+                        TipoVista: 2,
+                        NombreVista: 'Boton-FinalizarViaje'
+                    }
+
+                });
+
+                if (result.value) {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("FinalizarServicioPorId", "DetalleServicio")',
+                        dataType: 'json',
+                        async: false,
+                        data: { idServicio: IdServicio },
+                        success: function (response) {
+                            if (response > 0) {
+                                //mensaje de retroalimentacion
+                                $("#btn-finalizar-viaje").hide();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ConsultarSensoresEmersonPorIdServicio", "DetalleServicio")',
+            dataType: 'json',
+            dataSrc: '',
+            data: { codigo_servicio: IdServicio },
+            async: false,
+            success: function (response) {
+                if (response.length > 0)
+                {
+                    $("#div_sensores_servicio").show();
+                    response.forEach(function (sensor) {
+                        //console.log(sensor);
+
+                        /////***** ARMAR TABLA DETALLE DE SENSORES *****/////
+                        body = "<tr>";
+                        body += "<td>" + sensor.numSerie + "</td>";
+                        body += "<td>" + sensor.proveedor + " - " + sensor.tipo_sensor + "</td>";
+                        body += "<td>" + sensor.usuarioProgramador + "</td>";
+                        body += "<td>" + FormatDateControlador(sensor.fechaProgramacion) + "</td>";
+                        body += "<td>" + sensor.recibioDatos + "</td>";
+                        body += "</tr>";
+
+                        $("#DetalleSensores tbody").append(body);
+
+                        if (sensor.numSerie != null && sensor.numSerie != "" && sensor.tipo_sensor != null && sensor.tipo_sensor != "- SENSOR CO2 GENERICO" && sensor.tipo_sensor != "SENSOR CO2 GENERICO") {
+
+                            //$('#sensorEmerson2').text(sensor.numSerie);
+
+                            $("#tab-1").show();
+                            $("#div_sensores_servicio").show();
+                        } else {
+                            if (sensor.tipo_sensor == "- SENSOR CO2 GENERICO" || sensor.tipo_sensor == "SENSOR CO2 GENERICO" && response.length == 1) {
+
+                                //$('#sensorEmerson2').text("XXXXXXXX");
+                                $("#tab-1").hide();
+                                $("#div_sensores_servicio").hide();
+                            }
+
+                        }
+
+                    });
+
+
+                } else
+                {
+                    //$('#sensorEmerson2').text("XXXXXXXX");
+
+
+                    $("#tab-1").hide();
+                    $("#div_sensores_servicio").hide();
+
+                }
+
+            }
+
+        });
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 2,
+                NombreVista: 'DetalleServicioView'
+            },
+            async: false
+        });
+
+
+        var Contenedor, Booking, Commodity, Naviera, Nave, PuertoOrigen, PuertoDestino, Etd, EtaPuerto, EtaPuerto5, SetpointAC, SetpointT, Modem, CO2Ext, TemperaturaExt, AperturaPuerta, Descripcion, NumModem;
+        var RangoAltoCO2, RangoBajoCO2, RangoAltoO2, RangoBajoO2;
+        var PaltaMax, PaltaMin, ArandanoMax, AranadanoMin, DuraznoNectarinMax, DuraznoNectarinMin, CiruelaMax, CiruelaMin, EsparragoMax, EsparragoMin;
+        var FechaControlador, IdControlador;
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetMapaLogistico", "DetalleServicio")',
+            data: { IdServicio: IdServicio },
+            dataType: 'json',
+            dataSrc: '',
+            async: false,
+            success: function (response) {
+                IdControlador = response.IdControlador;
+                //tFechaControlador = FormatDateControlador(response.FechaControlador);
+                ubicacionesLista = response.UbicacionHistModem;
+                ubicacionesEmerson = response.UbicacionHistEmerson;
+
+                cuenta2 = ubicacionesEmerson.length;
+
+                /*if (cuenta2 == 0) {
+                    $('#TrazabilidadMapaEmerson').hide();
+                    $('#EmersonInactivoMapa').show();
+                }*/
+                if (response.NumModem == null) { NumModem = ""; }
+                else { NumModem = response.NumModem; }
+
+                if (response.Contenedor == null) { Contenedor = ""; }
+                else { Contenedor = response.Contenedor; }
+                if (response.Booking == null) { Booking = ""; }
+                else { Booking = response.Booking; }
+                if (response.Commodity == null) { Commodity = ""; }
+                else { Commodity = response.Commodity; }
+                if (response.Naviera == null) { Naviera = ""; }
+                else { Naviera = response.Naviera; }
+                if (response.Nave == null) { Nave = ""; }
+                else { Nave = response.Nave; }
+                if (response.PuertoOrigen == null) { PuertoOrigen = ""; }
+                else { PuertoOrigen = response.PuertoOrigen; }
+                if (response.PuertoDestino == null) { PuertoDestino = ""; }
+                else { PuertoDestino = response.PuertoDestino; }
+                if (response.FechaControlador == null) { FechaControlador = ""; }
+                else { FechaControlador = FormatDateControlador(response.FechaControlador); }
+                if (response.EtaPuerto == null) { EtaPuerto = ""; }
+                else { EtaPuerto = FormatDate(response.EtaPuerto); }
+                if (response.EtaPuerto5 == null) { EtaPuerto5 = ""; }
+                else { EtaPuerto5 = FormatDate(response.EtaPuerto5); }
+                if (response.Etd == null) { Etd = ""; }
+                else { Etd = FormatDate(response.Etd); }
+                if (response.SetpointAC == null) { SetpointAC = ""; }
+                else { SetpointAC = response.SetpointAC; }
+                if (response.SetpointT == null) { SetpointT = ""; }
+                else { SetpointT = response.SetpointT; }
+                if (response.Modem == null) { Modem = ""; }
+                else { Modem = response.Modem; }
+                if (response.CO2Ext == null) { CO2Ext = ""; }
+                else { CO2Ext = response.CO2Ext; }
+                if (response.TemperaturaExt == null) { TemperaturaExt = ""; }
+                else { TemperaturaExt = response.TemperaturaExt; }
+                if (response.AperturaPuerta == null) { AperturaPuerta = ""; }
+                else { AperturaPuerta = response.AperturaPuerta; }
+                if (response.Descripcion == null) { Descripcion = ""; }
+                else { Descripcion = response.Descripcion; }
+
+
+                if (response.IdEstadoServicioAlma == 4) {
+                    var botonFinalizar = document.getElementById("btn-finalizar-viaje").style.display = 'none';
+                }
+
+
+                RangoAltoCO2 = response.cantSetpointCO2 + 3;
+                RangoBajoCO2 = response.cantSetpointCO2 - 3;
+
+                if (Commodity == "AVOCADOS") {
+                    if (RangoAltoCO2 > 13) RangoAltoCO2 = 13;
+                    if (RangoBajoCO2 < 6) RangoBajoCO2 = 6;
+                }
+
+                if (Commodity == "BLUEBERRIES") {
+                    if (RangoAltoCO2 > 16) RangoAltoCO2 = 16;
+                    if (RangoBajoCO2 < 7) RangoBajoCO2 = 7;
+                }
+
+                /*PaltaMax = 5;
+                PaltaMin = 12;
+                ArandanoMax = 8;
+                AranadanoMin = 16;
+                DuraznoNectarinMax = 12;
+                DuraznoNectarinMin = 17;
+                CiruelaMax = 5;
+                CiruelaMin = 10;
+                EsparragoMax = 10;
+                EsparragoMin = 14;
+
+                if (Commodity == "AVOCADOS") {
+                    RangoAltoCO2 = PaltaMax;
+                    RangoBajoCO2 = PaltaMin;
+                } else if (Commodity == "BLUEBERRIES") {
+                    RangoAltoCO2 = ArandanoMax;
+                    RangoBajoCO2 = AranadanoMin;
+                } else if (Commodity == "NECTARINES" || Commodity == "PEACHES") {
+                    RangoAltoCO2 = DuraznoNectarinMax;
+                    RangoBajoCO2 = DuraznoNectarinMin;
+                } else if (Commodity == "PLUMS") {
+                    RangoAltoCO2 = CiruelaMax;
+                    RangoBajoCO2 = CiruelaMin;
+                } else if (Commodity == "ASPARAGUS") {
+                    RangoAltoCO2 = EsparragoMax;
+                    RangoBajoCO2 = EsparragoMin;
+                }*/
+
+                 body = "<tr>";
+                 body += "<td>" + Contenedor + "</td>";
+                 body += "<td>" + Commodity + "</td>";
+                 body += "<td>" + FechaControlador + "</td>";
+                 body += "<td>" + Etd + "</td>";
+                 body += "<td>" + EtaPuerto + "</td>";
+                 body += "<td>" + PuertoOrigen + "</td>";
+                 body += "<td>" + PuertoDestino + "</td>";
+                 body += "<td>" + Booking + "</td>";
+                 body += "<td>" + Naviera + "</td>";
+                 body += "<td>" + Nave + "</td>";
+                 body += "<td>" + SetpointAC + "</td>";
+                 body += "<td>" + SetpointT + "</td>";
+                 body += "<td>" + CO2Ext + "</td>";
+                 body += "<td>" + TemperaturaExt + "</td>";
+                 body += "<td>" + AperturaPuerta + "</td>";
+                 body += "<td>" + Descripcion + "</td>";
+                 body += "</tr>";
+
+                $("#DetalleServicio tbody").append(body);
+
+                /*if (NumModem != "" && NumModem!= null) {
+                    $('#sensorAlma2').text(NumModem);
+                } else {
+                    $('#sensorAlma2').text("XXXXXXXX");
+                }*/
+
+                if ((response.Modem == 'NO' && response.TemperaturaExt == 'NO' && response.CO2Ext == 'NO') && response.IdCliente != 1253 && response.IdCliente != 1208) {
+                    SinModem();
+                }
+
+                init();
+
+                /*var grid = document.getElementById("DetalleServicio").ej2_instances[0];
+                grid.Datasource = 'ViewBag.servicio';
+                grid.refresh();*/
+
+            }
+
+        });
+    });
+
+    function SinModem() {
+        document.getElementById("TrazabilidadMapa").style.display = 'none';
+        //document.getElementById("Grafico").style.display = 'none';
+        document.getElementById("ModemInactivoMapa").style.display = 'block';
+    }
+
+
+    function FormatDate(data) {
+        var dateString = data.substr(6);
+        var currentTime = new Date(parseInt(dateString));
+        var month = currentTime.getMonth() + 1;
+        var day = currentTime.getDate();
+        var year = currentTime.getFullYear();
+
+        if (month < 10) {
+            month = "0" + month;
+        } else {
+            month;
+        }
+
+        if (day < 10) {
+            day = "0" + day;
+        } else {
+            day;
+        }
+
+        var fecha = currentTime.toLocaleString('pt-PT', { timeZone: 'America/Santiago' })
+        var res = fecha.replace("/", "-");
+        var res = res.replace("/", "-");
+        var res2 = res.slice(0, 10);
+        //var c =new Date().toLocaleString('es-ES', { timeZone: 'America/Santiago' })
+
+        var date = day + "-" + month + "-" + year;
+        return res2;
+    }
+
+    function FormatDateControlador(data) {
+        var dateString = data.substr(6);
+        var currentTime = new Date(parseInt(dateString));
+        var month = currentTime.getMonth() + 1;
+        var day = currentTime.getDate();
+        var year = currentTime.getFullYear();
+        var Hora = currentTime.getHours();
+        var Minutos = currentTime.getMinutes();
+
+        if (month < 10) {
+            month = "0" + month;
+        } else {
+            month;
+        }
+
+        if (day < 10) {
+            day = "0" + day;
+        } else {
+            day;
+        }
+
+        if (Hora < 10 && Hora != 0) {
+            Hora = "0" + Hora;
+        } else if (Hora == 0) {
+            Hora = "00";
+        } else {
+            Hora;
+        }
+
+        if (Minutos < 10 && Minutos != 0) {
+            Minutos = "0" + Minutos;
+        } else if (Minutos == 0) {
+            Minutos = "00";
+        } else {
+            Minutos;
+        }
+
+        var date = day + "-" + month + "-" + year + " " + Hora + ":" + Minutos;
+        return date;
+    }
+
+    function init() {
+
+        var latlng = new google.maps.LatLng(0, 0);
+        var latlngCenter = new google.maps.LatLng(0, 0);
+        var travelCoordinates = [], travelCoordinates2 = [];
+        var cordenada, cordenada2;
+
+        cuenta = ubicacionesLista.length;
+        cuenta2 = ubicacionesEmerson.length;
+
+        /*if (cuenta != 0 && (cuenta-cuenta2) != 0) {
+            document.getElementById("mensajeMapaUnificado").style.display = "block";
+        }*/
+
+        
+        // Configuración del mapa
+        var mapProp = {
+            zoom: 3,
+            center: latlngCenter,
+            mapTypeId: google.maps.MapTypeId.ROADMAP,    //puede ser TERRAIN
+            disableDefaultUI: true,
+            zoomControl: true,
+            mapTypeControl: false,
+            scaleControl: false,
+            streetViewControl: false,
+            fullscreenControl: true
+        };
+
+            // Agregando el mapa al tag de id googleMap
+        var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+        if (cuenta > 0) {
+
+            for (var i = 0 ; i < cuenta ; i++) {
+
+                var latlng = new google.maps.LatLng(ubicacionesLista[i].Latitud, ubicacionesLista[i].Longitud);
+
+                var myinfowindow = new google.maps.InfoWindow({
+                    content: '<div class="infoWindow" <p> Actualización: <b> ' + FormatDateControlador(ubicacionesLista[i].FechaUbicacion) + ' </b> </p> </div>',
+                    maxWidth: 230
+                });
+
+                if (i == cuenta - 1) {
+                    var marker = new google.maps.Marker({
+                        position: latlng,
+                        map: map,
+                        //title: 'Container ' + i + (1),
+                        draggable: false,
+
+                        infoWindow: myinfowindow,
+                        icon: {
+                            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                        }
+                    });
+                } else {
+                    var marker = new google.maps.Marker({
+                        position: latlng,
+                        map: map,
+                        //title: 'Container ' + i + (1),
+                        draggable: false,
+                        infoWindow: myinfowindow,
+                        icon: {
+                            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                        }
+                    });
+                }
+
+                google.maps.event.addDomListener(map, 'click', function () {
+                    infoWindow.close();
+                });
+
+                google.maps.event.addListener(marker, 'click', function () {
+                    //marker.getPosition();
+
+                    this.infoWindow.open(map, this);
+                });
+                //crearMarket(latlng);
+                cordenada = { lat: parseFloat(ubicacionesLista[i].Latitud), lng: parseFloat(ubicacionesLista[i].Longitud) };
+
+                travelCoordinates.push(cordenada);
+                marker.setMap(map);
+
+            }
+
+            // Información de la ruta (coordenadas, color de línea, etc...)
+            var travel = new google.maps.Polyline({
+                path: travelCoordinates,
+                geodesic: false,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+
+
+            travel.setMap(map);
+
+        }
+        else if (cuenta2 > 0 && cuenta == 0) {
+            // Agregando el mapa al tag de id googleMap - Emerson
+            var map2 = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+            for (var i = 0 ; i < cuenta2 ; i++) {
+
+                var latlng2 = new google.maps.LatLng(ubicacionesEmerson[i].Latitud, ubicacionesEmerson[i].Longitud);
+
+                var myinfowindow2 = new google.maps.InfoWindow({
+                    content: '<div class="infoWindow" <p> Actualización: <b> ' + FormatDateControlador(ubicacionesEmerson[i].FechaUbicacion) + ' </b> </p> </div>',
+                    maxWidth: 230
+                });
+
+                if (i == cuenta2 - 1) {
+                    var marker2 = new google.maps.Marker({
+                        position: latlng2,
+                        map: map2,
+                        //title: 'Container ' + i + (1),
+                        draggable: false,
+
+                        infoWindow: myinfowindow2,
+                        icon: {
+                            url: "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+                        }
+                    });
+                } else {
+                    var marker2 = new google.maps.Marker({
+                        position: latlng2,
+                        map: map2,
+                        //title: 'Container ' + i + (1),
+                        draggable: false,
+                        infoWindow: myinfowindow2,
+                        icon: {
+                            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+                        }
+                    });
+                }
+
+                google.maps.event.addDomListener(map2, 'click', function () {
+                    infoWindow.close();
+                });
+
+                google.maps.event.addListener(marker2, 'click', function () {
+                    //marker.getPosition();
+
+                    this.infoWindow.open(map2, this);
+                });
+                //crearMarket(latlng);
+                cordenada2 = { lat: parseFloat(ubicacionesEmerson[i].Latitud), lng: parseFloat(ubicacionesEmerson[i].Longitud) };
+
+                travelCoordinates2.push(cordenada2);
+                marker2.setMap(map2);
+
+            }
+
+            // Información de la ruta EMERSON
+            var travel2 = new google.maps.Polyline({
+                path: travelCoordinates2,
+                geodesic: false,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+
+            travel2.setMap(map2);
+        }
+    }
+
+
+</script>
+
+<script id="coltemplateOrigen" type="text/x-template">
+    <div class="image">
+        <img src="@Url.Content("~/Content/grid/Map.png")" class="e-image" alt="${PuertoOrigen}" /> &nbsp
+        <span id="locationtext">${PuertoOrigen}</span>
+    </div>
+</script>
+
+<script id="coltemplateDestino" type="text/x-template">
+    <div class="image">
+        <img src="@Url.Content("~/Content/grid/Map.png")" class="e-image" alt="${PuertoDestino}" /> &nbsp
+        <span id="locationtext">${PuertoDestino}</span>
+    </div>
+</script>
+
+<style>
+    .gm-style-iw {
+        height: 45px;
+        width: 60%;
+        padding-left: 20px;
+        margin-left: 40px;
+        float: left;
+        line-height: 25px;
+    }
+</style>
+
+<script>
+
+        let params = new URLSearchParams(location.search);
+        var IdServicio = params.get('IdServicio');
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ValidoServicio", "DetalleServicio")',
+            dataType: 'json',
+            dataSrc: '',
+            data: { IdServicio: IdServicio },
+            async: false,
+            success: function (secciones) {
+                if (secciones != null) {
+                    for (var seccion in secciones) {
+                        if (secciones.hasOwnProperty(seccion)) {
+
+                            var dato = secciones[seccion].ClaseSeccion;
+                            var estado = secciones[seccion].Estado;
+
+                            if (dato != '.nada' && estado == 1)
+                                $(dato).hide();
+                            if (estado == 2)
+                                $(dato).show();
+                        }
+                    }
+                }
+            }
+        });
+
+
+
+</script>
+
+
+
+<style>
+    .e-content .e-item {
+        font-size: 12px;
+        padding: 10px;
+        text-align: justify;
+    }
+
+    .e-bigger .e-tab .e-list-item {
+        border-bottom: 1px solid gainsboro;
+    }
+
+    .e-tab .e-list-item {
+        height: 100%;
+        border-bottom: 1px solid gainsboro;
+    }
+
+    .e-bigger .e-tab .e-list-item {
+        height: 100%;
+    }
+
+    .e-tab .e-list-item:last-child {
+        border-bottom: 1px solid gainsboro;
+    }
+
+    .template-container {
+        height: 100%;
+        padding-top: 7px;
+    }
+
+    .left {
+        display: inline-block;
+        vertical-align: top;
+    }
+
+    .empImg {
+        height: 48px;
+        width: 48px;
+    }
+
+    .name, .role {
+        line-height: normal;
+    }
+
+    .name {
+        font-weight: 500;
+    }
+
+    .role {
+        color: grey;
+        font-weight: 100;
+    }
+
+    .empl-info {
+        padding: 7px 0 0 15px;
+    }
+
+    .content-title {
+        height: 50px;
+        display: table;
+        margin: 0 auto;
+    }
+
+    .cnt-text {
+        vertical-align: middle;
+        display: table-cell;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .e-tab .e-listview .e-header {
+        height: 50px;
+    }
+
+    .e-tab .e-listview .e-text {
+        display: block;
+        text-align: center;
+    }
+
+    .property-panel-content {
+        padding: 10px;
+    }
+
+    #orientationTab .e-listview:not(.e-list-template) .e-list-item {
+        height: 100%;
+    }
+
+    #orientationTab .e-tab-text {
+        display: inherit;
+    }
+
+    .e-vertical-tab .e-content .e-item.e-active,
+    .e-vertical-tab .e-content .e-item.e-active ul.e-list-parent {
+        width: 100%;
+    }
+
+
+
+    @@media screen and (max-width: 481px) {
+        .control-section.e-tab-section,
+        .container-fluid,
+        .e-tab-section .content-wrapper,
+        .sb-sample-content-area .e-active {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+
+    @@media screen and (max-width: 376px) {
+        #orientationTab .e-listview:not(.e-list-template) .e-list-item {
+            padding: 0;
+        }
+
+        .e-sample-resize-container {
+            padding: 0 5px;
+        }
+
+        .e-tab .e-content.sb-sample-content-area .e-item.e-active {
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .template-container {
+            padding: 7px 5px 0;
+        }
+
+        #orientationTab .e-content .e-item.e-active {
+            padding: 10px 0;
+        }
+
+        .info {
+            padding: 7px 0 0 8px;
+        }
+    }
+</style>
+
+<script type="text/javascript">
+
+    var tabObj;
+    function tabCreated() {
+        tabObj = document.getElementById('orientationTab').ej2_instances[0];
+    }
+
+    function tabSelected() {
+        var pestana_seleccionada = tabObj.items[tabObj.selectedItem].content;
+        if (pestana_seleccionada == "#div-temp") {
+            var chart = document.getElementById('ChartTemp').ej2_instances[0];
+            chart.refresh();
+        }
+        else if (pestana_seleccionada == "#div-co2") {
+            var chart = document.getElementById('ChartCO2').ej2_instances[0];
+            chart.refresh();
+        }
+        else if (pestana_seleccionada == "#div-luz") {
+            var chart = document.getElementById('ChartLuz').ej2_instances[0];
+            chart.refresh();
+        }
+    }
+
+    // Change event funtion for DropDownList component
+    function changeHeaderPosition(e) {
+
+        tabObj.headerPlacement = e.itemData.value;
+        tabObj.dataBind();
+    }
+
+    // Change event funtion for DropDownList component
+    function changeHeaderStyle(e) {
+        removeStyleClass();
+        let name = e.itemData.value;
+        if (e.itemData.value != null && name === 'Fill') {
+            tabObj.element.classList.add('e-fill');
+        } else if (e.itemData.value != null && name === 'Accent') {
+            tabObj.element.classList.add('e-background');
+            tabObj.element.classList.add('e-accent');
+        }
+    }
+
+    function removeStyleClass() {
+        tabObj.element.classList.remove('e-fill');
+        tabObj.element.classList.remove('e-background');
+        tabObj.element.classList.remove('e-accent');
+    }
+
+</script>
+
+<script>
+
+    $(document).ready(function () {
+
+        console.log(document.getElementById("verDivGraficos").innerHTML);
+        console.log(document.getElementById("poseeMedicionesTemp").innerHTML);
+        console.log(document.getElementById("poseeMedicionesCO2").innerHTML);
+        console.log(document.getElementById("poseeMedicionesCO2Alma").innerHTML);
+        console.log(document.getElementById("poseeMedicionesLuz").innerHTML);
+
+        if (document.getElementById("verDivGraficos").innerHTML == 1) {
+            document.getElementById("div-pestanas-graficos").style.display = "block";
+        }
+
+        if (document.getElementById("poseeMedicionesTemp").innerHTML == "True") {
+            document.getElementById("graficoTemp").style.display = "block";
+        }
+        else {
+            document.getElementById("div-infoSensoresTemp").style.display = "block";
+        }
+
+        if (document.getElementById("poseeMedicionesCO2").innerHTML == "True") {
+            document.getElementById("graficoCO2").style.display = "block";
+        }
+        else {
+            if (document.getElementById("poseeMedicionesCO2Alma").innerHTML != "True") {
+                document.getElementById("div-infoSensoresCO2").style.display = "block";
+            }
+
+        }
+
+        if (document.getElementById("poseeMedicionesLuz").innerHTML == "True") {
+            document.getElementById("graficoLuz").style.display = "block";
+        }
+        else {
+            document.getElementById("div-infoSensoresLuz").style.display = "block";
+        }
+
+        //15-02-2021// GetMapaLogistico ya esta siendo llamado 
+        @*if (document.getElementById("poseeMedicionesCO2Alma").innerHTML == "True" && document.getElementById("poseeMedicionesCO2").innerHTML == "False") {
+
+            //document.getElementById("graficoCO2-2").style.display = "block";
+            var RangoAltoCO2, RangoBajoCO2, FechaControlador, IdControlador, EtaPuerto5, Commodity;
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("GetMapaLogistico", "DetalleServicio")',
+                data: { IdServicio: IdServicio },
+                dataType: 'json',
+                dataSrc: '',
+                async: false,
+                success: function (response) {
+                    IdControlador = response.IdControlador;
+
+                    if (response.Commodity == null) { Commodity = ""; }
+                    else { Commodity = response.Commodity; }
+
+                    if (response.FechaControlador == null) { FechaControlador = ""; }
+                    else { FechaControlador = FormatDateControlador(response.FechaControlador); }
+
+                    if (response.EtaPuerto5 == null) { EtaPuerto5 = ""; }
+                    else { EtaPuerto5 = FormatDate(response.EtaPuerto5); }
+
+                    RangoAltoCO2 = response.cantSetpointCO2 + 3;
+                    RangoBajoCO2 = response.cantSetpointCO2 - 3;
+
+                    if (Commodity == "AVOCADOS") {
+                        if (RangoAltoCO2 > 13) RangoAltoCO2 = 13;
+                        if (RangoBajoCO2 < 6) RangoBajoCO2 = 6;
+                    }
+
+                    if (Commodity == "BLUEBERRIES") {
+                        if (RangoAltoCO2 > 16) RangoAltoCO2 = 16;
+                        if (RangoBajoCO2 < 7) RangoBajoCO2 = 7;
+                    }
+
+                    //console.log("http://132.255.70.203/Grafico/GraficoAlmaSensoresFinalv2.php?Controller=" + IdControlador + "&Fecha=" + FechaControlador.substr(0, 10) + "&FechaPOD=" + EtaPuerto5 + "&RangoAltoCO2=" + RangoAltoCO2 + "&RangoBajoCO2=" + RangoBajoCO2);
+                    //document.getElementById("Grafico").src = "http://132.255.70.203/Grafico/GraficoAlmaSensoresFinalv2.php?Controller=" + IdControlador + "&Fecha=" + FechaControlador.substr(0, 10) + "&FechaPOD=" + EtaPuerto5 + "&RangoAltoCO2=" + RangoAltoCO2 + "&RangoBajoCO2=" + RangoBajoCO2;
+
+                }
+
+            });
+        }*@
+        //else {
+        //    document.getElementById("div-infoSensoresCO2").style.display = "block";
+        //}
+
+    });
+
+    var mediciones_graf_temp_1 = [];
+    var mediciones_graf_temp_2 = [];
+    var mediciones_graf_temp_3 = [];
+    var mediciones_graf_temp_4 = [];
+    var mediciones_graf_temp_5 = [];
+    var sensor = "";
+    var sensor_anterior = "";
+    var contador_sensores_temp = 1;
+    var contador_mediciones_temp = 0;
+
+    var chartTemp = function (args) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetGraficoTemp", "DetalleServicio")',
+            data: { IdServicio: IdServicio },
+            async: false,
+            success: function (data) {
+                if (data.length > 0) {
+
+                    mediciones_graf_temp_1 = [];
+                    mediciones_graf_temp_2 = [];
+                    mediciones_graf_temp_3 = [];
+                    mediciones_graf_temp_4 = [];
+                    mediciones_graf_temp_5 = [];
+
+                    sensor = "";
+                    sensor_anterior = "";
+                    contador_sensores_temp = 1;
+                    contador_mediciones_temp = 0;
+
+                    data.forEach(recorrerListaMediciones);
+
+                    if (mediciones_graf_temp_1.length > 0)
+                    {
+                        args.chart.series[0].dataSource = mediciones_graf_temp_1;
+                        args.chart.series[0].xName = "x";
+                        args.chart.series[0].yName = "y";
+                    }
+                    if (mediciones_graf_temp_2.length > 0) {
+                        args.chart.series[1].dataSource = mediciones_graf_temp_2;
+                        args.chart.series[1].xName = "x";
+                        args.chart.series[1].yName = "y";
+                    }
+                    if (mediciones_graf_temp_3.length > 0) {
+                        args.chart.series[2].dataSource = mediciones_graf_temp_3;
+                        args.chart.series[2].xName = "x";
+                        args.chart.series[2].yName = "y";
+                    }
+                    if (mediciones_graf_temp_4.length > 0) {
+                        args.chart.series[3].dataSource = mediciones_graf_temp_4;
+                        args.chart.series[3].xName = "x";
+                        args.chart.series[3].yName = "y";
+                    }
+                    if (mediciones_graf_temp_5.length > 0) {
+                        args.chart.series[4].dataSource = mediciones_graf_temp_5;
+                        args.chart.series[4].xName = "x";
+                        args.chart.series[4].yName = "y";
+                    }
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log("Error en ajax DetalleServicio->GetGraficoTemp(IdServicio=" + IdServicio+")");
+            }
+        });
+    }
+
+    function recorrerListaMediciones(value, index) {
+        contador_mediciones_temp++;
+        sensor = value.id_rel_sensor_servicio;
+
+        if (contador_mediciones_temp > 1) {
+            if (sensor != sensor_anterior) {
+                contador_sensores_temp++;
+            }
+        }
+
+        var object = {
+            x: value.x,
+            y: value.y,
+            high: value.high,
+            low: value.low,
+            id_rel_sensor_servicio: value.id_rel_sensor_servicio
+        };
+
+        if (contador_sensores_temp == 1) {
+            mediciones_graf_temp_1.push(object);
+        }
+        else if (contador_sensores_temp == 2) {
+            mediciones_graf_temp_2.push(object);
+        }
+        else if (contador_sensores_temp == 3) {
+            mediciones_graf_temp_3.push(object);
+        }
+        else if (contador_sensores_temp == 4) {
+            mediciones_graf_temp_4.push(object);
+        }
+        else if (contador_sensores_temp == 5) {
+            mediciones_graf_temp_5.push(object);
+        }
+
+        sensor_anterior = sensor;
+    }
+
+
+    var mediciones_rango_beneficio = [];
+    var mediciones_graf_co2_1 = [];
+    var mediciones_graf_co2_2 = [];
+    var mediciones_graf_co2_3 = [];
+    var mediciones_graf_co2_4 = [];
+    var mediciones_graf_co2_5 = [];
+    var int_fecha_superior = 0;
+    var int_fecha_inferior = 9999999999999;
+    var rango_beneficio_superior = document.getElementById("rango_beneficio_sup").innerHTML;
+    var rango_beneficio_inferior = document.getElementById("rango_beneficio_inf").innerHTML;
+
+    var chartCO2 = function (args)
+    {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("MedicionesSinOutlier", "DetalleServicio")', //GetGraficoCO2
+            data: { IdServicio: IdServicio },
+            async: false,
+            success: function (data) {
+                if (data.length>0)
+                {
+                    mediciones_graf_co2_1 = [];
+                    mediciones_graf_co2_2 = [];
+                    mediciones_graf_co2_3 = [];
+                    mediciones_graf_co2_4 = [];
+                    mediciones_graf_co2_5 = [];
+                    mediciones_rango_beneficio = [];
+                    int_fecha_superior = 0;
+                    int_fecha_inferior = 9999999999999;
+
+                    sensor_co2 = "";
+                    sensor_co2_anterior = "";
+                    contador_sensores_co2 = 1;
+                    contador_mediciones_co2 = 0;
+
+                    data.forEach(recorrerListaMedicionesCO2);
+
+                    var object = {
+                        x: '/Date(' + int_fecha_inferior + ')/',
+                        high: rango_beneficio_superior,
+                        low: rango_beneficio_inferior
+                    };
+                    mediciones_rango_beneficio.push(object);
+
+                    var object2 = {
+                        x: '/Date(' + int_fecha_superior + ')/',
+                        high: rango_beneficio_superior,
+                        low: rango_beneficio_inferior
+                    };
+                    mediciones_rango_beneficio.push(object2);
+
+                    if (mediciones_graf_co2_1.length > 0) {
+                        args.chart.series[0].dataSource = mediciones_rango_beneficio;
+                        args.chart.series[0].xName = "x";
+
+                        args.chart.series[1].dataSource = mediciones_graf_co2_1;
+                        args.chart.series[1].xName = "x";
+                        args.chart.series[1].yName = "y";
+                    }
+                    if (mediciones_graf_co2_2.length > 0) {
+                        args.chart.series[2].dataSource = mediciones_graf_co2_2;
+                        args.chart.series[2].xName = "x";
+                        args.chart.series[2].yName = "y";
+                    }
+                    if (mediciones_graf_co2_3.length > 0) {
+                        args.chart.series[3].dataSource = mediciones_graf_co2_3;
+                        args.chart.series[3].xName = "x";
+                        args.chart.series[3].yName = "y";
+                    }
+                    if (mediciones_graf_co2_4.length > 0) {
+                        args.chart.series[4].dataSource = mediciones_graf_co2_4;
+                        args.chart.series[4].xName = "x";
+                        args.chart.series[4].yName = "y";
+                    }
+                    if (mediciones_graf_co2_5.length > 0) {
+                        args.chart.series[5].dataSource = mediciones_graf_co2_5;
+                        args.chart.series[5].xName = "x";
+                        args.chart.series[5].yName = "y";
+                    }
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log("Error en ajax DetalleServicio->GetGraficoCO2(IdServicio=" + IdServicio + ")");
+            }
+        });
+    }
+
+    var sensor_co2 = "";
+    var sensor_co2_anterior = "";
+    var contador_sensores_co2 = 1;
+    var contador_mediciones_co2 = 0;
+
+    function recorrerListaMedicionesCO2(value, index) {
+        contador_mediciones_co2++;
+        sensor_co2 = value.id_rel_sensor_servicio;
+
+        if (contador_mediciones_co2 > 1) {
+            if (sensor_co2 != sensor_co2_anterior) {
+                contador_sensores_co2++;
+            }
+        }
+
+        if (value.x.split("(")[1].split(")")[0] > int_fecha_superior) {
+            int_fecha_superior = value.x.split("(")[1].split(")")[0];
+        }
+
+        if (value.x.split("(")[1].split(")")[0] < int_fecha_inferior) {
+            int_fecha_inferior = value.x.split("(")[1].split(")")[0];
+        }
+
+        var object = {
+            x: value.x,
+            y: value.y,
+            id_rel_sensor_servicio: value.id_rel_sensor_servicio
+        };
+
+        if (contador_sensores_co2 == 1) {
+            mediciones_graf_co2_1.push(object);
+        }
+        else if (contador_sensores_co2 == 2) {
+            mediciones_graf_co2_2.push(object);
+        }
+        else if (contador_sensores_co2 == 3) {
+            mediciones_graf_co2_3.push(object);
+        }
+        else if (contador_sensores_co2 == 4) {
+            mediciones_graf_co2_4.push(object);
+        }
+        else if (contador_sensores_co2 == 5) {
+            mediciones_graf_co2_5.push(object);
+        }
+
+        sensor_co2_anterior = sensor_co2;
+    }
+
+
+    var mediciones_graf_luz_1 = [];
+    var mediciones_graf_luz_2 = [];
+    var mediciones_graf_luz_3 = [];
+    var mediciones_graf_luz_4 = [];
+    var mediciones_graf_luz_5 = [];
+    var sensor_luz = "";
+    var sensor_luz_anterior = "";
+    var contador_sensores_luz = 1;
+    var contador_mediciones_luz = 0;
+
+    var chartLuz = function (args) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetGraficoLuz", "DetalleServicio")',
+            data: { IdServicio: IdServicio },
+            async: false,
+            success: function (data) {
+                if (data.length > 0) {
+
+                    mediciones_graf_luz_1 = [];
+                    mediciones_graf_luz_2 = [];
+                    mediciones_graf_luz_3 = [];
+                    mediciones_graf_luz_4 = [];
+                    mediciones_graf_luz_5 = [];
+
+                    sensor_luz = "";
+                    sensor_luz_anterior = "";
+                    contador_sensores_luz = 1;
+                    contador_mediciones_luz = 0;
+
+                    data.forEach(recorrerListaMedicionesLuz);
+
+                    console.log(mediciones_graf_luz_1);
+                    console.log(mediciones_graf_luz_2);
+                    console.log(mediciones_graf_luz_3);
+                    console.log(mediciones_graf_luz_4);
+                    console.log(mediciones_graf_luz_5);
+
+                    if (mediciones_graf_luz_1.length > 0) {
+                        args.chart.series[0].dataSource = mediciones_graf_luz_1;
+                        args.chart.series[0].xName = "x";
+                        args.chart.series[0].yName = "y";
+                    }
+                    if (mediciones_graf_luz_2.length > 0) {
+                        args.chart.series[1].dataSource = mediciones_graf_luz_2;
+                        args.chart.series[1].xName = "x";
+                        args.chart.series[1].yName = "y";
+                    }
+                    if (mediciones_graf_luz_3.length > 0) {
+                        args.chart.series[2].dataSource = mediciones_graf_luz_3;
+                        args.chart.series[2].xName = "x";
+                        args.chart.series[2].yName = "y";
+                    }
+                    if (mediciones_graf_luz_4.length > 0) {
+                        args.chart.series[3].dataSource = mediciones_graf_luz_4;
+                        args.chart.series[3].xName = "x";
+                        args.chart.series[3].yName = "y";
+                    }
+                    if (mediciones_graf_luz_5.length > 0) {
+                        args.chart.series[4].dataSource = mediciones_graf_luz_5;
+                        args.chart.series[4].xName = "x";
+                        args.chart.series[4].yName = "y";
+                    }
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log("Error en ajax DetalleServicio->GetGraficoLuz(IdServicio=" + IdServicio + ")");
+            }
+        });
+    }
+
+
+    function recorrerListaMedicionesLuz(value, index) {
+        contador_mediciones_luz++;
+        sensor_luz = value.id_rel_sensor_servicio;
+
+        if (contador_mediciones_luz > 1) {
+            if (sensor_luz != sensor_luz_anterior) {
+                contador_sensores_luz++;
+            }
+        }
+
+        console.log(value);
+
+        var object = {
+            x: value.x,
+            y: value.y,
+            id_rel_sensor_servicio: value.id_rel_sensor_servicio
+        };
+
+        if (contador_sensores_luz == 1) {
+            mediciones_graf_luz_1.push(object);
+        }
+        else if (contador_sensores_luz == 2) {
+            mediciones_graf_luz_2.push(object);
+        }
+        else if (contador_sensores_luz == 3) {
+            mediciones_graf_luz_3.push(object);
+        }
+        else if (contador_sensores_luz == 4) {
+            mediciones_graf_luz_4.push(object);
+        }
+        else if (contador_sensores_luz == 5) {
+            mediciones_graf_luz_5.push(object);
+        }
+
+        sensor_luz_anterior = sensor_luz;
+    }
+</script>

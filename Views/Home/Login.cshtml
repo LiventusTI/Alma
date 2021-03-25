@@ -1,0 +1,130 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html xml:lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Alma</title>
+    <link rel="shortcut icon" type="image/x-icon" href="~/images/ALMA SOLO HOJA.png" />
+    <!-- Bootstrap -->
+    <link href="~/Vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="~/Vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="~/Vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link href="~/Vendors/animate.css/animate.min.css" rel="stylesheet">
+
+    <!-- Custom Theme Style -->
+    <link href="~/build/css/custom.min.css" rel="stylesheet">
+    <script src="~/vendors/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/Vendors/jquery/dist/jquery-ui.css">
+    <script src="~/Vendors/jquery/dist/jquery-1.12.4.js"></script>
+    <script src="~/Vendors/jquery/dist/jquery-ui.js"></script>
+    <script src="~/build/js/main.js"></script>
+
+    <!-- Hotjar Tracking Code for http://132.255.70.203:8080/ProyectoAlma -->
+    <!--<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:1859500,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>-->
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-174546114-1"></script>
+    <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-174546114-1');
+    </script>
+    <!-- End Global site tag - Google Analytics -->
+</head>
+
+<body class="login">
+    <div>
+        <a class="hiddenanchor" id="signup"></a>
+        <a class="hiddenanchor" id="signin"></a>
+
+        <div class="login_wrapper">
+            <div class="animate form login_form">
+                <h3 style="text-align:justify" class="tr" > &nbsp; &nbsp; &nbsp; <img src="~/images/alma-verde.png" /></h3>
+                <section class="login_content">
+
+                    @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+                    {
+                        <label class="control-label tr" key="usuario" style="text-align:center">Nombre Usuario</label>
+                        <div>
+                            <input type="text" class="form-control" name="user" id="user" style="text-align:center; text-align-last:center;" />
+                        </div>
+                        <label class="control-label tr" key="contrasena" style="text-align:center">Contraseña</label>
+                        <div>
+                            <input type="password" class="form-control" name="pass" id="pass" style="text-align:center; text-align-last:center;" />
+                        </div>
+                        <label class="control-label tr" key="idioma" style="text-align:center">Idioma</label>
+                        <div>
+                            <select class="form-control" name="lang" id="idioma" style="text-align:center; text-align-last:center;">
+                                <option value="es_ES">Español</option>
+                                <option value="en_GB">English</option>
+                            </select>
+                        </div>
+                        <br />
+                        <div class="controls" style="text-align:center">
+                            <button type="submit" key="botoninicio" class="btn btn-default submit tr">Entrar</button>
+                        </div>
+                    }
+
+                    <div class="clearfix"></div>
+
+                    <div class="separator">
+                        <div class="clearfix"></div>
+                        <br />
+
+                        <div>
+                            <p class="tr" key="derechosReservados">© 2020 Todos los Derechos Reservados</p>
+                            <p class="tr" key="proyectoAlma">Proyecto Alma <i class="fa fa-registered" id="r"></i></p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+
+        window.localStorage.clear();
+    });
+</script>
+<style>
+
+
+    body {
+        font-family: Gotham Medium !important;
+    }
+
+    @@font-face {
+        font-family: 'Gotham Medium';
+        /*src: url('../../fonts/gotham-medium.ttf'); local*/
+        /*src: url('http://132.255.70.203:8080/ProyectoAlma/fonts/gotham-medium.ttf');*/
+        src: url('http://132.255.70.203:8080/PruebaIntranet/fonts/gotham-medium.ttf');
+    }
+</style>
+
+
+

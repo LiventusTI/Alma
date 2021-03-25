@@ -1,0 +1,863 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using Syncfusion.EJ2;
+@using ProyectoAlmaInicio.Models;
+@using Syncfusion.EJ2.DropDowns;
+@using Syncfusion.EJ2.Navigations;
+
+<link href="~/Content/styles/bootstrap4.css" rel="stylesheet">
+
+<div class="main-content e-responsive" id="main-text">
+    <div class="sidebar-content">
+        <h4 class="h4 tr" key="historicos_M">HISTÓRICOS</h4>
+        <hr style="border-width: medium;" />
+        <div class="e-content">
+            <div class="row">
+                <div class="col-lg-11 card-control-section basic_card_layout">
+                    <div class="col-xs-3 col-sm-3 col-lg-3 col-md-3" id="contadorTotal">
+                        <!-- Weather Card Layout  -->
+                        <div tabindex="0" class="e-card" id="total_card">
+                            <div class="e-card-header">
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-sub-title tr" key="totalizadorEnTransito">En Tránsito</div>
+                                    <div class="e-card-sub-title"></div>
+                                </div>
+                            </div>
+                            <div class="e-card-header weather_report">
+                                <div class="e-card-header-image"></div>
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-header-title"><b>@ViewBag.ContadorTotal</b></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-lg-3  col-md-3" id="contadorCO2">
+                        <!-- Weather Card Layout  -->
+                        <div tabindex="0" class="e-card" id="co2_card">
+                            <div class="e-card-header">
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-sub-title tr" key="totalizadorConSensorCO2">C/ Sensor CO2</div>
+                                    <div class="e-card-sub-title"> </div>
+                                </div>
+                            </div>
+                            <div class="e-card-header weather_report">
+                                <div class="e-card-header-image"></div>
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-header-title"><b>@ViewBag.ContadorModem</b></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-lg-3 col-md-3" id="contadorTemperatura">
+                        <!-- Weather Card Layout  -->
+                        <div tabindex="0" class="e-card" id="temp_card">
+                            <div class="e-card-header">
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-sub-title tr" key="totalizadorConSensorTemp">C/ Sensor T&#186;</div>
+                                    <div class="e-card-sub-title"></div>
+                                </div>
+                            </div>
+                            <div class="e-card-header weather_report">
+                                <div class="e-card-header-image"></div>
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-header-title"><b>@ViewBag.ContadorTemperatura</b></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-3 col-sm-3 col-lg-3 col-md-3" id="contadorAperturaPuerta">
+                        <!-- Weather Card Layout  -->
+                        <div tabindex="0" class="e-card" id="puertas_card">
+                            <div class="e-card-header">
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-sub-title tr" key="totalizadorConSensorLuz">C/ Sensor Apertura Puertas</div>
+                                    <div class="e-card-sub-title"></div>
+                                </div>
+                            </div>
+                            <div class="e-card-header weather_report">
+                                <div class="e-card-header-image"></div>
+                                <div class="e-card-header-caption">
+                                    <div class="e-card-header-title"><b>@ViewBag.ContadorLuz</b></div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="control-section col-lg-12">
+
+                    <span id='msg'></span>
+                    @{
+                        List<object> cols = new List<object>();
+                        cols.Add(new { field = "EtaPuerto", direction = "Descending" });
+                    }
+
+                    @*@(Html.EJS().Grid<Clases.Servicio>("Historicos").DataSource((IEnumerable<Clases.Servicio>)ViewBag.DataSource).FilterSettings(filter => filter.Type(Syncfusion.EJ2.Grids.FilterType.Excel)).AllowReordering().AllowResizing(true).DetailTemplate("#detailtemplate").Columns(col =>*@
+                    @(Html.EJS().Grid<Clases.Servicio>("Historicos").DataSource((IEnumerable<Clases.Servicio>)ViewBag.DataSource).FilterSettings(filter => filter.Type(Syncfusion.EJ2.Grids.FilterType.Excel)).DetailTemplate("#detailtemplate").Columns(col =>
+                {
+                    col.Field("").HeaderTemplate("#div-limpiar-filtros").Width("100").Template("#coltemplateDetalle").Add();
+                    col.Field(p => p.Contenedor).HeaderText("Contenedor").Width("130").Add();
+                    col.Field(p => p.StringSensores).HeaderText("Sensores").Width("150").Add();
+                    col.Field(p => p.Commodity).HeaderText("Commodity").Width("140").Add();
+                    //col.Field(p => p.FechaControlador).HeaderText("Fecha Programacion Sensores").Width("170").Format(new { type = "datetime", format = "dd/MM/y" }).Add();
+                    col.Field(p => p.Etd).HeaderText("Fecha Despacho Estimada").Width("190").Format(new { type = "datetime", format = "dd/MM/y" }).Add();
+                    col.Field(p => p.EtaPuerto).HeaderText("Fecha Arribo Estimada").Width("165").Format(new { type = "datetime", format = "dd/MM/y" }).Add();
+                    col.Field(p => p.PuertoOrigen).HeaderText("Puerto Origen").Width("155").Template("#coltemplateOrigen").Add();
+                    col.Field(p => p.PuertoDestino).HeaderText("Puerto Destino").Width("185").Template("#coltemplateDestino").Add();
+                    col.Field(p => p.Booking).HeaderText("Booking").Width("145").Add();
+                    col.Field(p => p.Naviera).HeaderText("Naviera").Width("120").Add();
+                    //col.Field(p => p.Nave).HeaderText("Nave").Width("160").Add();
+                    col.Field(p => p.SetpointAC).HeaderText("Setpoint CO2").Width("150").Add();
+                    col.Field(p => p.SetpointT).HeaderText("Setpoint T°").Width("130").Add();
+                    col.Field(p => p.ObtieneDatos).HeaderText("Data Sensor").Width("130").Add();
+                    //col.Field(p => p.Descripcion).HeaderText("Descripcion").Width("160").Add();
+
+
+                    //CO2 EXTERNO INCLUYE MODEM
+                    //col.Field(p => p.CO2Ext).HeaderText("C/Sensor CO2").Width("150").Add();
+                    //col.Field(p => p.TemperaturaExt).HeaderText("C/Sensor T°").Width("140").Add();
+                    //col.Field(p => p.AperturaPuerta).HeaderText("C/Sensor Apertura Puertas").Width("240").Add();
+
+                }).SortSettings(sort => sort.Columns(cols)).AllowSorting(true).AllowMultiSorting(true).AllowPaging(true).PageSettings(page => page.PageCount(5)).AllowFiltering(true).EnablePersistence(true).SelectionSettings(select => select.CellSelectionMode(Syncfusion.EJ2.Grids.CellSelectionMode.Flow).Mode(Syncfusion.EJ2.Grids.SelectionMode.Cell).Type(Syncfusion.EJ2.Grids.SelectionType.Single)).CellSelected("onCellSelected").Render())
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <hr />
+                <b key="avisoConfidencialidad" class="tr">
+                    Aviso de Confidencialidad:
+                </b>
+                <p key="MensajeConfidencialidadOngoing" class="tr aviso1">
+                    La información aquí contenida es preliminar, obtenida en base a un sistema de interconexión remoto vía 3G, y que puede sufrir modificaciones. Toda la información y los datos que la presente plataforma proporciona tienen carácter meramente informativo. Los autores no se hacen responsables de su exactitud, actualización o validez, y por tanto están exentos de toda responsabilidad derivada de su incorrección, omisión, falta de actualización o retraso, así como de cualquier pérdida, o daño que pudiera causar su uso o exposición por parte de terceros (autorizados o no). Toda la información se proporciona en los términos en que se visualiza, pudiendo no ser exactamente correcta, acertada o definitiva. Cualquier forma no autorizada de distribución, copia, duplicación, reproducción, o venta (total o parcial) del contenido de esta web, tanto para uso personal como comercial, constituirá una infracción de los derechos de propiedad de los autores. El Usuario se compromete a no utilizar cualquiera de los Contenidos que la plataforma ponga a su disposición para desarrollar actividades contrarias a las leyes, a la moral o al orden público y, en general, a hacer un uso conforme a las presentes condiciones generales. En cualquier caso, el usuario se compromete a mantener la estricta confidencialidad de la información técnica a la que pudiera acceder, gestionando su uso de manera interna, y no utilizando dicha información para afectar derechos o fundar reclamos en contra de terceros.
+                </p>
+                <hr />
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<style type="text/css" class="cssStyles">
+    .detailtable td {
+        font-size: 13px;
+        padding: 4px;
+        max-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .photo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+        box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0, 0, 0, 0.2);
+    }
+</style>
+<script type="text/x-template" id="detailtemplate">
+    <table class="detailtable" width="100%">
+        <colgroup>
+            <col width="35%" />
+            <col width="35%" />
+            <col width="30%" />
+        </colgroup>
+        <tbody>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Contenedor: </span> ${Contenedor}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Commodity: </span> ${Commodity}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Inicio Servicio: </span> ${FechaControlador}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Fecha Estimada de Arribo: </span> ${EtaPuerto}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Puerto Origen: </span> ${PuertoOrigen}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Puerto Destino: </span> ${PuertoDestino}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Booking: </span> ${Booking}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Naviera: </span> ${Naviera}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Nave: </span> ${Nave}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Setpoint CO2: </span> ${SetpointAC}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Setpoint Temperatura: </span> ${SetpointT}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor CO2: </span> ${CO2Ext}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor Temperatura: </span> ${TemperaturaExt}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor Apertura Puertas: </span> ${AperturaPuerta}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+<script type="text/x-jsrender" id="progessTemplate">
+    <div id="myProgress" class="pbar">
+        <div id="myBar" class="bar">
+            <div id="label" class="barlabel"></div>
+        </div>
+    </div>
+</script>
+
+<script src="~/build/js/Perfiles.js"></script>
+
+<script>
+
+        $(document).ready(function () {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                dataType: 'json',
+                dataSrc: '',
+                data: {
+                    TipoVista: 3,
+                    NombreVista: 'HistoricoEnCursoView'
+                }
+
+            });
+
+            $('#hamburger').trigger('click');
+
+        });
+
+        function actionBegin(args) {
+            this.query.addParams('$filter', 'EmployeeID eq 1');
+        }
+
+</script>
+
+
+<script id="coltemplateOrigen" type="text/x-template">
+    <div class="image">
+        <img src="@Url.Content("~/Content/grid/Map.png")" class="e-image" alt="${PuertoOrigen}" /> &nbsp
+        <span id="locationtext">${PuertoOrigen}</span>
+    </div>
+</script>
+
+<style>
+    .btn-header, .btn-header:focus, .btn-header:active:focus {
+        outline: none;
+        background: white;
+        padding-top: 0px;
+    }
+</style>
+
+<script>
+    function ELiminarFiltrosTabla() {
+        var grid = document.getElementById("Historicos").ej2_instances[0];
+        grid.clearFiltering();
+    }
+</script>
+
+<script id="div-limpiar-filtros" type="text/x-template">
+    <button onclick="ELiminarFiltrosTabla()" class="btn btn-header">
+        <p style="display:inline;">
+            Limpiar&nbsp;
+        </p>
+        <span style="font-size: 1em; color: rgb(74, 185, 115);">
+            <i class="fa fa-filter"></i>
+        </span>
+    </button>
+</script>
+
+
+<script id="coltemplateDetalle" type="text/x-template">
+    <div class="image">
+        <button class="btn fa fa-bar-chart" style="background:white;border:1px gray solid; margin-left:20px"></button>
+    </div>
+</script>
+
+<script id="coltemplateDestino" type="text/x-template">
+    <div class="image">
+        <img src="@Url.Content("~/Content/grid/Map.png")" class="e-image" alt="${PuertoDestino}" /> &nbsp
+        <span id="locationtext">${PuertoDestino}</span>
+    </div>
+</script>
+
+
+<style>
+    .e-card {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab-text {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-control {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-treeview.e-list-text {
+        color: white !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .e-grid .e-filtered::before {
+        color: #4ab973 !important;
+    }
+
+    .h4 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .main-content {
+        background: #F7F7F7 !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .row {
+        color: black !important;
+    }
+
+
+    .fabric .empimg {
+        background-color: #0078d6;
+    }
+
+    .material .empimg {
+        background-color: #e3165b;
+    }
+
+    .highcontrast .empimg {
+        background-color: #ffd939;
+    }
+
+    _:-ms-fullscreen, :root .highcontrast .e-userimg.sf-icon-Male::before,
+    _:-ms-fullscreen, :root .highcontrast .e-userimg.sf-icon-FeMale::before {
+        color: black;
+    }
+
+    .highcontrast .e-userimg.sf-icon-Male::before,
+    .highcontrast .e-userimg.sf-icon-FeMale::before {
+        color: black;
+    }
+
+    .bootstrap .empimg {
+        background-color: #0078d6;
+    }
+
+    .bootstrap4 .empimg {
+        background-color: #0078d6;
+    }
+
+    #Emptext {
+        top: -12px;
+        left: 41px;
+        position: relative;
+    }
+
+    .e-grid.e-rtl #Emptext {
+        top: -12px;
+        left: -41px;
+        position: relative;
+    }
+
+    .empimg {
+        height: 27px;
+        width: 29px;
+        border-radius: 14px;
+    }
+
+
+    .e-userimg.sf-icon-Male::before,
+    .e-userimg.sf-icon-FeMale::before {
+        font-size: 13px;
+    }
+
+    .e-userimg.sf-icon-Male, .e-userimg.sf-icon-FeMale {
+        margin: 0px 8px;
+        line-height: 26px;
+        color: white;
+        font-size: 13px;
+    }
+
+        .e-userimg.sf-icon-Male::before {
+            content: '\e700';
+        }
+
+        .e-userimg.sf-icon-FeMale::before {
+            content: '\e701';
+        }
+
+
+    td.e-rowcell.e-selectionbackground.e-active {
+        background-color: transparent;
+    }
+
+    .e-hightheme td.e-rowcell.e-selectionbackground.e-active {
+        background-color: transparent;
+        color: white;
+    }
+
+    .e-bigger .e-grid .statustxt {
+        position: relative;
+        top: -2px;
+    }
+
+    .rating .star {
+        font-size: 132%;
+        color: lightgrey;
+    }
+
+        .rating .star.checked {
+            color: #ffa600;
+        }
+
+    td.e-rowcell .statustxt.e-activecolor {
+        color: #00cc00;
+        position: relative;
+        top: 9px;
+    }
+
+    td.e-rowcell .statustxt.e-inactivecolor {
+        color: #e60000;
+        position: relative;
+        top: 9px;
+    }
+
+    .statustemp.e-inactivecolor {
+        background-color: #ffd7cc;
+    }
+
+    .statustemp.e-activecolor {
+        background-color: #ccffcc;
+    }
+
+    .statustxt.e-activecolor {
+        color: #00cc00;
+    }
+
+    .statustxt.e-inactivecolor {
+        color: #e60000;
+    }
+
+    #Trusttext {
+        position: relative;
+        top: 1px;
+    }
+
+    .e-image {
+        height: 13px;
+        width: 14px;
+    }
+
+    .statustemp.e-inactivecolor {
+        width: 64px;
+    }
+
+    .statustemp.e-activecolor {
+        width: 57px;
+    }
+
+    .statustemp {
+        position: relative;
+        height: 19px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .highcontrast #msg {
+        color: #FFFFFF;
+    }
+
+
+    #msg {
+        font-family: "Segoe UI", "GeezaPro", "DejaVu Serif", sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        opacity: 0.95;
+        color: #333;
+        float: right;
+        margin-top: 3px;
+    }
+
+    @@media only screen and (max-width: 370px) {
+        #msg {
+            float: left;
+            margin-top: 3px;
+        }
+
+        #GridOverview {
+            margin-top: 36px;
+        }
+    }
+
+    #samplecontainer {
+        padding-top: 5px;
+    }
+
+    #myProgress {
+        position: relative;
+        height: 18px;
+        width: 10em;
+        text-align: left;
+        background-color: white;
+    }
+
+    .highcontrast .e-grid #myProgress {
+        background-color: black;
+    }
+
+    #myBar {
+        position: absolute;
+        width: 10%;
+        height: 100%;
+        background-color: #00b300;
+    }
+
+        #myBar.progressdisable {
+            background-color: #df2222;
+        }
+
+    #label {
+        position: relative;
+        left: 10px;
+        line-height: 18px;
+        font-size: 10px;
+        color: white;
+    }
+
+    .e-content {
+        min-height: 150px;
+    }
+</style>
+
+<style>
+    /* Weather Card Layout Customization */
+
+    .card-control-section.basic_card_layout #total_card.e-card {
+       background: #2d7440;
+
+    }
+
+    .card-control-section.basic_card_layout #puertas_card.e-card,
+    .card-control-section.basic_card_layout #temp_card.e-card,
+    .card-control-section.basic_card_layout #co2_card.e-card {
+       background: #4AB973;
+
+    }
+    .card-control-section.basic_card_layout #pink_card.e-card {
+       background: #4AB973;
+
+    }
+
+    .card-control-section.basic_card_layout #total_card.e-card .e-card-header-caption .e-card-header-title,
+    .card-control-section.basic_card_layout #temp_card.e-card .e-card-header-caption .e-card-header-title,
+    .card-control-section.basic_card_layout #puertas_card.e-card .e-card-header-caption .e-card-header-title,
+    .card-control-section.basic_card_layout #co2_card.e-card .e-card-header-caption .e-card-header-title
+            {
+            color: white;
+            font-size: 25px;
+            }
+    .card-control-section.basic_card_layout #total_card.e-card .e-card-header-caption .e-card-sub-title,
+    .card-control-section.basic_card_layout #temp_card.e-card .e-card-header-caption .e-card-sub-title,
+    .card-control-section.basic_card_layout #puertas_card.e-card .e-card-header-caption .e-card-sub-title,
+    .card-control-section.basic_card_layout #co2_card.e-card .e-card-header-caption .e-card-sub-title {
+        color: white;
+            font-size: 20px;
+    }
+
+    .highcontrast .card-control-section.basic_card_layout #total_card.e-card .e-card-header.weather_report .e-card-header-image,
+            .highcontrast .card-control-section.basic_card_layout #temp_card.e-card .e-card-header.weather_report .e-card-header-image,
+    .highcontrast .card-control-section.basic_card_layout #co2_card.e-card .e-card-header.weather_report .e-card-header-image,
+            .highcontrast .card-control-section.basic_card_layout #puertas_card.e-card .e-card-header.weather_report .e-card-header-image {
+        border: none;
+    }
+
+    .card-control-section.basic_card_layout #total_card.e-card .weather_report .e-card-header-caption,
+            .card-control-section.basic_card_layout #temp_card.e-card .weather_report .e-card-header-caption,
+            .card-control-section.basic_card_layout #co2_card.e-card .weather_report .e-card-header-caption,
+    .card-control-section.basic_card_layout #puertas_card.e-card .weather_report .e-card-header-caption {
+        text-align: right;
+    }
+
+    .card-control-section.basic_card_layout #total_card.e-card .e-card-header.weather_report .e-card-header-image{
+        background-image: url('@Url.Content("~/images/barco.png")');
+        height: 40px !important;
+        width: 40px !important;
+    }
+
+    .card-control-section.basic_card_layout #temp_card.e-card .e-card-header.weather_report .e-card-header-image {
+        background-image: url('@Url.Content("~/images/temperatura.png")');
+        height: 40px !important;
+        width: 40px !important;
+    }
+
+    .card-control-section.basic_card_layout #co2_card.e-card .e-card-header.weather_report .e-card-header-image {
+        background-image: url('@Url.Content("~/images/co2.png")');
+        height: 40px !important;
+        width: 40px !important;
+    }
+
+    .card-control-section.basic_card_layout #puertas_card.e-card .e-card-header.weather_report .e-card-header-image {
+        background-image: url('@Url.Content("~/images/puerta.png")');
+        height: 40px !important;
+        width: 40px !important;
+    }
+
+    .e-card .e-card-header .e-card-header-image {
+        background-size: contain;
+    }
+
+
+    .card-control-section.basic_card_layout .col-xs-6.col-sm-6.col-lg-6.col-md-6 {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .card-control-section.basic_card_layout .card-layout {
+        margin: auto;
+        max-width: 400px;
+    }
+
+    @@media (min-width: 870px) {
+        .card-control-section.basic_card_layout .col-xs-6.col-sm-6.col-lg-6.col-md-6 {
+            width: 50%;
+        }
+
+        .card-control-section.basic_card_layout .card-layout {
+            max-width: 870px;
+        }
+    }
+
+
+</style>
+
+
+
+<script>
+    var orPredicate = null;
+    var gridQuery = null;
+
+    $("#contadorCO2").on('click', function (args) {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 3,
+                NombreVista: 'Boton-ContadorCO2-Historico'
+            }
+
+        });
+
+        document.getElementById('total_card').style.background = '#4AB973';
+        document.getElementById('co2_card').style.background = '#2d7440';
+        document.getElementById('temp_card').style.background = '#4AB973';
+        document.getElementById('puertas_card').style.background = '#4AB973';
+
+
+        orPredicate = new ej.data.Predicate('CO2Ext', 'equal', 'SI');
+
+        var grid = document.getElementById("Historicos").ej2_instances[0];
+        if (gridQuery == null) gridQuery = grid.query;
+        grid.query = new ej.data.Query().where(orPredicate);
+        grid.refresh();
+        orPredicate = null;
+
+
+
+
+    });
+
+    $("#contadorTemperatura").on('click', function (args) {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 3,
+                NombreVista: 'Boton-ContadorTemperatura-Historico'
+            }
+
+        });
+
+        document.getElementById('total_card').style.background = '#4AB973';
+        document.getElementById('co2_card').style.background = '#4AB973';
+        document.getElementById('temp_card').style.background = '#2d7440';
+        document.getElementById('puertas_card').style.background = '#4AB973';
+
+
+        orPredicate = new ej.data.Predicate('TemperaturaExt', 'equal', 'SI');
+
+        var grid = document.getElementById("Historicos").ej2_instances[0];
+        if (gridQuery == null) gridQuery = grid.query;
+        grid.query = new ej.data.Query().where(orPredicate);
+        grid.refresh();
+
+
+    });
+
+    $("#contadorAperturaPuerta").on('click', function (args) {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 3,
+                NombreVista: 'Boton-ContadorAperturaPuerta-Historico'
+            }
+
+        });
+
+        document.getElementById('total_card').style.background = '#4AB973';
+        document.getElementById('co2_card').style.background = '#4AB973';
+        document.getElementById('temp_card').style.background = '#4AB973';
+        document.getElementById('puertas_card').style.background = '#2d7440';
+
+
+
+        orPredicate = new ej.data.Predicate('AperturaPuerta', 'equal', 'SI');
+
+        var grid = document.getElementById("Historicos").ej2_instances[0];
+        if (gridQuery == null) gridQuery = grid.query;
+        grid.query = new ej.data.Query().where(orPredicate);
+        grid.refresh();
+        orPredicate = null;
+
+    });
+
+    $("#contadorTotal").on('click', function (args) {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 3,
+                NombreVista: 'Boton-ContadorTotal-Historico'
+            }
+
+        });
+
+        //div.onmouseout = function () {
+        document.getElementById('total_card').style.background = '#2d7440';
+        document.getElementById('co2_card').style.background = '#4AB973';
+        document.getElementById('temp_card').style.background = '#4AB973';
+        document.getElementById('puertas_card').style.background = '#4AB973';
+
+        //var h2s = this.getElementsByTagName('e-card');
+        //h2s[0].style.background = '#2d7440';
+        //};
+
+        //var h2s = this.getElementsByTagName('e-card');
+        //h2s[0].style.background = '#4AB973';
+
+        var grid = document.getElementById("Historicos").ej2_instances[0];
+        grid.query = gridQuery;
+        grid.refresh();
+    });
+
+        //function modeChange(args) {
+
+        //    var grid = document.getElementById("TransitoEnCurso").ej2_instances[0];
+        //    grid.selectionSettings.mode = this.value;
+        //}
+
+        //function selectionChange(args) {
+        //    var grid = document.getElementById("TransitoEnCurso").ej2_instances[0];
+        //    grid.selectionSettings.type = this.value;
+    //}
+
+    function onCellSelected(args) {
+
+        var bd = '';
+        if (args.data["BDOrigen"] == '1') {
+            bd = 'S';
+        }
+        else if (args.data["BDOrigen"] == '2') {
+            bd = 'A';
+        }
+
+        var idServicio = args.data["IdServicio"];
+        var idBDServicio = args.data["BDOrigen"];
+        var contenedorSeleccionado = args.data["Contenedor"];
+
+            var cellIndex=args.cellIndex.cellIndex;
+            if(cellIndex==0)
+            {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                    dataType: 'json',
+                    dataSrc: '',
+                    data: {
+                        TipoVista: 3,
+                        NombreVista: 'Boton-DetalleGrilla-Historico'
+                    }
+
+                });
+
+                var url = '@Url.Action("DetalleServicioView", "DetalleServicio")?IdServicio=' + bd + idServicio;
+                window.location.href = url;
+            }
+
+        }
+
+
+</script>

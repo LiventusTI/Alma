@@ -1,0 +1,12 @@
+﻿
+@{
+    ViewBag.Title = "DMS";
+    Layout = "~/Views/MasterPage.cshtml";
+    string Url = "?user=" + Session["user"] + "&pass=" + Session["pass"];
+}
+
+<div class="row">
+    <div class="x_content">
+        <iframe src="http://localhost/seeddms51x/seeddms/out/out.Login.php@(Url)" style="width:100%; height:700px;" frameborder=1 scrolling=auto name="FramePadre" id="FramePadre"></iframe>
+    </div>
+</div>

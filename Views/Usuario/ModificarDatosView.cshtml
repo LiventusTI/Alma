@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Title = "ModificarDatosView";
+    Layout = "~/Views/MasterPage.cshtml";
+}
+<div class="login_wrapper">
+    <div class="animate form login_form">
+        <section class="login_content">
+            @using (Html.BeginForm("EditarContrasena", "Usuario", FormMethod.Post))
+            {
+                <div>
+                    <label>Nombre Usuario</label>
+                    <input type="text" class="form-control" name="user" id="user" style="text-align:center; text-align-last:center;" value="@ViewBag.NombreUsuario" readonly />
+                </div>
+                <div>
+                    <label>Contraseña</label>
+                    <input type="text" class="form-control" placeholder="Ingrese Contraseña" name="pass" id="pass" style="text-align:center; text-align-last:center;" value="@ViewBag.Contrasena" required />
+                </div>
+                <div>
+                    <label>Nombre y Apellido</label>
+                    <input type="text" class="form-control" name="nombre" id="nombre" style="text-align:center; text-align-last:center;" value="@ViewBag.Nombre @ViewBag.Apellido" readonly />
+                </div>
+                <br />
+                <div class="controls" style="text-align:center">
+                    <button type="submit" class="btn btn-success submit">Editar</button>
+                </div>
+            }
+        </section>
+    </div>
+</div>

@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Syncfusion.EJ2.Inputs;
+@using Syncfusion.EJ2;
+@using ProyectoAlmaInicio.Models;
+@using Syncfusion.EJ2.DropDowns;
+@using Syncfusion.EJ2.Navigations;
+
+<div class="main-content e-responsive" id="main-text" style="overflow-y:hidden!important; height:100%;">
+    <div class="sidebar-content sidebar">
+
+        <iframe id="iframe-dinamico2" src="" style="width:100%;"  frameborder=1></iframe> 
+
+    </div>
+    <br />
+    <br />
+    <br />
+
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $('#iframe-dinamico2').attr('src', "@ViewBag.src");
+
+    var iFrameID = document.getElementById('iframe-dinamico2');
+        if (iFrameID) {
+            iFrameID.height = window.outerHeight + 40;
+
+        }
+    });
+
+
+    /*function resizeIframe() {
+
+        var iFrameID = document.getElementById('iframe-dinamico2');
+        if (iFrameID) {
+            iFrameID.height = window.outerHeight + 40;
+
+        }
+
+        //iFrameID.contentWindow.document.location.href =  "ViewBag.src";
+    }*/
+
+
+
+</script>
+
+

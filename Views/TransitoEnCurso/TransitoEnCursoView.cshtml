@@ -1,0 +1,3703 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Syncfusion.EJ2;
+@using Syncfusion.EJ2.Inputs;
+@using ProyectoAlmaInicio.Models;
+@using Syncfusion.EJ2.DropDowns;
+@using Syncfusion.EJ2.Navigations;
+@model ProyectoAlmaInicio.Controllers.ServicioController.TextBoxModal
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmFthGxyCA9bKVIfiTXuRCEYls3hpm6Zs"></script>
+<div class="main-content e-responsive" id="main-text">
+    <div class="sidebar-content sidebar">
+        <div class="col-lg-12 control-section toast-default-section" hidden>
+            <div class="control_wrapper">
+                @Html.EJS().Toast("toast_type").Position(p => p.X("Right")).TimeOut(8000).Close("onclose").Created("created").BeforeOpen("onBeforeOpen").Render()
+                <div id="toast_types">
+                    <div>
+                        @Html.EJS().Button("info_Toast").CssClass("e-btn e-control e-info").Content("Info Message").Render()
+                        @Html.EJS().Button("success_Toast").CssClass("e-btn e-contro e-success").Content("Success Message").Render()
+                        @Html.EJS().Button("warning_Toast").CssClass("e-btn e-control e-warning").Content("Warning Message").Render()
+                        @Html.EJS().Button("error_Toast").CssClass("e-btn e-control e-danger").Content("Danger Message").Render()
+                    </div>
+                    <div style="padding-top: 15px">
+                        @Html.EJS().Button("hideToast").CssClass("e-btn e-control").Content("Hide All").Render()
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="h4 tr" key="serviciosONGOING">SERVICIOS EN TRÁNSITO</h4>
+        <hr style="border-width: medium;" />
+
+        @(Html.EJS().Tab("ej2Tab").ContentTemplate(
+        @<div>
+            <div id="pestana2" class="e-tab-header">
+                <div id="VistaServicios">Vista Servicios</div>
+                <div id="VistaMapa">Vista Mapa</div>
+            </div>
+            <div class="e-content">
+                <div>
+                    <div class="row">
+                        <br />
+                        <div class="col-lg-11 card-control-section basic_card_layout">
+                            <div class="col-xs-12 col-sm-12 col-lg-3 col-md-6" id="contadorTotal">
+                                <!-- Weather Card Layout  -->
+                                <div tabindex="0" class="e-card" id="total_card">
+                                    <div class="e-card-header">
+                                        <div class="e-card-header-caption">
+                                            <div class="e-card-sub-title tr" key="totalizadorEnTransito">En Tránsito</div>
+                                            <div class="e-card-sub-title"></div>
+                                        </div>
+                                    </div>
+                                    <div class="e-card-header weather_report">
+                                        <div class="e-card-header-image"></div>
+                                        <div class="e-card-header-caption">
+                                            <div class="e-card-header-title"><b>@ViewBag.ContadorTotal</b></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-lg-3 col-md-6" id="contadorCO2">
+                                <!-- Weather Card Layout  -->
+                                <div tabindex="0" class="e-card" id="co2_card">
+                                    <div class="e-card-header">
+                                        <div class="e-card-header-caption">
+                                            <div class="e-card-sub-title tr" key="totalizadorConSensorCO2">C/ Sensor CO2</div>
+                                            <div class="e-card-sub-title"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="e-card-header weather_report">
+                                        <div class="e-card-header-image"></div>
+                                        <div class="e-card-header-caption">
+                                            <div class="e-card-header-title"><b>@ViewBag.ContadorModem</b></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-lg-3 col-md-6" id="contadorTemperatura">
+                                <!-- Weather Card Layout  -->
+                                <div tabindex="0" class="e-card" id="temp_card">
+                                    <div class="e-card-header">
+                                        <div class="e-card-header-caption">
+                                            <div class="e-card-sub-title tr" key="totalizadorConSensorTemp">C/ Sensor T&#186;</div>
+                                            <div class="e-card-sub-title"></div>
+                                        </div>
+                                    </div>
+                                    <div class="e-card-header weather_report">
+                                        <div class="e-card-header-image"></div>
+                                        <div class="e-card-header-caption">
+                                            <div class="e-card-header-title"><b>@ViewBag.ContadorTemperatura</b></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 col-sm-12 col-lg-3 col-md-6" id="contadorAperturaPuerta">
+                                <!-- Weather Card Layout  -->
+                                <div tabindex="0" class="e-card" id="puertas_card">
+                                    <div class="e-card-header">
+                                        <div class="e-card-header-caption">
+                                            <div class="e-card-sub-title tr" key="totalizadorConSensorLuz">C/ Sensor Apertura Puertas</div>
+                                            <div class="e-card-sub-title"></div>
+                                        </div>
+                                    </div>
+                                    <div class="e-card-header weather_report">
+                                        <div class="e-card-header-image"></div>
+                                        <div class="e-card-header-caption">
+                                            <div class="e-card-header-title"><b>@ViewBag.ContadorLuz</b></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="control-section col-lg-12">
+                            <span id='msg'></span>
+                            @{
+                                List<object> cols = new List<object>();
+                                cols.Add(new { field = "EtaPuerto", direction = "Descending" });
+                            }
+
+                            @(Html.EJS().Grid<Clases.Servicio>("TransitoEnCurso").DataSource((IEnumerable<Clases.Servicio>)ViewBag.DataSource).FilterSettings(filter => filter.Type(Syncfusion.EJ2.Grids.FilterType.Excel)).AllowSelection().DetailTemplate("#detailtemplate").Columns(col =>
+                        //@(Html.EJS().Grid<Clases.Servicio>("TransitoEnCurso").DataSource((IEnumerable<Clases.Servicio>)ViewBag.DataSource).FilterSettings(filter => filter.Type(Syncfusion.EJ2.Grids.FilterType.Excel)).AllowPaging().DetailTemplate("#detailtemplate").Columns(col =>
+                        {
+                            //col.Field("BDOrigen").Visible(false).IsPrimaryKey(true).HeaderText("").Width("130").Add();
+                            //col.Field("idservicio").Visible(false).IsPrimaryKey(true).HeaderText("ID SERVICIO").Width("130").Add();
+                            col.Field("").HeaderTemplate("#div-limpiar-filtros").Width("100").Template("#coltemplateDetalle").Add();
+                            //col.Field("").HeaderText("").Width("55").Template("#coltemplateEditar").Add();
+                            //col.Field("").HeaderText("").Width("55").Template("#coltemplateFinalizar").Add();
+                            //col.Field("").HeaderText("").Width("55").Template("#coltemplateEliminar").Add();
+                            col.Field("").HeaderText("").Width("50").Template("#coltemplatePrueba").Add();
+                            col.Field(p => p.Contenedor).HeaderText("Contenedor").Width("130").Add();
+                            col.Field(p => p.StringSensores).HeaderText("Sensores").Width("150").Add();
+                            col.Field(p => p.Commodity).HeaderText("Commodity").Width("140").Add();
+                            //col.Field(p => p.FechaControlador).HeaderText("Fecha Programacion Sensores").Width("270").Format(new { type = "datetime", format = "dd/MM/y" }).Add();
+                            col.Field(p => p.Etd).HeaderText("Fecha Despacho Estimada").Width("190").Format(new { type = "datetime", format = "dd/MM/y" }).Filter(Syncfusion.EJ2.Grids.FilterType.Menu).Add();
+                            col.Field(p => p.EtaPuerto).HeaderText("Fecha Arribo Estimada").Width("165").Format(new { type = "datetime", format = "dd/MM/y" }).Add();
+                            col.Field(p => p.PuertoOrigen).HeaderText("Puerto Origen").Width("155").Template("#coltemplateOrigen").Add();
+                            col.Field(p => p.PuertoDestino).HeaderText("Puerto Destino").Width("185").Template("#coltemplateDestino").Add();
+                            col.Field(p => p.Booking).HeaderText("Booking").Width("145").Add();
+                            col.Field(p => p.Naviera).HeaderText("Naviera").Width("120").Add();
+                            //col.Field(p => p.Nave).HeaderText("Nave").Width("160").Add();
+                            col.Field(p => p.SetpointAC).HeaderText("Setpoint CO2").Width("150").Add();
+                            col.Field(p => p.SetpointT).HeaderText("Setpoint T°").Width("130").Add();
+                            col.Field(p => p.ObtieneDatos).HeaderText("Sensor Data").Width("130").Add();
+                            //col.Field(p => p.Descripcion).HeaderText("Descripción").Width("160").Add();
+
+                            //CO2 EXTERNO INCLUYE MODEM
+                            //col.Field(p => p.CO2Ext).HeaderText("C/Sensor CO2").Width("150").Add();
+                            //col.Field(p => p.TemperaturaExt).HeaderText("C/Sensor T°").Width("140").Add();
+                            //col.Field(p => p.AperturaPuerta).HeaderText("C/Sensor Apertura Puertas").Width("240").Add();
+
+
+                        }).SortSettings(sort => sort.Columns(cols)).AllowSorting(true).EnablePersistence(true).AllowPaging(true).PageSettings(page => page.PageCount(5)).AllowFiltering(true).SelectionSettings(select => select.CellSelectionMode(Syncfusion.EJ2.Grids.CellSelectionMode.Flow).Mode(Syncfusion.EJ2.Grids.SelectionMode.Cell).Type(Syncfusion.EJ2.Grids.SelectionType.Single)).CellSelected("onCellSelected").Render())
+                @*}).SortSettings(sort => sort.Columns(cols)).AllowResizing(true).AllowReordering().AllowSorting(true).EnablePersistence(true).AllowPaging(true).PageSettings(page => page.PageCount(5)).AllowFiltering(true).SelectionSettings(select => select.CellSelectionMode(Syncfusion.EJ2.Grids.CellSelectionMode.Flow).Mode(Syncfusion.EJ2.Grids.SelectionMode.Cell).Type(Syncfusion.EJ2.Grids.SelectionType.Single)).CellSelected("onCellSelected").Render())*@
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <br>
+                    @RenderSelect()
+                </div>
+            </div>
+        </div>).Created("tabCreated").Items(ViewBag.orientationItems).Selected("tabSelected").HeightAdjustMode(HeightStyles.Content).OverflowMode(OverflowMode.Scrollable).Selecting("tabSelecting").Render())
+        <div class="row">
+            <div class="col-lg-12">
+                <hr />
+                <b key="avisoConfidencialidad" class="tr">
+                    Aviso de Confidencialidad:
+                </b>
+                <p key="MensajeConfidencialidadOngoing" class="tr aviso1">
+                    La información aquí contenida es provista por un sistema de geolocalización. Pueden existir errores o distorsiones de ubicación que no necesariamente impliquen movimientos reales. Mientras la Aplicación Alma® se mantenga en periodo de pruebas, recomendamos validar mediante la utilización de su sistema de tracking habitual. En caso de dudas, solicitar mayor información a su contacto habitual de Liventus S.A. La información aquí contenida es preliminar, obtenida en base a un sistema de interconexión remoto vía 3G, y que puede sufrir modificaciones. Toda la información y los datos que la presente plataforma proporciona tienen carácter meramente informativo. Los autores no se hacen responsables de su exactitud, actualización o validez, y por tanto están exentos de toda responsabilidad derivada de su incorrección, omisión, falta de actualización o retraso, así como de cualquier pérdida, o daño que pudiera causar su uso o exposición por parte de terceros (autorizados o no). Toda la información se proporciona en los términos en que se visualiza, pudiendo no ser exactamente correcta, acertada o definitiva. Cualquier forma no autorizada de distribución, copia, duplicación, reproducción, o venta (total o parcial) del contenido de esta web, tanto para uso personal como comercial, constituirá una infracción de los derechos de propiedad de los autores. El Usuario se compromete a no utilizar cualquiera de los Contenidos que la plataforma ponga a su disposición para desarrollar actividades contrarias a las leyes, a la moral o al orden público y, en general, a hacer un uso conforme a las presentes condiciones generales. En cualquier caso, el usuario se compromete a mantener la estricta confidencialidad de la información técnica a la que pudiera acceder, gestionando su uso de manera interna, y no utilizando dicha información para afectar derechos o fundar reclamos en contra de terceros.
+                </p>
+                <hr />
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="margin-left:80px; margin-right:10px;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content" style="width:60%">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="h4 modal-title tr" key="editarContenedorSensor" id="myModalLabel3">EDITAR CONTENEDOR/SENSOR</h4>
+                </div>
+                @*<div class="modal-body" >*@
+                <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+
+                    @using (Html.BeginForm("EditarServicioPorModal", "Servicio", FormMethod.Post, new { id = "form_agregar" }))
+                    {
+
+                        @Html.ValidationSummary(true)
+                        <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12 control-section">
+                            <div id="wrapper" style="margin-top: 20px;">
+                                <h5 class="h5 tr" key="datosContenedor">DATOS DEL CONTENEDOR</h5>
+                                <hr style="border-width: medium;" />
+                                <div class="alert alert-info row">
+                                    <i class="glyphicon glyphicon-info-sign fa-2x" style="vertical-align:middle;"></i>
+                                    <span class="tr" key="camposObligatorios" style="vertical-align:middle;">Los campos que poseen un (*) son obligatorios.</span>
+                                </div>
+                                <div class="div1">
+                                    <div class="row">
+                                        <div id="div-contenedor_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @*@Html.EJS().ComboBox("contenedor_agregar").Placeholder("Seleccione un contenedor").AllowFiltering(true).Filtering("onfilteringContenedor_agregar").Change("contenedorChange_agregar").DataSource((IEnumerable<object>)ViewBag.lista_contenedores).NoRecordsTemplate("<div>"
+                                                + "<div id=\"nodata-contenedor_agregar\"> El contenedor ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                                + "<button id=\"btn-contenedor_agregar\" class=\"e-control e-btn\"> Agregar contenedor</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()*@
+                                            @Html.EJS().TextBoxFor(model => model.contenedor_agregar).Placeholder("Número de Contenedor (*)").FloatLabelType(FloatLabelType.Auto).Enabled(false).Render()
+                                        </div>
+                                        <div hidden>
+                                            @Html.EJS().TextBoxFor(model => model.contenedor_agregar2).Render()
+                                        </div>
+                                        @*<div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                                <br />
+                                                <input id="btn-validar_contenedor" type="button" value="Validar" class="btn btn-success">
+                                            </div>*@
+                                        <div hidden>
+                                            @Html.EJS().TextBoxFor(model => model.servicio_app_servicios_agregar).Render()
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div id="div-origen_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.lugar_origen_agregar).Placeholder("Lugar de Origen (*)").FloatLabelType(FloatLabelType.Auto).Enabled(false).Render()
+
+                                        </div>
+                                        <div id="div-destino_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.lugar_destino_agregar).Placeholder("Lugar de Destino (*)").FloatLabelType(FloatLabelType.Auto).Enabled(false).Render()
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div id="div-etd_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().DatePicker("etd_agregar").Placeholder("Fecha Estimada (*)").FloatLabelType(FloatLabelType.Auto).Format("dd/MM/yyyy").Enabled(false).Render()
+                                        </div>
+                                        <div id="div-eta_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().DatePicker("eta_agregar").Placeholder("Fecha Estimada de Arribo (*)").FloatLabelType(FloatLabelType.Auto).Format("dd/MM/yyyy").Enabled(false).Render()
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.booking_agregar).Placeholder("Booking").FloatLabelType(FloatLabelType.Auto).Enabled(false).Render()
+                                            <div>
+                                                @Html.ValidationMessageFor(model => model.booking_agregar)
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().ComboBox("nave_agregar").Placeholder("Nave").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).DataSource((IEnumerable<object>)ViewBag.lista_naves).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().ComboBox("commodity_agregar").Placeholder("Commodity").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Filtering("onfilteringCommodity_agregar").DataSource((IEnumerable<object>)ViewBag.lista_commodities).NoRecordsTemplate("<div>"
+                                + "<div id=\"nodata-commodity_agregar\"> El commodity ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                + "<button id=\"btn-commodity_agregar\" class=\"e-control e-btn\">Agregar commodity</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().ComboBox("naviera_agregar").Placeholder("Naviera").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).DataSource((IEnumerable<object>)ViewBag.lista_navieras).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @*@Html.EJS().ComboBox("setpoint_co2_agregar").Placeholder("Setpoint CO2 (%)").AllowFiltering(true).Filtering("onfilteringSetpointCO2_agregar").DataSource((IEnumerable<object>)ViewBag.lista_setpoint_co2).NoRecordsTemplate("<div>"
+                                                + "<div id=\"nodata-setpoint-co2_agregar\"> El setpoint de CO2 ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                                + "<button id=\"btn-setpoint-co2_agregar\" class=\"e-control e-btn\">Agregar setpoint CO2</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()*@
+                                            @Html.EJS().TextBoxFor(model => model.setpoint_co2_agregar).Placeholder("Setpoint CO2 (%)").FloatLabelType(FloatLabelType.Auto).Enabled(false).Render()
+                                            <div>
+                                                @Html.ValidationMessageFor(model => model.setpoint_co2_agregar)
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @*@Html.EJS().ComboBox("setpoint_temp_agregar").Placeholder("Setpoint Temperatura (°C)").AllowFiltering(true).Filtering("onfilteringSetpointTemp_agregar").DataSource((IEnumerable<object>)ViewBag.lista_setpoint_temp).NoRecordsTemplate("<div>"
+                                                + "<div id=\"nodata-setpoint-temp_agregar\"> El setpoint de temperatura ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                                + "<button id=\"btn-setpoint-temp_agregar\" class=\"e-control e-btn\">Agregar setpoint temperatura</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()*@
+                                            @Html.EJS().TextBoxFor(model => model.setpoint_temp_agregar).Placeholder("Setpoint Temperatura (°C)").FloatLabelType(FloatLabelType.Auto).Enabled(false).Render()
+                                            <div>
+                                                @Html.ValidationMessageFor(model => model.setpoint_temp_agregar)
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.descripcion_agregar).Placeholder("Descripción").FloatLabelType(FloatLabelType.Auto).Enabled(false).Render()
+                                            <div>
+                                                @Html.ValidationMessageFor(model => model.descripcion_agregar)
+                                            </div>
+                                        </div>
+                                        @*<div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                                <br />
+                                                <div class="col-xs-4 col-sm-4 col-lg-4 col-md-4">
+                                                    <label>Asignar y programar sensores al contenedor?</label>
+                                                </div>
+                                                <div class="col-xs-2 col-sm-2 col-lg-2 col-md-2">
+                                                    @Html.EJS().RadioButton("rb_si").Label("SI").Name("Seleccion").Value("SI").Render()
+                                                    @Html.EJS().RadioButton("rb_no").Label("NO").Name("Seleccion").Value("NO").Checked(true).Render()
+                                                </div>
+
+                                            </div>*@
+                                    </div>
+                                    <br />
+
+                                </div>
+                                <br />
+
+                                <h5 class="h5 tr" key="AsignarYProgramarSensores">ASIGNAR Y PROGRAMAR SENSORES</h5>
+                                <hr style="border-width: medium;" />
+                                <div id="div_seccion_sensores" class="div_seccion_sensores">
+                                    <div id="div_sensores1" class="row">
+                                        <div id="div-btn_agregar_sensor" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            <input id="btn-agregar_sensor" type="button" class="btn btn-success tr" key="botonAgregarSensor" value="Agregar Nuevo Sensor" />
+                                        </div>
+                                        <div id="div-numero-serie_agregar1" class="col-xs-5 col-sm-5 col-lg-5 col-md-5" hidden="hidden">
+                                            @Html.EJS().TextBoxFor(model => model.numero_serie_agregar).Placeholder("Número de Serie (*)").FloatLabelType(FloatLabelType.Auto).Render()
+                                        </div>
+                                        <div id="div-tipo-sensor_agregar1" class="col-xs-6 col-sm-6 col-lg-6 col-md-6" hidden="hidden">
+                                            @Html.EJS().ComboBox("sensores_agregar").Change("sensoresChange_agregar").Placeholder("Tipo de Sensor (*)").FloatLabelType(FloatLabelType.Auto).DataSource((IEnumerable<object>)ViewBag.lista_sensores).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Name" }).Render()
+                                        </div>
+                                        <div id="div-eliminar_sensor1" class="col-xs-1 col-sm-1 col-lg-1 col-md-1" hidden="hidden">
+                                            <br />
+                                            <input id="btn-eliminar_sensor1" type="button" class="btn btn-danger tr" key="botonEliminar" value="Eliminar" />
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                            @Html.ValidationMessageFor(model => model.numero_serie_agregar)
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div id="div_sensores2" class="row" hidden="hidden">
+                                        <div id="div-btn_agregar_sensor2" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            <input id="btn-agregar_sensor2" type="button" class="btn btn-success tr" key="botonAgregarSensor" value="Agregar Nuevo Sensor" />
+                                        </div>
+                                        <div id="div-numero-serie_agregar2" class="col-xs-5 col-sm-5 col-lg-5 col-md-5" hidden="hidden">
+                                            @Html.EJS().TextBoxFor(model => model.numero_serie_agregar2).Placeholder("Número de Serie").FloatLabelType(FloatLabelType.Auto).Render()
+                                        </div>
+                                        <div id="div-tipo-sensor_agregar2" class="col-xs-6 col-sm-6 col-lg-6 col-md-6" hidden="hidden">
+                                            @Html.EJS().ComboBox("sensores_agregar2").Change("sensoresChange_agregar2").Placeholder("Tipo de Sensor").FloatLabelType(FloatLabelType.Auto).DataSource((IEnumerable<object>)ViewBag.lista_sensores).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Name" }).Render()
+                                        </div>
+                                        <div id="div-eliminar_sensor2" class="col-xs-1 col-sm-1 col-lg-1 col-md-1" hidden="hidden">
+                                            <br />
+                                            <input id="btn-eliminar_sensor2" type="button" class="btn btn-danger tr" key="botonEliminar" value="Eliminar" />
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                            @Html.ValidationMessageFor(model => model.numero_serie_agregar2)
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div id="div_sensores3" class="row" hidden="hidden">
+                                        <div id="div-btn_agregar_sensor3" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            <input id="btn-agregar_sensor3" type="button" class="btn btn-success tr" key="botonAgregarSensor" value="Agregar Nuevo Sensor" />
+                                        </div>
+                                        <div id="div-numero-serie_agregar3" class="col-xs-5 col-sm-5 col-lg-5 col-md-5" hidden="hidden">
+                                            @Html.EJS().TextBoxFor(model => model.numero_serie_agregar3).Placeholder("Número de Serie").FloatLabelType(FloatLabelType.Auto).Render()
+                                        </div>
+                                        <div id="div-tipo-sensor_agregar3" class="col-xs-6 col-sm-6 col-lg-6 col-md-6" hidden="hidden">
+                                            @Html.EJS().ComboBox("sensores_agregar3").Change("sensoresChange_agregar3").Placeholder("Tipo de Sensor").FloatLabelType(FloatLabelType.Auto).DataSource((IEnumerable<object>)ViewBag.lista_sensores).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Name" }).Render()
+                                        </div>
+                                        <div id="div-eliminar_sensor3" class="col-xs-1 col-sm-1 col-lg-1 col-md-1" hidden="hidden">
+                                            <br />
+                                            <input id="btn-eliminar_sensor3" type="button" class="btn btn-danger tr" key="botonEliminar" value="Eliminar" />
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                            @Html.ValidationMessageFor(model => model.numero_serie_agregar3)
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div id="div_sensores4" class="row" hidden="hidden">
+                                        <div id="div-btn_agregar_sensor4" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            <input id="btn-agregar_sensor4" type="button" class="btn btn-success tr" key="botonAgregarSensor" value="Agregar Nuevo Sensor" />
+                                        </div>
+                                        <div id="div-numero-serie_agregar4" class="col-xs-5 col-sm-5 col-lg-5 col-md-5" hidden="hidden">
+                                            @Html.EJS().TextBoxFor(model => model.numero_serie_agregar4).Placeholder("Número de Serie").FloatLabelType(FloatLabelType.Auto).Render()
+                                        </div>
+                                        <div id="div-tipo-sensor_agregar4" class="col-xs-6 col-sm-6 col-lg-6 col-md-6" hidden="hidden">
+                                            @Html.EJS().ComboBox("sensores_agregar4").Change("sensoresChange_agregar4").Placeholder("Tipo de Sensor").FloatLabelType(FloatLabelType.Auto).DataSource((IEnumerable<object>)ViewBag.lista_sensores).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Name" }).Render()
+                                        </div>
+                                        <div id="div-eliminar_sensor4" class="col-xs-1 col-sm-1 col-lg-1 col-md-1" hidden="hidden">
+                                            <br />
+                                            <input id="btn-eliminar_sensor4" type="button" class="btn btn-danger tr" key="botonEliminar" value="Eliminar" />
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                            @Html.ValidationMessageFor(model => model.numero_serie_agregar4)
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div id="div_sensores5" class="row" hidden="hidden">
+                                        <div id="div-btn_agregar_sensor5" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            <input id="btn-agregar_sensor5" type="button" class="btn btn-success tr" key="botonAgregarSensor" value="Agregar Nuevo Sensor" />
+                                        </div>
+                                        <div id="div-numero-serie_agregar5" class="col-xs-5 col-sm-5 col-lg-5 col-md-5" hidden="hidden">
+                                            @Html.EJS().TextBoxFor(model => model.numero_serie_agregar5).Placeholder("Número de Serie").FloatLabelType(FloatLabelType.Auto).Render()
+                                        </div>
+                                        <div id="div-tipo-sensor_agregar5" class="col-xs-6 col-sm-6 col-lg-6 col-md-6" hidden="hidden">
+                                            @Html.EJS().ComboBox("sensores_agregar5").Change("sensoresChange_agregar5").Placeholder("Tipo de Sensor").FloatLabelType(FloatLabelType.Auto).DataSource((IEnumerable<object>)ViewBag.lista_sensores).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()
+                                        </div>
+                                        <div id="div-eliminar_sensor5" class="col-xs-1 col-sm-1 col-lg-1 col-md-1" hidden="hidden">
+                                            <br />
+                                            <input id="btn-eliminar_sensor5" type="button" class="btn btn-danger tr" key="botonEliminar" value="Eliminar" />
+                                        </div>
+                                        <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                            @Html.ValidationMessageFor(model => model.numero_serie_agregar5)
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+
+                            </div>
+                        </div>
+                    }
+
+                </div>
+                @*</div>*@
+                <div class="modal-footer d-flex justify-content-center">
+                    <div id="submitbutton" align="center">
+                        <input id="btn-guardar_agregar" class="e-control e-btn e-success tr" key="botonGuardar" type="button" value="Guardar">
+                        <input id="btn-limpiar_agregar" class="e-control e-btn e-lib tr" key="botonLimpiar" type="button" value="Limpiar">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal1" id="ModalEditarContenedor" style="display:none;"></button>
+
+</div>
+
+@helper RenderSelect()
+{
+    @(Html.EJS().Tab("pestanaMapas").ContentTemplate(
+    @<div>
+        <div id="pestanas" class="e-tab-header">
+            <div>Sensores Emerson</div>
+            <div>Modem Alma</div>
+        </div>
+        <div class="e-content">
+            <div>
+                <div class="row">
+                    <br>
+                    <div class="col-lg-12" id="googleMapEmerson" style="height:500px;border:2px solid #999999;"></div>
+                </div>
+            </div>
+            <div>
+                <br />
+                <div class="row" id="FiltrosMapaONGOING">
+
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class='col-lg-3 col-md-3 col-sm-3'>
+                                @Html.EJS().ComboBox("ComboBoxContenedor").Width("100%").Placeholder("Seleccione Contenedor").DataSource((IEnumerable<Clases.Contenedor>)ViewBag.Contenedores).Fields(new ComboBoxFieldSettings { Text = "NumeroContenedor", Value = "IdContenedor" }).Render()
+                            </div>
+                            <div class='col-lg-3 col-md-3 col-sm-3'>
+                                @Html.EJS().ComboBox("ComboBoxNaviera").Width("100%").Placeholder("Seleccione Naviera").DataSource((IEnumerable<Clases.Naviera>)ViewBag.Navieras).Fields(new ComboBoxFieldSettings { Text = "Nombre", Value = "Id" }).Render()
+                            </div>
+                            <div class='col-lg-3 col-md-3 col-sm-3'>
+                                @Html.EJS().ComboBox("ComboBoxBooking").Width("100%").Placeholder("Seleccione Booking").DataSource(ViewBag.Bookings).Render()
+                            </div>
+                            <div class='col-lg-3 col-md-3 col-sm-3'>
+                                @Html.EJS().ComboBox("ComboBoxNave").Width("100%").Placeholder("Seleccione Nave").DataSource((IEnumerable<Clases.Nave>)ViewBag.Naves).Fields(new ComboBoxFieldSettings { Text = "NombreNave", Value = "IdNave" }).Render()
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <br />
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class='col-lg-3 col-md-3 col-sm-3'>
+                                @Html.EJS().ComboBox("ComboBoxPuertoOrigen").Width("100%").Placeholder("Seleccione Puerto Origen").DataSource((IEnumerable<Clases.PuertoDestino>)ViewBag.PuertosOrigen).Fields(new ComboBoxFieldSettings { Text = "Nombre", Value = "Id" }).Render()
+                            </div>
+                            <div class='col-lg-3 col-md-3 col-sm-3'>
+                                @Html.EJS().ComboBox("ComboBoxPuertoDestino").Width("100%").Placeholder("Seleccione Puerto Destino").DataSource((IEnumerable<Clases.PuertoDestino>)ViewBag.PuertosDestino).Fields(new ComboBoxFieldSettings { Text = "Nombre", Value = "Id" }).Render()
+                            </div>
+                            <div class='col-lg-3 col-md-3 col-sm-3'>
+                                @Html.EJS().ComboBox("ComboBoxCommodity").Width("100%").Placeholder("Seleccione Commodity").DataSource((IEnumerable<Clases.Commodity>)ViewBag.Commoditys).Fields(new ComboBoxFieldSettings { Text = "Nombre", Value = "Id" }).Render()
+                            </div>
+                            <div class='col-lg-3 col-md-3 col-sm-3'>
+                                <!--Calendar("calendar")-->
+                                @Html.EJS().DatePicker("DatePickerEtaPod").Width("100%").WeekNumber(true).Placeholder("Seleccione Fecha Estimada Arribo").Render()
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12" style="text-align:center">
+                            <br />
+                            <button type="button" class="btn btn-success tr btn-sm" id="FiltroMapa" key="FiltroMapa"> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Filtrar&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </button>
+                            <button type="button" class="btn btn-primary tr btn-sm" id="EliminarFiltros" key="EliminarFiltros"> &nbsp;&nbsp;Eliminar Filtros&nbsp;&nbsp; </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <br>
+                    <div class="col-lg-12" id="googleMap" style="height:500px;border:2px solid #999999;"></div>
+                </div>
+            </div>
+        </div>
+    </div>).HeightAdjustMode(HeightStyles.Content).OverflowMode(OverflowMode.Scrollable).Selecting("tabSelecting").Render())
+}
+
+<style type="text/css" class="cssStyles">
+    .detailtable td {
+        font-size: 13px;
+        padding: 4px;
+        max-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .photo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+        box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0, 0, 0, 0.2);
+    }
+</style>
+<script type="text/x-template" id="detailtemplate">
+    <table class="detailtable" width="100%">
+        <colgroup>
+            <col width="35%" />
+            <col width="35%" />
+            <col width="30%" />
+        </colgroup>
+        <tbody>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Contenedor: </span> ${Contenedor}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Commodity: </span> ${Commodity}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Inicio Servicio: </span> ${FechaControlador}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Fecha Estimada de Arribo: </span> ${EtaPuerto}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Puerto Origen: </span> ${PuertoOrigen}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Puerto Destino: </span> ${PuertoDestino}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Booking: </span> ${Booking}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Naviera: </span> ${Naviera}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Nave: </span> ${Nave}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Setpoint CO2: </span> ${SetpointAC}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Setpoint Temperatura: </span> ${SetpointT}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor CO2: </span> ${CO2Ext}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor Temperatura: </span> ${TemperaturaExt}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor Apertura Puertas: </span> ${AperturaPuerta}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+
+<script>
+    var lang = getCookie("Lenguaje");
+
+    /*document.addEventListener('DOMContentLoaded', function () {
+        loadCultureFiles(lang);
+    });
+
+    function loadCultureFiles(name) {
+        var files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json'];
+        if (name === 'ar') {
+            files.push('numberingSystems.json');
+        }
+        var loader = ej.base.loadCldr;
+        var loadCulture = function (prop) {
+            var val, ajax;
+            if (name === 'ar' && prop === files.length - 1) {
+                ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../PruebaIntranet/build/node_modules/cldr-data/supplemental/' + files[prop], 'GET', false);
+            } else {
+                ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../PruebaIntranet/build/node_modules/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
+            }
+            ajax.onSuccess = function (value) {
+                val = value;
+            };
+            ajax.send();
+            loader(JSON.parse(val));
+        };
+        for (var prop = 0; prop < files.length; prop++) {
+            loadCulture(prop);
+        }
+    }*/
+
+
+    var toast_titulo1 = '¡Advertencia!';
+    var toast_titulo2 = '¡Muy bien!';
+    var toast_titulo3 = '¡Error!';
+    var toast_titulo4 = '¡Información!';
+    var toast_content1 = 'El contenedor fue creado exitosamente.';
+    var toast_content2 = 'El contenedor fue editado exitosamente.';
+    var toast_content3 = 'El contenedor fue eliminado exitosamente.';
+    var toast_content4 = 'Error al asignar/programar sensor al contenedor, las posibles razones del error son: Número de serie mal digitado, no existe conexión con los servidores de Emerson, el sensor posee un viaje activo creado desde otra aplicación, o error no identificado.';
+    var toast_content5 = 'El viaje de su contenedor ha sido finalizado exitosamente.';
+
+    if (lang === 'en') {
+        toast_titulo1 = 'Warnings!';
+        toast_titulo2 = 'Well done!';
+        toast_titulo3 = 'Error!';
+        toast_titulo4 = 'Information';
+        toast_content1 = 'The container was created successfully.';
+        toast_content2 = 'The container was edited successfully.';
+        toast_content3 = 'The container was deleted successfully.';
+        toast_content4 = 'Error assigning / programming sensor to the container, the possible reasons for the error are: Serial number wrongly typed, there is no connection to Emerson servers, the sensor has an active trip created from another application, or an unidentified error.';
+        toast_content5 = 'The trip of your container has been successfully ended.';
+    }
+
+    var toasts = [
+        { title: toast_titulo1, content: 'Advertencia.', cssClass: 'e-toast-warning', icon: 'e-warning toast-icons' },
+        { title: toast_titulo2, content: toast_content1, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo2, content: toast_content2, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo2, content: toast_content3, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo3, content: toast_content4, cssClass: 'e-toast-danger', icon: 'e-error toast-icons' },
+        { title: toast_titulo4, content: 'Información.', cssClass: 'e-toast-info', icon: 'e-info toast-icons' },
+        { title: toast_titulo2, content: toast_content5, cssClass: 'e-toast-success', icon: 'e-success toast-icons' }];
+
+    var btnEleHide = document.getElementById('hideToast');
+    var toastObj;
+    var infoBtn = document.getElementById('info_Toast');
+    var warnBtn = document.getElementById('warning_Toast');
+    var successBtn = document.getElementById('success_Toast');
+    var errorBtn = document.getElementById('error_Toast');
+    document.onclick = function (e) {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        if (e.target !== infoBtn && e.target !== warnBtn && e.target !== successBtn && e.target !== errorBtn) {
+            toastObj.hide('All');
+        }
+    };
+
+    document.getElementById('hideToast').onclick = function () {
+        toastObj.hide('All');
+    };
+    infoBtn.onclick = function () {
+        toastObj.show(toasts[1]);
+        toastObj.show(toasts[2]);
+        toastObj.show(toasts[3]);
+        toastObj.show(toasts[4]);
+    };
+    warnBtn.onclick = function () {
+        toastObj.show(toasts[0]);
+    };
+    successBtn.onclick = function () {
+        toastObj.show(toasts[1]);
+    };
+    errorBtn.onclick = function () {
+        toastObj.show(toasts[2]);
+    };
+
+    var toastObj;
+    function created() {
+        toastObj = this;
+    }
+    function onclose(e) {
+        if (e.toastContainer.childElementCount === 0) {
+            btnEleHide.style.display = 'none';
+        }
+    }
+    function onBeforeOpen() {
+        btnEleHide.style.display = 'inline-block';
+    }
+
+    function mergeHead(args) {
+        console.log('APSO');
+        //args.headerCellMerge(1, 2);
+    }
+
+
+
+
+    $(document).ready(function () {
+
+        //var grid = document.getElementById("TransitoEnCurso").ej2_instances[0];
+
+        var contador = 0;
+        $("th").each(function (index) {
+            contador++;
+
+            if (contador == 1) {
+                //$(this).css("display", "none");
+            }
+            else if (contador == 2) {
+                //$(this).attr("colSpan", "3");
+                $(this).css("width", "100%");
+            }
+            else if (contador == 3) {
+                //$(this).css("display", "none");
+            }
+        });
+
+
+        @*$.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'TransitoEnCursoView'
+            }
+
+        });*@
+
+        var urlString = window.location.href;
+        let url = new URL(urlString);
+        let searchString = url.search.slice(1);
+        let searchParams = new URLSearchParams(searchString);
+        let inputParam = 'desplegarMensaje';
+        let inputParam2 = 'sensoresConError';
+        let inputParam3 = 'sensoresSinError';
+
+        if (searchParams.has(inputParam)) {
+            if (searchParams.get(inputParam) == 1) {
+                desplegarMensaje(searchParams.get(inputParam2), searchParams.get(inputParam3));
+            }
+            else if (searchParams.get(inputParam) == 2) {
+                desplegarMensajeEditar(searchParams.get(inputParam2), searchParams.get(inputParam3));
+            }
+            else if (searchParams.get(inputParam) == 3) {
+                desplegarMensajeCancelar();
+            }
+            else if (searchParams.get(inputParam) == 4) {
+                desplegarMensajeFinalizar();
+            }
+        }
+
+    });
+
+    function desplegarMensaje(sensoresConError, sensoresSinError) {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        if (sensoresConError == "" || sensoresConError == null)
+        {
+            setTimeout(function () {
+                toastObj.target = document.body;
+                toastObj.show({ title: 'Muy bien!', content: 'El contenedor fue creado exitosamente y todos sus sensores programados.', cssClass: 'e-toast-success', icon: 'e-success toast-icons' });
+            }, 500);
+        } else if (sensoresSinError == "" || sensoresSinError == null)
+        {
+             setTimeout(function () {
+                toastObj.target = document.body;
+                toastObj.show({ title: 'Error!', content: 'Error al asignar/programar sensor al contenedor, los sensores son errores son: ' + sensoresConError + ', las posibles razones del error son: Número de serie mal digitado, no existe conexión con los servidores de Emerson, el sensor posee un viaje activo creado desde otra aplicación, o error no identificado.', cssClass: 'e-toast-danger', icon: 'e-error toast-icons' });
+             }, 500);
+        }
+        else
+        {
+            setTimeout(function () {
+                toastObj.target = document.body;
+                toastObj.show({ title: 'Advertencia!', content: 'El contenedor fue creado correctamente pero existen algunos sensores que no se programaron correctamente: ' + sensoresConError + ' mientras que existen otros que si se programaron ' + sensoresSinError, cssClass: 'e-toast-warning', icon: 'e-warning toast-icons' });
+            }, 500);
+        }
+    }
+
+
+    function desplegarMensajeEditar(sensoresConError, sensoresSinError) {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+
+        if (sensoresConError == "" || sensoresConError == null) {
+            setTimeout(function () {
+                toastObj.target = document.body;
+                toastObj.show({ title: 'Muy bien!', content: 'El contenedor fue editado exitosamente y todos sus sensores programados correctamente.', cssClass: 'e-toast-success', icon: 'e-success toast-icons' });
+            }, 500);
+        } else if (sensoresSinError == "" || sensoresSinError == null) {
+            setTimeout(function () {
+                toastObj.target = document.body;
+                toastObj.show({ title: 'Error!', content: 'Error al asignar/programar sensor al contenedor, los sensores con errores son: ' + sensoresConError + ', las posibles razones del error son: Número de serie mal digitado, no existe conexión con los servidores de Emerson, el sensor posee un viaje activo creado desde otra aplicación, o error no identificado.', cssClass: 'e-toast-danger', icon: 'e-error toast-icons' });
+            }, 500);
+        }
+        else {
+            setTimeout(function () {
+                toastObj.target = document.body;
+                toastObj.show({ title: 'Advertencia!', content: 'El contenedor fue editado correctamente pero existen algunos sensores que no se programaron correctamente: ' + sensoresConError + ' mientras que existen otros que si se programaron correctamente: ' + sensoresSinError, cssClass: 'e-toast-warning', icon: 'e-warning toast-icons' });
+            }, 500);
+        }
+    }
+    function desplegarMensajeCancelar() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[3]);
+        }, 500);
+    }
+
+    function desplegarMensajeFinalizar() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[6]);
+        }, 500);
+    }
+
+
+
+
+
+    var boton_eliminar_sensor = document.getElementById('btn-eliminar_sensor1');
+    boton_eliminar_sensor.addEventListener("click", function () {
+
+        $("#div-tipo-sensor_agregar1").hide();
+        $("#div-numero-serie_agregar1").hide();
+        $("#div-btn_agregar_sensor").show();
+        $("#div-eliminar_sensor1").hide();
+        $("#div_sensores2").hide();
+
+        var sensores_agregar = document.getElementById("sensores_agregar").ej2_instances[0];
+        var numero_serie_agregar = document.getElementById("numero_serie_agregar").ej2_instances[0];
+        sensores_agregar.value = "";
+        numero_serie_agregar.value = "";
+
+    });
+
+    var boton_eliminar_sensor = document.getElementById('btn-eliminar_sensor2');
+    boton_eliminar_sensor.addEventListener("click", function () {
+        $("#div-tipo-sensor_agregar2").hide();
+        $("#div-numero-serie_agregar2").hide();
+        $("#div-btn_agregar_sensor2").show();
+        $("#div-eliminar_sensor2").hide();
+        $("#div_sensores3").hide();
+
+        var sensores_agregar2 = document.getElementById("sensores_agregar2").ej2_instances[0];
+        var numero_serie_agregar2 = document.getElementById("numero_serie_agregar2").ej2_instances[0];
+        sensores_agregar2.value = "";
+        numero_serie_agregar2.value = "";
+    });
+
+    var boton_eliminar_sensor = document.getElementById('btn-eliminar_sensor3');
+    boton_eliminar_sensor.addEventListener("click", function () {
+        $("#div-tipo-sensor_agregar3").hide();
+        $("#div-numero-serie_agregar3").hide();
+        $("#div-btn_agregar_sensor3").show();
+        $("#div-eliminar_sensor3").hide();
+        $("#div_sensores4").hide();
+
+        var sensores_agregar3 = document.getElementById("sensores_agregar3").ej2_instances[0];
+        var numero_serie_agregar3 = document.getElementById("numero_serie_agregar3").ej2_instances[0];
+        sensores_agregar3.value = "";
+        numero_serie_agregar3.value = "";
+    });
+
+    var boton_eliminar_sensor = document.getElementById('btn-eliminar_sensor4');
+    boton_eliminar_sensor.addEventListener("click", function () {
+        $("#div-tipo-sensor_agregar4").hide();
+        $("#div-numero-serie_agregar4").hide();
+        $("#div-btn_agregar_sensor4").show();
+        $("#div-eliminar_sensor4").hide();
+        $("#div_sensores5").hide();
+
+        var sensores_agregar4 = document.getElementById("sensores_agregar4").ej2_instances[0];
+        var numero_serie_agregar4 = document.getElementById("numero_serie_agregar4").ej2_instances[0];
+        sensores_agregar4.value = "";
+        numero_serie_agregar4.value = "";
+    });
+
+    var boton_eliminar_sensor = document.getElementById('btn-eliminar_sensor5');
+    boton_eliminar_sensor.addEventListener("click", function () {
+        $("#div-tipo-sensor_agregar5").hide();
+        $("#div-numero-serie_agregar5").hide();
+        $("#div-btn_agregar_sensor5").show();
+        $("#div-eliminar_sensor5").hide();
+
+        var sensores_agregar5 = document.getElementById("sensores_agregar5").ej2_instances[0];
+        var numero_serie_agregar5 = document.getElementById("numero_serie_agregar5").ej2_instances[0];
+        sensores_agregar5.value = "";
+        numero_serie_agregar5.value = "";
+    });
+
+    var boton_agregar_sensor = document.getElementById('btn-agregar_sensor');
+    boton_agregar_sensor.addEventListener("click", function () {
+        $("#div_sensores2").show();
+        $("#div-tipo-sensor_agregar1").show();
+        $("#div-numero-serie_agregar1").show();
+        $("#div-btn_agregar_sensor").hide();
+        $("#div-eliminar_sensor1").show();
+        $("#div-btn_agregar_sensor2").show();
+    });
+
+    var boton_agregar_sensor = document.getElementById('btn-agregar_sensor2');
+    boton_agregar_sensor.addEventListener("click", function () {
+        $("#div_sensores3").show();
+        $("#div-tipo-sensor_agregar2").show();
+        $("#div-numero-serie_agregar2").show();
+        $("#div-btn_agregar_sensor2").hide();
+        $("#div-eliminar_sensor2").show();
+        $("#div-btn_agregar_sensor3").show();
+    });
+
+    var boton_agregar_sensor = document.getElementById('btn-agregar_sensor3');
+    boton_agregar_sensor.addEventListener("click", function () {
+        $("#div_sensores4").show();
+        $("#div-tipo-sensor_agregar3").show();
+        $("#div-numero-serie_agregar3").show();
+        $("#div-btn_agregar_sensor3").hide();
+        $("#div-eliminar_sensor3").show();
+        $("#div-btn_agregar_sensor4").show();
+    });
+
+    var boton_agregar_sensor = document.getElementById('btn-agregar_sensor4');
+    boton_agregar_sensor.addEventListener("click", function () {
+        $("#div_sensores5").show();
+        $("#div-tipo-sensor_agregar4").show();
+        $("#div-numero-serie_agregar4").show();
+        $("#div-btn_agregar_sensor4").hide();
+        $("#div-eliminar_sensor4").show();
+        $("#div-btn_agregar_sensor5").show();
+    });
+
+    var boton_agregar_sensor = document.getElementById('btn-agregar_sensor5');
+    boton_agregar_sensor.addEventListener("click", function () {
+        $("#div-tipo-sensor_agregar5").show();
+        $("#div-numero-serie_agregar5").show();
+        $("#div-btn_agregar_sensor5").hide();
+        $("#div-eliminar_sensor5").show();
+    });
+
+    //$("#rb_si").click(function () {
+    //    var seleccionado = findSelection("Seleccion");
+
+    //    if (seleccionado == "SI") {
+    //        $("#div_sensores1").show();
+    //        $("#div-tipo-sensor_agregar1").hide();
+    //        $("#div-numero-serie_agregar1").hide();
+    //        $("#div-btn_agregar_sensor").show();
+    //        $("#div-eliminar_sensor1").hide();
+
+    //        $("#div_seccion_sensores").show();
+    //        //$("#div-btn_agregar_sensor").show();
+    //    }
+    //});
+
+    //$("#rb_no").click(function () {
+    //    var seleccionado = findSelection("Seleccion");
+
+    //    if (seleccionado == "NO") {
+
+    //        limpiarTodosLosCampos();
+
+    //        $("#div-tipo-sensor_agregar1").hide();
+    //        $("#div-numero-serie_agregar1").hide();
+    //        $("#div-btn_agregar_sensor").show();
+    //        $("#div-eliminar_sensor1").hide();
+    //        $("#div_sensores2").hide();
+
+    //        $("#div-tipo-sensor_agregar2").hide();
+    //        $("#div-numero-serie_agregar2").hide();
+    //        $("#div-btn_agregar_sensor2").hide();
+    //        $("#div-eliminar_sensor2").hide();
+    //        $("#div_sensores3").hide();
+
+    //        $("#div-tipo-sensor_agregar3").hide();
+    //        $("#div-numero-serie_agregar3").hide();
+    //        $("#div-btn_agregar_sensor3").hide();
+    //        $("#div-eliminar_sensor3").hide();
+    //        $("#div_sensores4").hide();
+
+    //        $("#div-tipo-sensor_agregar4").hide();
+    //        $("#div-numero-serie_agregar4").hide();
+    //        $("#div-btn_agregar_sensor4").hide();
+    //        $("#div-eliminar_sensor4").hide();
+    //        $("#div_sensores5").hide();
+
+    //        $("#div-tipo-sensor_agregar5").hide();
+    //        $("#div-numero-serie_agregar5").hide();
+    //        $("#div-btn_agregar_sensor5").hide();
+    //        $("#div-eliminar_sensor5").hide();
+
+    //        $("#div_seccion_sensores").hide();
+    //    }
+    //});
+
+
+    function tabSelecting(e) {
+        if (e.isSwiped) {
+            e.cancel = true;
+        }
+    }
+
+    function findSelection(field) {
+        var test = document.getElementsByName(field);
+        var sizes = test.length;
+        for (i = 0; i < sizes; i++) {
+            if (test[i].checked == true) {
+                return test[i].value;
+            }
+        }
+    }
+
+    var boton_limpiar = document.getElementById('btn-limpiar_agregar');
+    boton_limpiar.addEventListener("click", function () {
+        var contenedor_agregar = document.getElementById("contenedor_agregar").ej2_instances[0];
+        var eta_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+        var etd_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+        var booking_agregar = document.getElementById("booking_agregar").ej2_instances[0];
+        var origen_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+        var destino_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+        var descripcion_agregar = document.getElementById("descripcion_agregar").ej2_instances[0];
+
+        var nave_agregar = document.getElementById("nave_agregar").ej2_instances[0];
+        var commodity_agregar = document.getElementById("commodity_agregar").ej2_instances[0];
+        var naviera_agregar = document.getElementById("naviera_agregar").ej2_instances[0];
+        var setpoint_co2_agregar = document.getElementById("setpoint_co2_agregar").ej2_instances[0];
+        var setpoint_temp_agregar = document.getElementById("setpoint_temp_agregar").ej2_instances[0];
+        var sensores_agregar = document.getElementById("sensores_agregar").ej2_instances[0];
+        var numero_serie_agregar = document.getElementById("numero_serie_agregar").ej2_instances[0];
+        var sensores_agregar2 = document.getElementById("sensores_agregar2").ej2_instances[0];
+        var numero_serie_agregar2 = document.getElementById("numero_serie_agregar2").ej2_instances[0];
+        var sensores_agregar3 = document.getElementById("sensores_agregar3").ej2_instances[0];
+        var numero_serie_agregar3 = document.getElementById("numero_serie_agregar3").ej2_instances[0];
+        var sensores_agregar4 = document.getElementById("sensores_agregar4").ej2_instances[0];
+        var numero_serie_agregar4 = document.getElementById("numero_serie_agregar4").ej2_instances[0];
+        var sensores_agregar5 = document.getElementById("sensores_agregar5").ej2_instances[0];
+        var numero_serie_agregar5 = document.getElementById("numero_serie_agregar5").ej2_instances[0];
+        //var rb_no = document.getElementById("rb_no").ej2_instances[0];
+
+        //rb_no.checked = true;
+        //contenedor_agregar.value = "";
+        eta_agregar.value = "";
+        etd_agregar.value = "";
+        booking_agregar.value = "";
+        origen_agregar.value = "";
+        destino_agregar.value = "";
+        descripcion_agregar.value = "";
+        nave_agregar.text = "";
+        commodity_agregar.text = "";
+        naviera_agregar.text = "";
+        setpoint_co2_agregar.value = "";
+        setpoint_temp_agregar.value = "";
+        sensores_agregar.value = "";
+        numero_serie_agregar.value = "";
+        sensores_agregar2.value = "";
+        numero_serie_agregar2.value = "";
+        sensores_agregar3.text = "";
+        numero_serie_agregar3.value = "";
+        sensores_agregar4.text = "";
+        numero_serie_agregar4.value = "";
+        sensores_agregar5.text = "";
+        numero_serie_agregar5.value = "";
+    });
+
+    $("#numero_serie_agregar").blur(function () {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ValidarModem", "Servicio")',
+                data: { numSerie: $("#numero_serie_agregar").val() },
+                success: function (response) {
+                    var sensores_agregar = document.getElementById("sensores_agregar").ej2_instances[0];
+
+                    if (response != "False") { // es modem
+
+                        sensores_agregar.value = "CO2 Generico";
+                        sensores_agregar.enabled = false;
+
+                    } else {
+
+                        sensores_agregar.value = "";
+                        sensores_agregar.enabled = true;
+
+                        if ($("#numero_serie_agregar").val() != "") {
+
+                             $.ajax({
+                                type: "POST",
+                                url: '@Url.Action("ValidarSensorEnServicio", "Servicio")',
+                                data: { num_sensor: $("#numero_serie_agregar").val() },
+                                success: function (response) {
+                                    if (response != "0") {
+                                        var titulo = '¡Sensor asociado a otro viaje!';
+                                        var texto = 'El sensor está asociado al contenedor ' + response;
+                                        if (lang === 'en') {
+                                            titulo = 'Sensor associated with another trip!';
+                                            texto = 'The sensor is associated with the container ' + response;
+                                        }
+
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: titulo,
+                                            text: texto,
+                                        });
+                                        $("#numero_serie_agregar").val("");
+                                        return false;
+                                    }
+                                    else {
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+                }
+        });
+
+    });
+
+    $("#numero_serie_agregar2").blur(function () {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ValidarModem", "Servicio")',
+                data: { numSerie: $("#numero_serie_agregar2").val() },
+                success: function (response) {
+                    var sensores_agregar = document.getElementById("sensores_agregar2").ej2_instances[0];
+
+                    if (response != "False") { // es modem
+
+                        sensores_agregar.value = "CO2 Generico";
+                        sensores_agregar.enabled = false;
+
+                    } else {
+
+                        sensores_agregar.value = "";
+                        sensores_agregar.enabled = true;
+
+                        if ($("#numero_serie_agregar2").val() != "") {
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("ValidarSensorEnServicio", "Servicio")',
+                                data: { num_sensor: $("#numero_serie_agregar2").val() },
+                                success: function (response) {
+                                    if (response == "False") {
+                                        var titulo = '¡Sensor asociado a otro viaje!';
+                                        var texto = 'El sensor está asociado al contenedor ' + response;
+                                        if (lang === 'en') {
+                                            titulo = 'Sensor associated with another trip!';
+                                            texto = 'The sensor is associated with the container ' + response;
+                                        }
+
+                                        Swal.fire({
+                                            icon: 'error',
+                                            title: titulo,
+                                            text: texto,
+                                        });
+                                        $("#numero_serie_agregar2").val("");
+                                        return false;
+                                    }
+                                    else {
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+
+                    }
+                }
+            });
+
+    });
+
+    $("#numero_serie_agregar3").blur(function () {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ValidarModem", "Servicio")',
+            data: { numSerie: $("#numero_serie_agregar3").val() },
+            success: function (response) {
+                var sensores_agregar = document.getElementById("sensores_agregar3").ej2_instances[0];
+
+                if (response != "False") { // es modem
+
+                    sensores_agregar.value = "CO2 Generico";
+                    sensores_agregar.enabled = false;
+
+                } else {
+
+                    sensores_agregar.value = "";
+                    sensores_agregar.enabled = true;
+
+                    if ($("#numero_serie_agregar3").val() != "") {
+
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("ValidarSensorEnServicio", "Servicio")',
+                            data: { num_sensor: $("#numero_serie_agregar3").val() },
+                            success: function (response) {
+                                if (response == "False") {
+                                    var titulo = '¡Sensor asociado a otro viaje!';
+                                    var texto = 'El sensor está asociado al contenedor ' + response;
+                                    if (lang === 'en') {
+                                        titulo = 'Sensor associated with another trip!';
+                                        texto = 'The sensor is associated with the container ' + response;
+                                    }
+
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: titulo,
+                                        text: texto,
+                                    });
+                                    $("#numero_serie_agregar3").val("");
+                                    return false;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+
+                }
+            }
+        });
+
+    });
+
+
+    $("#numero_serie_agregar4").blur(function () {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ValidarModem", "Servicio")',
+            data: { numSerie: $("#numero_serie_agregar4").val() },
+            success: function (response) {
+                var sensores_agregar = document.getElementById("sensores_agregar4").ej2_instances[0];
+
+                if (response != "False") { // es modem
+
+                    sensores_agregar.value = "CO2 Generico";
+                    sensores_agregar.enabled = false;
+
+                } else {
+
+                    sensores_agregar.value = "";
+                    sensores_agregar.enabled = true;
+
+                    if ($("#numero_serie_agregar4").val() != "") {
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("ValidarSensorEnServicio", "Servicio")',
+                            data: { num_sensor: $("#numero_serie_agregar4").val() },
+                            success: function (response) {
+                                if (response == "False") {
+                                    var titulo = '¡Sensor asociado a otro viaje!';
+                                    var texto = 'El sensor está asociado al contenedor ' + response;
+                                    if (lang === 'en') {
+                                        titulo = 'Sensor associated with another trip!';
+                                        texto = 'The sensor is associated with the container ' + response;
+                                    }
+
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: titulo,
+                                        text: texto,
+                                    });
+                                    $("#numero_serie_agregar4").val("");
+                                    return false;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+
+                }
+            }
+        });
+
+    });
+
+    $("#numero_serie_agregar5").blur(function () {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ValidarModem", "Servicio")',
+            data: { numSerie: $("#numero_serie_agregar4").val() },
+            success: function (response) {
+                var sensores_agregar = document.getElementById("sensores_agregar5").ej2_instances[0];
+
+                if (response != "False") { // es modem
+
+                    sensores_agregar.value = "CO2 Generico";
+                    sensores_agregar.enabled = false;
+
+                } else {
+
+                    sensores_agregar.value = "";
+                    sensores_agregar.enabled = true;
+
+                    if ($("#numero_serie_agregar5").val() != "") {
+                        $.ajax({
+                            type: "POST",
+                            url: '@Url.Action("ValidarSensorEnServicio", "Servicio")',
+                            data: { num_sensor: $("#numero_serie_agregar5").val() },
+                            success: function (response) {
+                                if (response == "False") {
+                                    var titulo = '¡Sensor asociado a otro viaje!';
+                                    var texto = 'El sensor está asociado al contenedor ' + response;
+                                    if (lang === 'en') {
+                                        titulo = 'Sensor associated with another trip!';
+                                        texto = 'The sensor is associated with the container ' + response;
+                                    }
+
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: titulo,
+                                        text: texto,
+                                    });
+                                    $("#numero_serie_agregar5").val("");
+                                    return false;
+                                }
+                                else {
+                                    return false;
+                                }
+                            }
+                        });
+                    }
+
+                }
+            }
+        });
+
+    });
+
+
+
+
+    function limpiarTodosLosCampos() {
+        var sensores_agregar = document.getElementById("sensores_agregar").ej2_instances[0];
+        var numero_serie_agregar = document.getElementById("numero_serie_agregar").ej2_instances[0];
+        var sensores_agregar2 = document.getElementById("sensores_agregar2").ej2_instances[0];
+        var numero_serie_agregar2 = document.getElementById("numero_serie_agregar2").ej2_instances[0];
+        var sensores_agregar3 = document.getElementById("sensores_agregar3").ej2_instances[0];
+        var numero_serie_agregar3 = document.getElementById("numero_serie_agregar3").ej2_instances[0];
+        var sensores_agregar4 = document.getElementById("sensores_agregar4").ej2_instances[0];
+        var numero_serie_agregar4 = document.getElementById("numero_serie_agregar4").ej2_instances[0];
+        var sensores_agregar5 = document.getElementById("sensores_agregar5").ej2_instances[0];
+        var numero_serie_agregar5 = document.getElementById("numero_serie_agregar5").ej2_instances[0];
+        //var rb_no = document.getElementById("rb_no").ej2_instances[0];
+
+        //rb_no.checked = true;
+
+        sensores_agregar.value = "";
+        numero_serie_agregar.value = "";
+        sensores_agregar2.value = "";
+        numero_serie_agregar2.value = "";
+        sensores_agregar3.text = "";
+        numero_serie_agregar3.value = "";
+        sensores_agregar4.text = "";
+        numero_serie_agregar4.value = "";
+        sensores_agregar5.text = "";
+        numero_serie_agregar5.value = "";
+    }
+
+    function contenedorChange_agregar() {
+
+        var div_contenedor_agregar = document.getElementById("div-contenedor_agregar").childNodes;
+        div_contenedor_agregar[1].style.borderColor = "#ced4da";
+    }
+
+    var habilitar_campos_agregar = false;
+
+    function validarContenedor_agregar(item, index) {
+        if (document.getElementById('contenedor_agregar').value == item.Name) {
+            habilitar_campos_agregar = true;
+        }
+    }
+
+    function sensoresChange_agregar() {
+        var div_tipo_sensor_agregar = document.getElementById("div-tipo-sensor_agregar1").childNodes;
+        div_tipo_sensor_agregar[1].style.borderColor = "#ced4da";
+    }
+
+    function sensoresChange_agregar2() {
+        var div_tipo_sensor_agregar = document.getElementById("div-tipo-sensor_agregar2").childNodes;
+        div_tipo_sensor_agregar[1].style.borderColor = "#ced4da";
+    }
+    function sensoresChange_agregar3() {
+        var div_tipo_sensor_agregar = document.getElementById("div-tipo-sensor_agregar3").childNodes;
+        div_tipo_sensor_agregar[1].style.borderColor = "#ced4da";
+    }
+    function sensoresChange_agregar4() {
+        var div_tipo_sensor_agregar = document.getElementById("div-tipo-sensor_agregar4").childNodes;
+        div_tipo_sensor_agregar[1].style.borderColor = "#ced4da";
+    }
+    function sensoresChange_agregar5() {
+        var div_tipo_sensor_agregar = document.getElementById("div-tipo-sensor_agregar5").childNodes;
+        div_tipo_sensor_agregar[1].style.borderColor = "#ced4da";
+    }
+    //function numeroSerieChange_agregar() {
+    //    var div_numero_serie_agregar = document.getElementById("div-numero-serie_agregar1").childNodes;
+    //    div_numero_serie_agregar[1].style.borderColor = "#ced4da";
+    //}
+    //function numeroSerieChange_agregar2() {
+    //    var div_numero_serie_agregar = document.getElementById("div-numero-serie_agregar2").childNodes;
+    //    div_numero_serie_agregar[1].style.borderColor = "#ced4da";
+    //}
+    //function numeroSerieChange_agregar3() {
+    //    var div_numero_serie_agregar = document.getElementById("div-numero-serie_agregar3").childNodes;
+    //    div_numero_serie_agregar[1].style.borderColor = "#ced4da";
+    //}
+    //function numeroSerieChange_agregar4() {
+    //    var div_numero_serie_agregar = document.getElementById("div-numero-serie_agregar4").childNodes;
+    //    div_numero_serie_agregar[1].style.borderColor = "#ced4da";
+    //}
+    //function numeroSerieChange_agregar5() {
+    //    var div_numero_serie_agregar = document.getElementById("div-numero-serie_agregar5").childNodes;
+    //    div_numero_serie_agregar[1].style.borderColor = "#ced4da";
+    //}
+    //function origenChange_agregar() {
+    //    var div_lugar_origen_agregar = document.getElementById("div-lugar-origen_agregar").childNodes;
+    //    div_lugar_origen_agregar[1].style.borderColor = "#ced4da";
+    //}
+    //function destinoChange_agregar() {
+    //    var div_lugar_destino_agregar = document.getElementById("div-lugar-destino_agregar").childNodes;
+    //    div_lugar_destino_agregar[1].style.borderColor = "#ced4da";
+    //}
+
+
+    function HabilitarOtrosCampos_agregar() {
+        var campo1_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+        var campo2_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+        var campo3_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+        var campo4_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+        var campo5_agregar = document.getElementById("booking_agregar").ej2_instances[0];
+        var campo6_agregar = document.getElementById("nave_agregar").ej2_instances[0];
+        var campo7_agregar = document.getElementById("commodity_agregar").ej2_instances[0];
+        var campo8_agregar = document.getElementById("naviera_agregar").ej2_instances[0];
+        var campo9_agregar = document.getElementById("setpoint_co2_agregar").ej2_instances[0];
+        var campo10_agregar = document.getElementById("setpoint_temp_agregar").ej2_instances[0];
+        var campo11_agregar = document.getElementById("descripcion_agregar").ej2_instances[0];
+        //var campo12_agregar = document.getElementById("rb_si").ej2_instances[0];
+        //var campo13_agregar = document.getElementById("rb_no").ej2_instances[0];
+        campo1_agregar.enabled = true;
+        campo2_agregar.enabled = true;
+        campo3_agregar.enabled = true;
+        campo4_agregar.enabled = true;
+        campo5_agregar.enabled = true;
+        campo6_agregar.enabled = true;
+        campo7_agregar.enabled = true;
+        campo8_agregar.enabled = true;
+        campo9_agregar.enabled = true;
+        campo10_agregar.enabled = true;
+        campo11_agregar.enabled = true;
+        //campo12_agregar.enabled = true;
+        //campo13_agregar.enabled = true;
+        campo1_agregar.dataBind();
+        campo2_agregar.dataBind();
+        campo3_agregar.dataBind();
+        campo4_agregar.dataBind();
+        campo5_agregar.dataBind();
+        campo6_agregar.dataBind();
+        campo7_agregar.dataBind();
+        campo8_agregar.dataBind();
+        campo9_agregar.dataBind();
+        campo10_agregar.dataBind();
+        campo11_agregar.dataBind();
+        //campo12_agregar.dataBind();
+        //campo13_agregar.dataBind();
+    }
+
+    function DeshabilitarOtrosCampos_agregar() {
+        var campo1_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+        var campo2_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+        var campo3_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+        var campo4_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+        var campo5_agregar = document.getElementById("booking_agregar").ej2_instances[0];
+        var campo6_agregar = document.getElementById("nave_agregar").ej2_instances[0];
+        var campo7_agregar = document.getElementById("commodity_agregar").ej2_instances[0];
+        var campo8_agregar = document.getElementById("naviera_agregar").ej2_instances[0];
+        var campo9_agregar = document.getElementById("setpoint_co2_agregar").ej2_instances[0];
+        var campo10_agregar = document.getElementById("setpoint_temp_agregar").ej2_instances[0];
+        var campo11_agregar = document.getElementById("nombre_lugar_origen_agregar").ej2_instances[0];
+        var campo12_agregar = document.getElementById("nombre_lugar_destino_agregar").ej2_instances[0];
+        campo1_agregar.value = "";
+        campo2_agregar.value = "";
+        campo3_agregar.value = "";
+        campo4_agregar.value = "";
+        campo5_agregar.value = "";
+        campo6_agregar.value = "";
+        campo7_agregar.value = "";
+        campo8_agregar.value = "";
+        campo9_agregar.value = "";
+        campo10_agregar.value = "";
+        campo11_agregar.value = "";
+        campo12_agregar.value = "";
+        campo1_agregar.enabled = false;
+        campo2_agregar.enabled = false;
+        campo3_agregar.enabled = false;
+        campo4_agregar.enabled = false;
+        campo5_agregar.enabled = false;
+        campo6_agregar.enabled = false;
+        campo7_agregar.enabled = false;
+        campo8_agregar.enabled = false;
+        campo9_agregar.enabled = false;
+        campo10_agregar.enabled = false;
+        campo11_agregar.enabled = false;
+        campo12_agregar.enabled = false;
+        campo1_agregar.dataBind();
+        campo2_agregar.dataBind();
+        campo3_agregar.dataBind();
+        campo4_agregar.dataBind();
+        campo5_agregar.dataBind();
+        campo6_agregar.dataBind();
+        campo7_agregar.dataBind();
+        campo8_agregar.dataBind();
+        campo9_agregar.dataBind();
+        campo10_agregar.dataBind();
+        campo11_agregar.dataBind();
+        campo12_agregar.dataBind();
+    }
+
+    function onfilteringCommodity_agregar(e) {
+        var commodity_agregar = document.getElementById('commodity_agregar').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(commodity_agregar.dataSource, query);
+
+        if (document.getElementById('nodata-commodity_agregar')) {
+            document.getElementById('btn-commodity_agregar').onclick = function () {
+                var customValue = (document.getElementById('commodity_agregar')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (commodity_agregar.dataSource).push(newItem);
+                commodity_agregar.hidePopup();
+                commodity_agregar.addItem(newItem);
+                commodity_agregar.value = customValue;
+            };
+        }
+    }
+
+    function onfilteringSetpointCO2_agregar(e) {
+        var setpoint_co2_agregar = document.getElementById('setpoint_co2_agregar').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(setpoint_co2_agregar.dataSource, query);
+
+        if (document.getElementById('nodata-setpoint-co2_agregar')) {
+            document.getElementById('btn-setpoint-co2_agregar').onclick = function () {
+                var customValue = (document.getElementById('setpoint_co2_agregar')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (setpoint_co2_agregar.dataSource).push(newItem);
+                setpoint_co2_agregar.hidePopup();
+                setpoint_co2_agregar.addItem(newItem);
+                setpoint_co2_agregar.value = customValue;
+            };
+        }
+    }
+
+    function onfilteringSetpointTemp_agregar(e) {
+        var setpoint_temp_agregar = document.getElementById('setpoint_temp_agregar').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(setpoint_temp_agregar.dataSource, query);
+
+        if (document.getElementById('nodata-setpoint-tem_agregarp')) {
+            document.getElementById('btn-setpoint-temp_agregar').onclick = function () {
+                var customValue = (document.getElementById('setpoint_temp_agregar')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (setpoint_temp_agregar.dataSource).push(newItem);
+                setpoint_temp_agregar.hidePopup();
+                setpoint_temp_agregar.addItem(newItem);
+                setpoint_temp_agregar.value = customValue;
+            };
+        }
+    }
+
+
+    var boton_guardar_agregar = document.getElementById('btn-guardar_agregar');
+    boton_guardar_agregar.addEventListener("click", function () {
+        var contenedor_agregar = document.getElementById("contenedor_agregar").ej2_instances[0];
+        var origen_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+        var destino_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+        var etd_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+        var eta_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+        var numero_serie_agregar = document.getElementById("numero_serie_agregar").ej2_instances[0];
+        var sensores_agregar = document.getElementById("sensores_agregar").ej2_instances[0];
+        var contenedor_agregar2 = document.getElementById("contenedor_agregar2").ej2_instances[0];
+
+        var seleccionado = findSelection("Seleccion");
+
+        if (contenedor_agregar.value == "" || origen_agregar.value == "" || destino_agregar.value == "" || etd_agregar.value == null || etd_agregar.value == "" || eta_agregar.value == null || eta_agregar.value == "" || (seleccionado == "SI" && (numero_serie_agregar.value == "" || sensores_agregar.value == ""))) {
+
+            if (contenedor_agregar.value == "") {
+                $("#contenedor_agregar").css("border", "1px solid red");
+            }
+            if (origen_agregar.value == "") {
+                $("#lugar_origen_agregar").css("border", "1px solid red");
+            }
+            if (destino_agregar.value == "") {
+                $("#lugar_destino_agregar").css("border", "1px solid red");
+            }
+            if (etd_agregar.value == null || etd_agregar.value == "") {
+                $("#etd_agregar").css("border", "1px solid red");
+                //var div_etd_agregar = document.getElementById("div-etd_agregar").childNodes;
+                //div_etd_agregar[1].style.borderColor = "red";
+            }
+            if (eta_agregar.value == null || eta_agregar.value == "") {
+                $("#eta_agregar").css("border", "1px solid red");
+                //var div_eta_agregar = document.getElementById("div-eta_agregar").childNodes;
+                //div_eta_agregar[1].style.borderColor = "red";
+            }
+
+            if (seleccionado == "SI" && numero_serie_agregar.value == "") {
+                $("#numero_serie_agregar").css("border", "1px solid red");
+            }
+
+            if (seleccionado == "SI" && sensores_agregar.value == null) {
+                $("#sensores_agregar").css("border", "1px solid red");
+            }
+
+
+            var texto = '¡Faltan algunos campos obligatorios!';
+            if (lang === 'en') {
+                texto = '¡Some mandatory fields are missing!';
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: texto,
+            });
+        }
+        else {
+            var titulo = '¿Seguro que deseas guardar el servicio?';
+            var boton1 = 'Sí';
+            var boton2 = 'No';
+            if (lang === 'en') {
+                titulo = 'Are you sure you want to save the service?';
+                boton1 = 'Yes';
+                boton2 = 'No';
+            }
+
+            Swal.fire({
+                title: titulo,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: boton1,
+                cancelButtonText: boton2
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById('form_agregar').submit();
+                }
+            });
+        }
+    });
+
+    function actionBegin(args) {
+        this.query.addParams('$filter', 'EmployeeID eq 1');
+    }
+
+
+    $("#AgregarViaje").click(function () {
+        function formatDate(date) {
+            if (date != null) {
+                var fecha = date.substring(0, 10);
+                var dia = date.substring(0, 2);
+                var mes = date.substring(3, 5);
+                var ano = date.substring(6, 10);
+                return dia + "/" + mes + "/" + ano;
+            } else {
+                return "";
+            }
+        }
+
+        $('#AgregarViajeTrigger').trigger('click');
+    });
+
+   $("#FiltroMapa").on('click', function () {
+
+       @*$.ajax({
+           type: "POST",
+           url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+           dataType: 'json',
+           dataSrc: '',
+           data: {
+               TipoVista: 1,
+               NombreVista: 'Boton-FiltrarMapaModem'
+           }
+
+       });*@
+
+        $.ajax({
+            metodo: 'POST',
+            url: '@Url.Action("GetServiciosMapaFiltros", "Servicio")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                contenedor: document.getElementById('ComboBoxContenedor').ej2_instances[0].value,
+                naviera: document.getElementById('ComboBoxNaviera').ej2_instances[0].value,
+                booking: $("#ComboBoxBooking").val(),
+                nave: document.getElementById('ComboBoxNave').ej2_instances[0].value,
+                porigen: document.getElementById('ComboBoxPuertoOrigen').ej2_instances[0].value,
+                pdestino: document.getElementById('ComboBoxPuertoDestino').ej2_instances[0].value,
+                commodity: document.getElementById('ComboBoxCommodity').ej2_instances[0].value,
+                etapuerto: $("#DatePickerEtaPod").val()
+            },
+            success: function (datos) {
+
+                // Configuración del mapa
+                var latlngCenter = new google.maps.LatLng(0, 0);
+
+                var mapProp = {
+                    zoom: 3,
+                    center: latlngCenter,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,    //puede ser TERRAIN
+                    disableDefaultUI: true,
+                    zoomControl: true,
+                    mapTypeControl: false,
+                    scaleControl: false,
+                    streetViewControl: false,
+                    fullscreenControl: true
+                };
+
+                // Agregando el mapa al tag de id googleMap
+                var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+
+                for (var dato in datos) {
+                    if (datos.hasOwnProperty(dato)) {
+
+                        var bd = '';
+                        if (datos[dato].BDOrigen == '1') {
+                            bd = 'S';
+                        }
+                        else if (datos[dato].BDOrigen == '2') {
+                            bd = 'A';
+                        }
+
+                        latlng = new google.maps.LatLng(datos[dato].Latitud, datos[dato].Longitud);
+                        var url = "@Url.Action("DetalleServicioView", "DetalleServicio")?IdServicio=" + bd + datos[dato].IdServicio;
+
+                        var myinfowindow = new google.maps.InfoWindow({
+                            content: '<div class="infoWindow"> <p> Contenedor: <b>' + datos[dato].ContenedorUbicacion + '</b> </p> <p> Ult Actualización: <b> ' + FormatDate(datos[dato].FechaUbicacion) + ' </b> </p> <p> Detalle Servicio: <a class="btn fa fa-search" href="' + url + '"> </a> </p> </div>',
+                            maxWidth: 210
+                        });
+
+                        var marker = new google.maps.Marker({
+                            position: latlng,
+                            map: map,
+                            //title: 'Contenedor: '+ dato.IdContenedor,
+                            draggable: false,
+                            infoWindow: myinfowindow
+                        });
+
+                        google.maps.event.addDomListener(map, 'click', function () {
+                            infoWindow.close();
+                        });
+
+                        google.maps.event.addListener(marker, 'click', function () {
+                            //marker.getPosition();
+
+                            this.infoWindow.open(map, this);
+                        });
+
+                        marker.setMap(map);
+                    }
+                }
+            },
+            error: function () {                 // Configuración del mapa
+                var latlngCenter = new google.maps.LatLng(0, 0);
+
+                var mapProp = {
+                    zoom: 3,
+                    center: latlngCenter,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP,    //puede ser TERRAIN
+                    disableDefaultUI: true,
+                    zoomControl: true,
+                    mapTypeControl: false,
+                    scaleControl: false,
+
+                    streetViewControl: false,
+                    fullscreenControl: true
+                };
+                // se supone que aqui debiera mostrar info el marker
+                var contentString = '';
+
+                // Agregando el mapa al tag de id googleMap
+                var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+            }
+
+        });
+
+
+    });
+
+    function FormatDate(data) {
+        var dateString = data.substr(6);
+        var currentTime = new Date(parseInt(dateString));
+        var month = currentTime.getMonth() + 1;
+        var day = currentTime.getDate();
+        var year = currentTime.getFullYear();
+
+        if (month < 10) {
+            month = "0" + month;
+        } else {
+            month;
+        }
+
+        if (day < 10) {
+            day = "0" + day;
+        } else {
+            day;
+        }
+
+        var date = day + "-" + month + "-" + year;
+        return date;
+    }
+
+
+
+    $("#EliminarFiltros").on('click', function () {
+
+        $("#ComboBoxBooking").val('');
+
+        $("#ComboBoxContenedor").val('');
+        document.getElementById('ComboBoxContenedor').ej2_instances[0].value = '';
+
+        $("#ComboBoxNaviera").val('');
+        document.getElementById('ComboBoxNaviera').ej2_instances[0].value = '';
+
+        $("#ComboBoxNave").val('');
+        document.getElementById('ComboBoxNave').ej2_instances[0].value = '';
+
+        $("#ComboBoxPuertoOrigen").val('');
+        document.getElementById('ComboBoxPuertoOrigen').ej2_instances[0].value = '';
+
+        $("#ComboBoxPuertoDestino").val('');
+        document.getElementById('ComboBoxPuertoDestino').ej2_instances[0].value = '';
+
+        $("#ComboBoxCommodity").val('');
+        document.getElementById('ComboBoxCommodity').ej2_instances[0].value = '';
+
+        $("#DatePickerEtaPod").val('');
+
+        //$('#FiltroMapa').trigger('click');
+
+    });
+
+
+
+    @*$("#VistaServicios").on('click', function () {
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'Pestana-VistaServicios'
+            }
+
+        });
+
+    });*@
+
+    @*$("#VistaMapa").on('click', function () {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'Pestana-VistaMapa'
+            }
+
+        });
+    });*@
+
+
+    var tabObj;
+    function tabCreated() {
+        tabObj = document.getElementById('ej2Tab').ej2_instances[0];
+    }
+
+    function tabSelected() {
+        var pestana_seleccionada = tabObj.items[tabObj.selectedItem].content;
+
+        if (pestana_seleccionada == "#div-tab1") {
+            console.log('TABULADOR - VISTA SERVICIOS');
+        }
+        else if (pestana_seleccionada == "#div-tab2") {
+            console.log('TABULADOR - VISTA MAPA');
+
+            // Configuración del mapa
+            var latlngCenter = new google.maps.LatLng(0, 0);
+
+            var mapProp = {
+                zoom: 3,
+                center: latlngCenter,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,    //puede ser TERRAIN
+                disableDefaultUI: true,
+                zoomControl: true,
+                mapTypeControl: false,
+                scaleControl: false,
+                streetViewControl: false,
+                fullscreenControl: true
+            };
+
+            // Agregando el mapa al tag de id googleMap
+            var map = new google.maps.Map(document.getElementById("googleMap"), mapProp);
+            var map2 = new google.maps.Map(document.getElementById("googleMapEmerson"), mapProp);
+
+            // Lectura y carga de markers en Mapa
+            var latlng = '';
+            var latlng2 = '';
+
+            $.ajax({
+            metodo: 'POST',
+            url: '@Url.Action("GetMapa", "Servicio")',
+            dataType: 'json',
+            dataSrc: '',
+            success: function (datosMapa) {
+
+                console.log('CARGO DATOS MAPA');
+                var datos = datosMapa.UbicacionHistModem;
+                var datosEmerson = datosMapa.UbicacionHistEmerson;
+
+                for (var dato in datos) {
+                    if (datos.hasOwnProperty(dato)) {
+
+                        var bd = '';
+                        if (datos[dato].BDOrigen == '1') {
+                            bd = 'S';
+                        }
+                        else if (datos[dato].BDOrigen == '2') {
+                            bd = 'A';
+                        }
+
+                        var url = '@Url.Action("DetalleServicioView", "DetalleServicio")?IdServicio=' + bd + datos[dato].IdServicio;
+                        latlng = new google.maps.LatLng(datos[dato].Latitud, datos[dato].Longitud);
+                        crearMarket(latlng, datos[dato].ContenedorUbicacion, datos[dato].FechaUbicacion, url);
+                    }
+                }
+
+                for (var dato in datosEmerson) {
+                    if (datosEmerson.hasOwnProperty(dato)) {
+
+                        var bd2 = '';
+                        if (datosEmerson[dato].BDOrigen == '1') {
+                            bd2 = 'S';
+                        }
+                        else if (datosEmerson[dato].BDOrigen == '2') {
+                            bd2 = 'A';
+                        }
+
+                        var url2 = '@Url.Action("DetalleServicioView", "DetalleServicio")?IdServicio=' + bd2 + datosEmerson[dato].IdServicio;
+                        latlng2 = new google.maps.LatLng(datosEmerson[dato].Latitud, datosEmerson[dato].Longitud);
+                        crearMarketEmerson(latlng2, datosEmerson[dato].ContenedorUbicacion, datosEmerson[dato].FechaUbicacion, url2);
+                    }
+                }
+            },
+            //error: function () { alert("Error de lectura"); }
+            });
+
+
+
+
+            // Crear Marcador
+            function crearMarket(latlng, name, date, url) {
+
+                var myinfowindow = new google.maps.InfoWindow({
+                    content: '<div class="infoWindow"> <p> Contenedor: <b>' + name + '</b> </p> <p> Ult Actualización: <b> ' + FormatDate(date) + ' </b> </p> <p> Detalle Servicio: <a class="btn fa fa-search" href="' + url + '"> </a> </p> </div>',
+                    maxWidth: 210
+                });
+
+                var marker = new google.maps.Marker({
+                    position: latlng,
+                    map: map,
+                    //title: 'Contenedor: '+ dato.IdContenedor,
+                    draggable: false,
+                    infoWindow: myinfowindow
+                });
+
+                google.maps.event.addDomListener(map, 'click', function () {
+                    infoWindow.close();
+                });
+
+                google.maps.event.addListener(marker, 'click', function () {
+                    //marker.getPosition();
+
+                    marker.infoWindow.open(map, this);
+                });
+
+                marker.setMap(map);
+            }
+
+            // Crear Marcador Mapa Emerson
+            function crearMarketEmerson(latlng, name, date, url) {
+
+                var myinfowindow2 = new google.maps.InfoWindow({
+                    content: '<div class="infoWindow"> <p> Contenedor: <b>' + name + '</b> </p> <p> Ult Actualización: <b> ' + FormatDate(date) + ' </b> </p> <p> Detalle Servicio: <a class="btn fa fa-search" href="' + url + '"> </a> </p> </div>',
+                    maxWidth: 210
+                });
+
+                var marker2 = new google.maps.Marker({
+                    position: latlng,
+                    map: map2,
+                    //title: 'Contenedor: '+ dato.IdContenedor,
+                    draggable: false,
+                    infoWindow: myinfowindow2
+                });
+
+                google.maps.event.addDomListener(map2, 'click', function () {
+                    infoWindow.close();
+                });
+
+                google.maps.event.addListener(marker2, 'click', function () {
+                    //marker.getPosition();
+
+                    marker2.infoWindow.open(map2, this);
+                });
+
+                marker2.setMap(map2);
+            }
+        }
+    }
+
+</script>
+
+
+<script type="text/x-jsrender" id="progessTemplate">
+    <div id="myProgress" class="pbar">
+        <div id="myBar" class="bar">
+            <div id="label" class="barlabel"></div>
+        </div>
+    </div>
+</script>
+
+
+<style>
+    .btn-header, .btn-header:focus, .btn-header:active:focus {
+        outline: none;
+        background: white;
+        padding-top: 0px;
+    }
+</style>
+
+<script src="~/build/js/Perfiles.js"></script>
+
+<script id="div-limpiar-filtros" type="text/x-template">
+    <button onclick="ELiminarFiltrosTabla()" class="btn btn-header">
+        <p style="display:inline;">
+            Limpiar&nbsp;
+        </p>
+        <span style="font-size: 1em; color: rgb(74, 185, 115);">
+            <i class="fa fa-filter"></i>
+        </span>
+    </button>
+</script>
+
+
+
+<script id="coltemplateOrigen" type="text/x-template">
+    <div class="image">
+        <img src="@Url.Content("~/Content/grid/Map.png")" class="e-image" alt="${PuertoOrigen}" /> &nbsp
+        <span id="locationtext">${PuertoOrigen}</span>
+    </div>
+</script>
+
+<script id="coltemplateDetalle" type="text/x-template">
+    <div class="image">
+        <button id="botonDetalleGrilla" title="Detalle Contenedor" class="btn fa fa-bar-chart" style="background:white;border:1px gray solid; margin-left:20px"></button>
+    </div>
+</script>
+
+<script id="coltemplateEditar" type="text/x-template">
+    <div class="image">
+        <button id="botonEditarGrilla" title="Editar Contenedor" class="btn fa fa-edit" style="background:white;border:1px gray solid;"></button>
+    </div>
+</script>
+
+<script id="coltemplateFinalizar" type="text/x-template">
+    <div class="image">
+        <button id="botonFinalizarGrilla" title="Finalizar Contenedor" class="btn fa fa-check" style="background:white;border:1px gray solid;"></button>
+    </div>
+</script>
+
+<script id="coltemplateEliminar" type="text/x-template">
+    <div class="image">
+        <button id="botonEliminarGrilla" title="Eliminar Contenedor" class="btn fa fa-trash" style="background:white;border:1px gray solid;"></button>
+    </div>
+</script>
+
+
+<script id="coltemplatePrueba" type="text/x-template">
+    <div class="image">
+        <button id="btnOpcionesServicio" title="Opciones" class="btn fa fa-ellipsis-v" style="background:white; border:1px gray solid;"></button>
+    </div>
+
+    <div id="divOpcionesServicio-${BDOrigen}-${IdServicio}" class="div-opciones" style="position:absolute; z-index: 100000; background-color:white; display:none; border-radius: 5px; border:1px gray solid;">
+        <div style="text-align:center; margin: 8px 0px 8px 0px;">
+            <b4>Opciones:</b4>
+        </div>
+        <div style="padding: 0px 0px 8px 5px;">
+            <!--<div style="display:inline-block;">
+                <button id="botonDetalleGrilla" onclick="accionDetalleServicio(this)" value="${BDOrigen}-${IdServicio}" title="Detalle Contenedor" class="btn fa fa-search" style="background:white; border:1px gray solid;"></button>
+            </div>-->
+            <div style="display:inline-block;">
+                <button id="botonEditarGrilla" onclick="accionEditarServicio(this)" value="${BDOrigen}-${IdServicio}" title="Editar Contenedor" class="btn fa fa-edit" style="background:white; border:1px gray solid;"></button>
+            </div>
+            <div style="display:inline-block;">
+                <button id="botonFinalizarGrilla" onclick="accionFinalizarServicio(this)" value="${BDOrigen}-${IdServicio}" title="Finalizar Viaje" class="btn fa fa-check" style="background:white; border:1px gray solid;"></button>
+            </div>
+            <div style="display:inline-block;">
+                <button id="botonEliminarGrilla" onclick="accionEliminarServicio(this)" value="${BDOrigen}-${IdServicio}" title="Eliminar Viaje" class="btn fa fa-trash" style="background:white; border:1px gray solid;"></button>
+            </div>
+        </div>
+
+    </div>
+</script>
+
+
+
+
+
+
+
+<script id="coltemplateDestino" type="text/x-template">
+    <div class="image">
+        <img src="@Url.Content("~/Content/grid/Map.png")" class="e-image" alt="${PuertoDestino}" /> &nbsp
+        <span id="locationtext">${PuertoDestino}</span>
+    </div>
+</script>
+
+
+<style>
+    .e-card {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab-text {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-control {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-treeview.e-list-text {
+        color: white !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .e-grid .e-filtered::before {
+        color: #4ab973 !important;
+    }
+
+    p {
+        margin: 0 0 0px;
+        margin-bottom: 0px;
+    }
+
+    .h4 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .h5 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .main-content {
+        background: #F7F7F7 !important;
+        font-family: Gotham Medium !important;
+    }
+
+    #Emptext {
+        top: -12px;
+        left: 41px;
+        position: relative;
+    }
+
+    .e-grid.e-rtl #Emptext {
+        top: -12px;
+        left: -41px;
+        position: relative;
+    }
+
+    .empimg {
+        height: 27px;
+        width: 29px;
+        border-radius: 14px;
+    }
+
+    .gm-style-iw {
+        height: 95px;
+        width: 60%;
+        padding-left: 20px;
+        margin-left: 40px;
+        float: left;
+        line-height: 25px;
+    }
+
+
+    td.e-rowcell.e-selectionbackground.e-active {
+        background-color: transparent;
+    }
+
+    .e-hightheme td.e-rowcell.e-selectionbackground.e-active {
+        background-color: transparent;
+        color: white;
+    }
+
+    .e-bigger .e-grid .statustxt {
+        position: relative;
+        top: -2px;
+    }
+
+    .rating .star {
+        font-size: 132%;
+        color: lightgrey;
+    }
+
+        .rating .star.checked {
+            color: #ffa600;
+        }
+
+    td.e-rowcell .statustxt.e-activecolor {
+        color: #00cc00;
+        position: relative;
+        top: 9px;
+    }
+
+    td.e-rowcell .statustxt.e-inactivecolor {
+        color: #e60000;
+        position: relative;
+        top: 9px;
+    }
+
+    .statustemp.e-inactivecolor {
+        background-color: #ffd7cc;
+    }
+
+    .statustemp.e-activecolor {
+        background-color: #ccffcc;
+    }
+
+    .statustxt.e-activecolor {
+        color: #00cc00;
+    }
+
+    .statustxt.e-inactivecolor {
+        color: #e60000;
+    }
+
+    #Trusttext {
+        position: relative;
+        top: 1px;
+    }
+
+    .e-image {
+        height: 13px;
+        width: 14px;
+    }
+
+    .statustemp.e-inactivecolor {
+        width: 64px;
+    }
+
+    .statustemp.e-activecolor {
+        width: 57px;
+    }
+
+    .statustemp {
+        position: relative;
+        height: 19px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .highcontrast #msg {
+        color: #FFFFFF;
+    }
+
+
+    #msg {
+        font-family: "Segoe UI", "GeezaPro", "DejaVu Serif", sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        opacity: 0.95;
+        color: #333;
+        float: right;
+        margin-top: 3px;
+    }
+
+    @@media only screen and (max-width: 370px) {
+        #msg {
+            float: left;
+            margin-top: 3px;
+        }
+
+        #GridOverview {
+            margin-top: 36px;
+        }
+    }
+
+    #samplecontainer {
+        padding-top: 5px;
+    }
+
+    #myProgress {
+        position: relative;
+        height: 18px;
+        width: 10em;
+        text-align: left;
+        background-color: white;
+    }
+
+    .highcontrast .e-grid #myProgress {
+        background-color: black;
+    }
+
+    #myBar {
+        position: absolute;
+        width: 10%;
+        height: 100%;
+        background-color: #00b300;
+    }
+
+        #myBar.progressdisable {
+            background-color: #df2222;
+        }
+
+    #label {
+        position: relative;
+        left: 10px;
+        line-height: 18px;
+        font-size: 10px;
+        color: white;
+    }
+
+    .modal-dialog {
+        right: auto;
+        left: 15%;
+        width: 2000px;
+        padding-top: 30px;
+        padding-bottom: 30px;
+    }
+
+    .modal {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+    }
+
+    .e-content {
+        min-height: 150px;
+    }
+</style>
+
+<style>
+    /* Weather Card Layout Customization */
+
+
+
+    .card-control-section.basic_card_layout #total_card.e-card {
+       background: #2d7440;
+
+    }
+
+    .card-control-section.basic_card_layout #puertas_card.e-card,
+    .card-control-section.basic_card_layout #temp_card.e-card,
+    .card-control-section.basic_card_layout #co2_card.e-card {
+       background: #4AB973;
+
+    }
+    .card-control-section.basic_card_layout #pink_card.e-card {
+       background: #4AB973;
+
+    }
+
+    .e-card .e-card-header .e-card-header-image {
+    background-size: contain;
+    }
+
+    .card-control-section.basic_card_layout #total_card.e-card .e-card-header-caption .e-card-header-title,
+    .card-control-section.basic_card_layout #temp_card.e-card .e-card-header-caption .e-card-header-title,
+    .card-control-section.basic_card_layout #puertas_card.e-card .e-card-header-caption .e-card-header-title,
+    .card-control-section.basic_card_layout #co2_card.e-card .e-card-header-caption .e-card-header-title
+            {
+            color: white;
+            font-size: 25px;
+            }
+    .card-control-section.basic_card_layout #total_card.e-card .e-card-header-caption .e-card-sub-title,
+    .card-control-section.basic_card_layout #temp_card.e-card .e-card-header-caption .e-card-sub-title,
+    .card-control-section.basic_card_layout #puertas_card.e-card .e-card-header-caption .e-card-sub-title,
+    .card-control-section.basic_card_layout #co2_card.e-card .e-card-header-caption .e-card-sub-title {
+        color: white;
+            font-size: 20px;
+
+    }
+
+    .highcontrast .card-control-section.basic_card_layout #total_card.e-card .e-card-header.weather_report .e-card-header-image,
+            .highcontrast .card-control-section.basic_card_layout #temp_card.e-card .e-card-header.weather_report .e-card-header-image,
+    .highcontrast .card-control-section.basic_card_layout #co2_card.e-card .e-card-header.weather_report .e-card-header-image,
+            .highcontrast .card-control-section.basic_card_layout #puertas_card.e-card .e-card-header.weather_report .e-card-header-image {
+        border: none;
+    }
+
+    .card-control-section.basic_card_layout #total_card.e-card .weather_report .e-card-header-caption,
+            .card-control-section.basic_card_layout #temp_card.e-card .weather_report .e-card-header-caption,
+            .card-control-section.basic_card_layout #co2_card.e-card .weather_report .e-card-header-caption,
+    .card-control-section.basic_card_layout #puertas_card.e-card .weather_report .e-card-header-caption {
+        text-align: right;
+    }
+
+    .card-control-section.basic_card_layout #total_card.e-card .e-card-header.weather_report .e-card-header-image{
+        background-image: url('@Url.Content("~/images/barco.png")');
+        height: 40px !important;
+        width: 40px !important;
+    }
+
+    .card-control-section.basic_card_layout #temp_card.e-card .e-card-header.weather_report .e-card-header-image {
+        background-image: url('@Url.Content("~/images/temperatura.png")');
+        height: 40px !important;
+        width: 40px !important;
+    }
+
+    .card-control-section.basic_card_layout #co2_card.e-card .e-card-header.weather_report .e-card-header-image {
+        background-image: url('@Url.Content("~/images/co2.png")');
+        height: 40px !important;
+        width: 40px !important;
+    }
+
+    .card-control-section.basic_card_layout #puertas_card.e-card .e-card-header.weather_report .e-card-header-image {
+        background-image: url('@Url.Content("~/images/puerta.png")');
+        height: 40px !important;
+        width: 40px !important;
+    }
+
+    .card-control-section.basic_card_layout .col-xs-6.col-sm-6.col-lg-6.col-md-6 {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .card-control-section.basic_card_layout .card-layout {
+        margin: auto;
+        max-width: 400px;
+    }
+
+    @@media (min-width: 870px) {
+        .card-control-section.basic_card_layout .col-xs-6.col-sm-6.col-lg-6.col-md-6 {
+            width: 50%;
+        }
+
+        .card-control-section.basic_card_layout .card-layout {
+            max-width: 870px;
+        }
+    }
+
+
+
+</style>
+
+<script>
+    var orPredicate = null;
+    var gridQuery = null;
+
+    $("#contadorCO2").on('click', function (args) {
+
+        @*$.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'Boton-ContadorCO2'
+            }
+
+        });*@
+
+        document.getElementById('total_card').style.background = '#4AB973';
+        document.getElementById('co2_card').style.background = '#2d7440';
+        document.getElementById('temp_card').style.background = '#4AB973';
+        document.getElementById('puertas_card').style.background = '#4AB973';
+
+
+        orPredicate = new ej.data.Predicate('CO2Ext', 'equal', 'SI');
+
+        var grid = document.getElementById("TransitoEnCurso").ej2_instances[0];
+        if (gridQuery == null) gridQuery = grid.query;
+        grid.query = new ej.data.Query().where(orPredicate);
+        grid.refresh();
+        orPredicate = null;
+        traducirTabla();
+
+    });
+
+
+    function traducirTabla() {
+        if (lang === 'en') {
+            $('.e-headertext').each(function (i) {
+                //console.log($(this).text());
+                if ($(this).text() === 'Contenedor') {
+                    $(this).text('Container');
+                }
+                else if ($(this).text() === 'Sensores') {
+                    $(this).text('Sensors');
+                }
+                else if ($(this).text() === 'Commodity') {
+                    $(this).text('Commodity');
+                }
+                else if ($(this).text() === 'Fecha Programacion Sensores') {
+                    $(this).text('Sensor Programming Date');
+                }
+                else if ($(this).text() === 'Fecha Estimada de Arribo') {
+                    $(this).text('Estimated Arrival Date');
+                }
+                else if ($(this).text() === 'Puerto Origen') {
+                    $(this).text('Origin Port');
+                }
+                else if ($(this).text() === 'Puerto Destino') {
+                    $(this).text('Destination Port');
+                }
+                else if ($(this).text() === 'Booking') {
+                    $(this).text('Booking');
+                }
+                else if ($(this).text() === 'Naviera') {
+                    $(this).text('Shipping Company');
+                }
+                else if ($(this).text() === 'Nave') {
+                    $(this).text('Ship');
+                }
+                else if ($(this).text() === 'Setpoint CO2') {
+                    $(this).text('Setpoint CO2');
+                }
+                else if ($(this).text() === 'Setpoint T°') {
+                    $(this).text('Setpoint T°');
+                }
+                else if ($(this).text() === 'Se han recibido datos del sensor') {
+                    $(this).text('Sensor data received');
+                }
+                else if ($(this).text() === 'Descripción') {
+                    $(this).text('Description');
+                }
+                else if ($(this).text() === 'C/Sensor CO2') {
+                    $(this).text('W/O2 Sensor');
+                }
+                else if ($(this).text() === 'C/Sensor T°') {
+                    $(this).text('W/T° Sensor');
+                }
+                else if ($(this).text() === 'C/Sensor Apertura Puertas') {
+                    $(this).text('W/Door Opening Sensor');
+                }
+            });
+        }
+    }
+
+    // BOTON "ELIMINAR FILTROS" DE TABLA
+    function ELiminarFiltrosTabla() {
+        var grid = document.getElementById("TransitoEnCurso").ej2_instances[0];
+        grid.clearFiltering();
+    }
+
+    $("#contadorTemperatura").on('click', function (args) {
+
+        @*$.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'Boton-ContadorTemperatura'
+            }
+
+        });*@
+
+        document.getElementById('total_card').style.background = '#4AB973';
+        document.getElementById('co2_card').style.background = '#4AB973';
+        document.getElementById('temp_card').style.background = '#2d7440';
+        document.getElementById('puertas_card').style.background = '#4AB973';
+
+
+        orPredicate = new ej.data.Predicate('TemperaturaExt', 'equal', 'SI');
+
+        var grid = document.getElementById("TransitoEnCurso").ej2_instances[0];
+        if (gridQuery == null) gridQuery = grid.query;
+        grid.query = new ej.data.Query().where(orPredicate);
+        grid.refresh();
+        traducirTabla();
+
+    });
+
+    $("#contadorAperturaPuerta").on('click', function (args) {
+
+        @*$.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'Boton-ContadorAperturaPuerta'
+            }
+
+        });*@
+
+        document.getElementById('total_card').style.background = '#4AB973';
+        document.getElementById('co2_card').style.background = '#4AB973';
+        document.getElementById('temp_card').style.background = '#4AB973';
+        document.getElementById('puertas_card').style.background = '#2d7440';
+
+
+
+        orPredicate = new ej.data.Predicate('AperturaPuerta', 'equal', 'SI');
+
+        var grid = document.getElementById("TransitoEnCurso").ej2_instances[0];
+        if (gridQuery == null) gridQuery = grid.query;
+        grid.query = new ej.data.Query().where(orPredicate);
+        grid.refresh();
+        orPredicate = null;
+        traducirTabla();
+    });
+
+    $("#contadorTotal").on('click', function (args) {
+
+        @*$.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'Boton-ContadorTotal'
+            }
+
+        });*@
+
+
+        //div.onmouseout = function () {
+        document.getElementById('total_card').style.background = '#2d7440';
+        document.getElementById('co2_card').style.background = '#4AB973';
+        document.getElementById('temp_card').style.background = '#4AB973';
+        document.getElementById('puertas_card').style.background = '#4AB973';
+
+        //var h2s = this.getElementsByTagName('e-card');
+        //h2s[0].style.background = '#2d7440';
+        //};
+
+        //var h2s = this.getElementsByTagName('e-card');
+        //h2s[0].style.background = '#4AB973';
+
+        var grid = document.getElementById("TransitoEnCurso").ej2_instances[0];
+        grid.query = gridQuery;
+        grid.refresh();
+        traducirTabla();
+    });
+
+
+
+    @*function onCellSelected(args) {
+
+        var bd = '';
+        if (args.data["BDOrigen"] == '1') {
+            bd = 'S';
+        }
+        else if (args.data["BDOrigen"] == '2') {
+            bd = 'A';
+        }
+
+        var idServicio = args.data["IdServicio"];
+        var idBDServicio = args.data["BDOrigen"];
+        var contenedorSeleccionado = args.data["Contenedor"];
+
+        var cellIndex = args.cellIndex.cellIndex;
+        if (cellIndex == 0) {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                dataType: 'json',
+                dataSrc: '',
+                data: {
+                    TipoVista: 1,
+                    NombreVista: 'Boton-DetalleGrilla'
+                }
+
+            });
+
+            var url = '@Url.Action("DetalleServicioView", "DetalleServicio")?IdServicio=' + bd + idServicio;
+                window.location.href = url;
+        } else if (cellIndex == 1) {
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                dataType: 'json',
+                dataSrc: '',
+                data: {
+                    TipoVista: 1,
+                    NombreVista: 'Boton-EditarGrilla'
+                }
+
+            });
+
+            limpiarOcultar();
+            HabilitarOtrosCampos_agregar();
+            LlenarOtrosCampos_agregar(idServicio, idBDServicio);
+            LlenarCamposSensores(idServicio, idBDServicio);
+            $('#ModalEditarContenedor').trigger('click');
+
+        } else if (cellIndex == 2) {
+
+            var titulo = '¿Deseas finalizar el viaje del contenedor y sus respectivos sensores, esto provocará que el contenedor se vaya a históricos?';
+            var boton1 = 'Sí';
+            var boton2 = 'No';
+            if (lang === 'en') {
+                titulo = 'Do you want to end the journey of the container and its respective sensors, this will cause the container to go to historical?';
+                boton1 = 'Yes';
+                boton2 = 'No';
+            }
+
+            Swal.fire({
+                title: titulo,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: boton1,
+                cancelButtonText: boton2
+            }).then((result) => {
+                if (result.value) {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                        dataType: 'json',
+                        dataSrc: '',
+                        data: {
+                            TipoVista: 1,
+                            NombreVista: 'Boton-FinalizarGrilla'
+                        }
+
+                    });
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("FinalizarServicioPorId", "TransitoEnCurso")',
+                        dataType: 'json',
+                        data: { idServicio: idServicio, idBD: args.data["BDOrigen"] },
+                        success: function (response) {
+                            if (response > 0) {
+                                var str = window.location.href;
+                                var res = str.split("?");
+                                console.log(res[0]);
+                                var urlString = res[0];
+                                location.href = urlString + "?desplegarMensaje=" + 4;
+                            }
+                        }
+                    });
+
+
+
+                }
+            });
+        } else if (cellIndex == 3) {
+
+            var titulo = '¿Seguro que deseas eliminar el viaje del contenedor y sus respectivos sensores asociados?';
+            var boton1 = 'Sí';
+            var boton2 = 'No';
+            if (lang === 'en') {
+                titulo = 'Are you sure you want to eliminate the trip of the container and its associated sensors?';
+                boton1 = 'Yes';
+                boton2 = 'No';
+            }
+
+            Swal.fire({
+                title: titulo,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: boton1,
+                cancelButtonText: boton2
+            }).then((result) => {
+                if (result.value) {
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                        dataType: 'json',
+                        dataSrc: '',
+                        data: {
+                            TipoVista: 1,
+                            NombreVista: 'Boton-EliminarGrilla'
+                        }
+
+                    });
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("CancelarServicioPorId", "TransitoEnCurso")',
+                        dataType: 'json',
+                        data: { idServicio: idServicio, idBD: args.data["BDOrigen"] },
+                        success: function (response) {
+                            if (response > 0) {
+                                var str = window.location.href;
+                                var res = str.split("?");
+                                console.log(res[0]);
+                                var urlString = res[0];
+                                location.href = urlString + "?desplegarMensaje=" + 3;
+                            }
+                        }
+                    });
+
+
+
+                }
+            });
+        }
+    }*@
+
+    @*var boton_validar_contenedor = document.getElementById('btn-validar_contenedor');
+    boton_validar_contenedor.addEventListener("click", function () {
+        if ($("#contenedor_agregar").val() != "") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ValidarNumeroContenedor", "Servicio")',
+                data: { containerNumberToCheck: $("#contenedor_agregar").val() },
+                success: function (response) {
+                    if (response == "False") {
+                        Swal.fire({
+                            icon: 'error',
+                            title: '¡Número de contenedor inválido!',
+                            text: 'Vuelva a escribir el número del contenedor.',
+                        });
+                        $("#contenedor_agregar").val("");
+                        return false;
+                    } else {
+                        HabilitarOtrosCampos_agregar();
+                        LlenarOtrosCampos_agregar();
+                    }
+                }
+            });
+        }
+    });*@
+
+
+    function onCellSelected(args) {
+        var idServicio = args.data["IdServicio"];
+        var idBDServicio = args.data["BDOrigen"];
+        var elemento;
+
+        var bd = '';
+        if (args.data["BDOrigen"] == '1') {
+            bd = 'S';
+        }
+        else if (args.data["BDOrigen"] == '2') {
+            bd = 'A';
+        }
+
+        $.each($('.div-opciones'), function (i, v) {
+            if (document.getElementById(v.id)) {
+                elemento = 'divOpcionesServicio-' + idBDServicio + '-' + idServicio;
+                if (elemento != v.id) {
+                    document.getElementById(v.id).style.display = 'none';
+                }
+            }
+        })
+
+        var cellIndex = args.cellIndex.cellIndex;
+        if (cellIndex == 0) {
+
+            @*$.ajax({
+                type: "POST",
+                url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                dataType: 'json',
+                dataSrc: '',
+                data: {
+                    TipoVista: 1,
+                    NombreVista: 'Boton-DetalleGrilla'
+                }
+
+            });*@
+
+            var url = '@Url.Action("DetalleServicioView", "DetalleServicio")?IdServicio=' + bd + idServicio;
+            window.location.href = url;
+        }
+        else if (cellIndex == 1) {
+            if (document.getElementById('divOpcionesServicio-' + idBDServicio + '-' + idServicio)) {
+                var div = document.getElementById('divOpcionesServicio-' + idBDServicio + '-' + idServicio);
+                if (div.style.display == 'none') {
+                    div.style.display = 'block';
+                }
+                else {
+                    div.style.display = 'none';
+                }
+            }
+        }
+    }
+
+
+    function LlenarOtrosCampos_agregar(idServicio, idBDServicio) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ObtenerDatosServicio", "Servicio")',
+            dataType: 'json',
+            data: {
+                IdServicio: idServicio,
+                IdBDServicio: idBDServicio
+            },
+            async: false,
+            success: function (response) {
+                if (response.id > 0) {
+                    //Swal.fire({
+                    //    icon: 'success',
+                    //    title: '¡Contenedor válido! ',
+                    //    text: 'Se precargó la información del viaje prexistente en Alma, si desea puede editarla.',
+                    //    showConfirmButton: false,
+                    //    timer: 4000
+                    //});
+
+                    document.getElementById('servicio_app_servicios_agregar').value = 1;
+                    //DeshabilitarOtrosCampos_agregar();
+                    var contenedor_agregar = document.getElementById("contenedor_agregar").ej2_instances[0];
+                    var eta_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+                    var etd_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+                    var booking_agregar = document.getElementById("booking_agregar").ej2_instances[0];
+                    var origen_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+                    var destino_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+                    var descripcion_agregar = document.getElementById("descripcion_agregar").ej2_instances[0];
+
+                    var nave_agregar = document.getElementById("nave_agregar").ej2_instances[0];
+                    var commodity_agregar = document.getElementById("commodity_agregar").ej2_instances[0];
+                    var naviera_agregar = document.getElementById("naviera_agregar").ej2_instances[0];
+                    var setpoint_co2_agregar = document.getElementById("setpoint_co2_agregar").ej2_instances[0];
+                    var setpoint_temp_agregar = document.getElementById("setpoint_temp_agregar").ej2_instances[0];
+                    var sensores_agregar = document.getElementById("sensores_agregar").ej2_instances[0];
+                    var numero_serie_agregar = document.getElementById("numero_serie_agregar").ej2_instances[0];
+                    var sensores_agregar2 = document.getElementById("sensores_agregar2").ej2_instances[0];
+                    var numero_serie_agregar2 = document.getElementById("numero_serie_agregar2").ej2_instances[0];
+                    var sensores_agregar3 = document.getElementById("sensores_agregar3").ej2_instances[0];
+                    var numero_serie_agregar3 = document.getElementById("numero_serie_agregar3").ej2_instances[0];
+                    var sensores_agregar4 = document.getElementById("sensores_agregar4").ej2_instances[0];
+                    var numero_serie_agregar4 = document.getElementById("numero_serie_agregar4").ej2_instances[0];
+                    var sensores_agregar5 = document.getElementById("sensores_agregar5").ej2_instances[0];
+                    var numero_serie_agregar5 = document.getElementById("numero_serie_agregar5").ej2_instances[0];
+                    var contenedor_agregar2 = document.getElementById("contenedor_agregar2").ej2_instances[0];
+
+                    //eta_agregar.value = formatDate(response.eta_string);
+                    //etd_agregar.value = formatDate(response.etd_string);
+                    contenedor_agregar.value = response.contenedor;
+                    eta_agregar.value = response.eta_string;
+                    etd_agregar.value = response.etd_string;
+                    booking_agregar.value = response.booking;
+                    origen_agregar.value = response.lugar_origen;
+                    destino_agregar.value = response.lugar_destino;
+                    contenedor_agregar2.value = response.contenedor;
+
+                    nave_agregar.value = response.nave;
+                    commodity_agregar.value = response.commodity;
+                    naviera_agregar.value = response.naviera;
+                    setpoint_co2_agregar.value = response.setpoint_co2;
+                    setpoint_temp_agregar.value = response.setpoint_temp;
+                    descripcion_agregar.value = response.descripcion;
+                    sensores_agregar.text = response.tipo_sensor;
+                    numero_serie_agregar.text = response.numero_sensor1;
+                    sensores_agregar2.text = response.tipo_sensor2;
+                    sensores_agregar2.enabled = true;
+                    numero_serie_agregar2.text = response.numero_sensor2;
+                    sensores_agregar3.text = response.tipo_sensor3;
+                    sensores_agregar3.enabled = true;
+                    numero_serie_agregar3.text = response.numero_sensor3;
+                    sensores_agregar4.text = response.tipo_sensor4;
+                    sensores_agregar4.enabled = true;
+                    numero_serie_agregar4.text = response.numero_sensor4;
+                    sensores_agregar5.text = response.tipo_sensor5;
+                    sensores_agregar5.enabled = true;
+
+                    numero_serie_agregar5.text = response.numero_sensor5;
+                }
+                else {
+                    document.getElementById('servicio_app_servicios_agregar').value = 0;
+                    if (document.getElementById("contenedor_agregar").ej2_instances[0].value != null
+                        && document.getElementById("contenedor_agregar").ej2_instances[0].value != "") {
+
+                        var titulo = '¡Contenedor válido!';
+                        if (lang === 'en') {
+                            titulo = 'Valid Container!';
+                        }
+
+                        Swal.fire({
+                            icon: 'success',
+                            title: titulo,
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+                    return false;
+                }
+            }
+        });
+    }
+
+    function LlenarCamposSensores(idServicio, idBDServicio) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ObtenerSensoresServicio", "Servicio")',
+            dataType: 'json',
+            data: {
+                IdServicio: idServicio,
+                IdBDServicio: idBDServicio
+            },
+            async: false,
+            success: function (response) {
+                if (response.length > 0) {
+                    //Swal.fire({
+                    //    icon: 'success',
+                    //    title: '¡Contenedor válido! ',
+                    //    text: 'Se precargó la información del viaje prexistente en Alma, si desea puede editarla.',
+                    //    showConfirmButton: false,
+                    //    timer: 4000
+                    //});
+                    document.getElementById('servicio_app_servicios_agregar').value = 1;
+                    //DeshabilitarOtrosCampos_agregar();
+
+
+
+                    var sensores_agregar = document.getElementById("sensores_agregar").ej2_instances[0];
+                    var numero_serie_agregar = document.getElementById("numero_serie_agregar").ej2_instances[0];
+                    var sensores_agregar2 = document.getElementById("sensores_agregar2").ej2_instances[0];
+                    var numero_serie_agregar2 = document.getElementById("numero_serie_agregar2").ej2_instances[0];
+                    var sensores_agregar3 = document.getElementById("sensores_agregar3").ej2_instances[0];
+                    var numero_serie_agregar3 = document.getElementById("numero_serie_agregar3").ej2_instances[0];
+                    var sensores_agregar4 = document.getElementById("sensores_agregar4").ej2_instances[0];
+                    var numero_serie_agregar4 = document.getElementById("numero_serie_agregar4").ej2_instances[0];
+                    var sensores_agregar5 = document.getElementById("sensores_agregar5").ej2_instances[0];
+                    var numero_serie_agregar5 = document.getElementById("numero_serie_agregar5").ej2_instances[0];
+
+
+
+
+                    if (response[0] != null) {
+                        $("#div_sensores1").show();
+                        $("#div-tipo-sensor_agregar1").show();
+                        $("#div-numero-serie_agregar1").show();
+                        $("#div-btn_agregar_sensor").hide();
+                        $("#div-eliminar_sensor1").show();
+                        $("#div_seccion_sensores").show();
+                        $("#div-btn_agregar_sensor2").show();
+                        $("#div_sensores2").show();
+
+                        sensores_agregar.text = response[0].tipo_sensor;
+                        numero_serie_agregar.value = response[0].numSerie;
+                        numero_serie_agregar.enabled = true;
+                        sensores_agregar.dataBind();
+                        numero_serie_agregar.dataBind();
+
+                        if (response[0].EsModem == 0) {
+                            sensores_agregar.enabled = true;
+                        }
+                    }
+
+                    if (response[1] != null) {
+                        $("#div-tipo-sensor_agregar2").show();
+                        $("#div-numero-serie_agregar2").show();
+                        $("#div-btn_agregar_sensor2").hide();
+                        $("#div-eliminar_sensor2").show();
+                        $("#div-btn_agregar_sensor3").show();
+                        $("#div_sensores3").show();
+                        sensores_agregar2.text = response[1].tipo_sensor;
+                        numero_serie_agregar2.value = response[1].numSerie;
+                        numero_serie_agregar2.enabled = true;
+                        sensores_agregar2.dataBind();
+                        numero_serie_agregar2.dataBind();
+
+                        if (response[1].EsModem == 0) {
+                            sensores_agregar2.enabled = true;
+                        }
+                    }
+                    if (response[2] != null) {
+                        $("#div-tipo-sensor_agregar3").show();
+                        $("#div-numero-serie_agregar3").show();
+                        $("#div-btn_agregar_sensor3").hide();
+                        $("#div-eliminar_sensor3").show();
+                        $("#div-btn_agregar_sensor4").show();
+                        $("#div_sensores4").show();
+                        sensores_agregar3.text = response[2].tipo_sensor;
+                        numero_serie_agregar3.value = response[2].numSerie;
+                        numero_serie_agregar3.enabled = true;
+                        sensores_agregar3.dataBind();
+                        numero_serie_agregar3.dataBind();
+
+                        if (response[2].EsModem == 0) {
+                            sensores_agregar3.enabled = true;
+                        }
+                    }
+                    if (response[3] != null) {
+                        $("#div-tipo-sensor_agregar4").show();
+                        $("#div-numero-serie_agregar4").show();
+                        $("#div-btn_agregar_sensor4").hide();
+                        $("#div-eliminar_sensor4").show();
+                        $("#div-btn_agregar_sensor5").show();
+                        $("#div_sensores5").show();
+                        sensores_agregar4.text = response[3].tipo_sensor;
+                        numero_serie_agregar4.value = response[3].numSerie;
+                        numero_serie_agregar4.enabled = true;
+                        sensores_agregar4.dataBind();
+                        numero_serie_agregar4.dataBind();
+
+                        if (response[3].EsModem == 0) {
+                            sensores_agregar4.enabled = true;
+                        }
+                    }
+
+                    if (response[4] != null) {
+                        $("#div-tipo-sensor_agregar5").show();
+                        $("#div-numero-serie_agregar5").show();
+                        $("#div-btn_agregar_sensor5").hide();
+                        $("#div-eliminar_sensor5").show();
+                        sensores_agregar5.text = response[4].tipo_sensor;
+                        numero_serie_agregar5.value = response[4].numSerie;
+                        numero_serie_agregar5.enabled = true;
+                        sensores_agregar5.dataBind();
+                        numero_serie_agregar5.dataBind();
+
+                        if (response[4].EsModem == 0) {
+                            sensores_agregar5.enabled = true;
+                        }
+                    }
+
+
+
+                    //sensores_agregar2.text = response.tipo_sensor2;
+                    //numero_serie_agregar2.value = response.numero_sensor2;
+                    //sensores_agregar3.text = response.tipo_sensor3;
+                    //numero_serie_agregar3.value = response.numero_sensor3;
+                    //sensores_agregar4.text = response.tipo_sensor4;
+                    //numero_serie_agregar4.value = response.numero_sensor4;
+                    //sensores_agregar5.text = response.tipo_sensor5;
+                    //numero_serie_agregar5.value = response.numero_sensor5;
+                } else {
+                    $("#div_seccion_sensores").show();
+                    $("#div_sensores1").show();
+                    $("#div-btn_agregar_sensor").show();
+                }
+            }
+        });
+    }
+
+
+    function limpiarOcultar() {
+        document.getElementById("contenedor_agregar").ej2_instances[0].value = "";
+
+        var contenedor_agregar = document.getElementById("contenedor_agregar").ej2_instances[0];
+        var eta_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+        var etd_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+        var booking_agregar = document.getElementById("booking_agregar").ej2_instances[0];
+        var origen_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+        var destino_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+        var descripcion_agregar = document.getElementById("descripcion_agregar").ej2_instances[0];
+
+        var nave_agregar = document.getElementById("nave_agregar").ej2_instances[0];
+        var commodity_agregar = document.getElementById("commodity_agregar").ej2_instances[0];
+        var naviera_agregar = document.getElementById("naviera_agregar").ej2_instances[0];
+        var setpoint_co2_agregar = document.getElementById("setpoint_co2_agregar").ej2_instances[0];
+        var setpoint_temp_agregar = document.getElementById("setpoint_temp_agregar").ej2_instances[0];
+        var sensores_agregar = document.getElementById("sensores_agregar").ej2_instances[0];
+        var numero_serie_agregar = document.getElementById("numero_serie_agregar").ej2_instances[0];
+        var sensores_agregar2 = document.getElementById("sensores_agregar2").ej2_instances[0];
+        var numero_serie_agregar2 = document.getElementById("numero_serie_agregar2").ej2_instances[0];
+        var sensores_agregar3 = document.getElementById("sensores_agregar3").ej2_instances[0];
+        var numero_serie_agregar3 = document.getElementById("numero_serie_agregar3").ej2_instances[0];
+        var sensores_agregar4 = document.getElementById("sensores_agregar4").ej2_instances[0];
+        var numero_serie_agregar4 = document.getElementById("numero_serie_agregar4").ej2_instances[0];
+        var sensores_agregar5 = document.getElementById("sensores_agregar5").ej2_instances[0];
+        var numero_serie_agregar5 = document.getElementById("numero_serie_agregar5").ej2_instances[0];
+        //var rb_no = document.getElementById("rb_no").ej2_instances[0];
+
+        //rb_no.checked = true;
+        contenedor_agregar.value = "";
+        eta_agregar.value = "";
+        etd_agregar.value = "";
+        booking_agregar.value = "";
+        origen_agregar.value = "";
+        destino_agregar.value = "";
+        descripcion_agregar.value = "";
+        nave_agregar.text = "";
+        commodity_agregar.text = "";
+        naviera_agregar.text = "";
+        setpoint_co2_agregar.value = "";
+        setpoint_temp_agregar.value = "";
+        sensores_agregar.text = "";
+        numero_serie_agregar.value = "";
+        sensores_agregar2.text = "";
+        numero_serie_agregar2.value = "";
+        sensores_agregar3.text = "";
+        numero_serie_agregar3.value = "";
+        sensores_agregar4.text = "";
+        numero_serie_agregar4.value = "";
+        sensores_agregar5.text = "";
+        numero_serie_agregar5.value = "";
+
+        $("#div-tipo-sensor_agregar1").hide();
+        $("#div-numero-serie_agregar1").hide();
+        $("#div-btn_agregar_sensor").show();
+        $("#div-eliminar_sensor1").hide();
+        $("#div_sensores2").hide();
+
+        $("#div-tipo-sensor_agregar2").hide();
+        $("#div-numero-serie_agregar2").hide();
+        $("#div-btn_agregar_sensor2").hide();
+        $("#div-eliminar_sensor2").hide();
+        $("#div_sensores3").hide();
+
+        $("#div-tipo-sensor_agregar3").hide();
+        $("#div-numero-serie_agregar3").hide();
+        $("#div-btn_agregar_sensor3").hide();
+        $("#div-eliminar_sensor3").hide();
+        $("#div_sensores4").hide();
+
+        $("#div-tipo-sensor_agregar4").hide();
+        $("#div-numero-serie_agregar4").hide();
+        $("#div-btn_agregar_sensor4").hide();
+        $("#div-eliminar_sensor4").hide();
+        $("#div_sensores5").hide();
+
+        $("#div-tipo-sensor_agregar5").hide();
+        $("#div-numero-serie_agregar5").hide();
+        $("#div-btn_agregar_sensor5").hide();
+        $("#div-eliminar_sensor5").hide();
+
+        $("#div_seccion_sensores").hide();
+
+    }
+</script>
+
+
+
+
+
+<style>
+    /*@@font-face {
+        font-family: 'tbicons';
+        src: url(data:application/x-font-ttf;charset=utf-8;base64,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AAIAAAAAA+kDqgAIACAAAAEXIRUhBxc3JyURHgEzITI2NzUjFSERIRUzNS4BIyEiBgLKdf5NAbByP+Dg/PgBNCcBzyc0AVz+MgHOXAE0J/4yKDQClXRZcz7e3oD9RCUyMiXMzAK8zMwlMjIAAAMAAAAAA6QD6QADABMAHAAAAREhEQcRHgEXIT4BNxEuASchDgEnETMRITUhDgEDSv4MWwEzJwH0JjQBATQm/gwnM7dZAhL97iYyAtj9hAJ8Bf2IJjMBATMmAngmNAEBNJX9hAJ8WwEzAAAAAAAAEgDeAAEAAAAAAAAAAQAAAAEAAAAAAAEABwABAAEAAAAAAAIABwAIAAEAAAAAAAMABwAPAAEAAAAAAAQABwAWAAEAAAAAAAUACwAdAAEAAAAAAAYABwAoAAEAAAAAAAoALAAvAAEAAAAAAAsAEgBbAAMAAQQJAAAAAgBtAAMAAQQJAAEADgBvAAMAAQQJAAIADgB9AAMAAQQJAAMADgCLAAMAAQQJAAQADgCZAAMAAQQJAAUAFgCnAAMAAQQJAAYADgC9AAMAAQQJAAoAWADLAAMAAQQJAAsAJAEjIE5ld0ljb25SZWd1bGFyTmV3SWNvbk5ld0ljb25WZXJzaW9uIDEuME5ld0ljb25Gb250IGdlbmVyYXRlZCB1c2luZyBTeW5jZnVzaW9uIE1ldHJvIFN0dWRpb3d3dy5zeW5jZnVzaW9uLmNvbQAgAE4AZQB3AEkAYwBvAG4AUgBlAGcAdQBsAGEAcgBOAGUAdwBJAGMAbwBuAE4AZQB3AEkAYwBvAG4AVgBlAHIAcwBpAG8AbgAgADEALgAwAE4AZQB3AEkAYwBvAG4ARgBvAG4AdAAgAGcAZQBuAGUAcgBhAHQAZQBkACAAdQBzAGkAbgBnACAAUwB5AG4AYwBmAHUAcwBpAG8AbgAgAE0AZQB0AHIAbwAgAFMAdAB1AGQAaQBvAHcAdwB3AC4AcwB5AG4AYwBmAHUAcwBpAG8AbgAuAGMAbwBtAAAAAAIAAAAAAAAACgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIwECAQMBBAEFAQYBBwEIAQkBCgELAQwBDQEOAQ8BEAERARIBEwEUARUBFgEXARgBGQEaARsBHAEdAR4BHwEgASEBIgEjASQAEFRleHRfT3V0ZGVudF8wMDELUGljdHVyZV8wMDEMU2V0dGluZ3NfMDAxEENvbG9yX3BpY2tlcl8wMDIQQWxpZ25fQ2VudGVyXzAwNghMaW5lXzAwMQ1VbmRlcmxpbmVfMDAxDFNvcnRfWi1BXzAwMQhVbmRvXzAwMRBDaGFydF9idWJibGVfMDAxC0Rvd25sb2FkXzAwD1RleHRfaW5kZW50XzAwMRJDaGFydF9Eb3VnaG51dF8wMDEJQ2xlYXJfMDAyDU51bWJlcmluZ18wMDEMU29ydF9BLVpfMDAxCkl0YWxpY18wMDELQnVsbGV0c18wMDEJUGFzdGVfMDAxCFJlZG9fMDAxD0NoYXJ0X3JhZGFyXzAwMQ9BbGlnbl9SaWdodF8wMDEJVGFibGVfMDAxDkFsaWduX0xlZnRfMDAxCE1lbnVfMDAxB0N1dF8wMDIIQm9sZF8wMDERQWxpZ25fSnVzdGlmeV8wMDEKUmVsb2FkXzAwMQpTZWFyY2hfMDAxClVwbG9hZF8wMDEKRGVzaWduXzAwNQpFeHBvcnRfMDAxCENvcHlfMDAyAAA=) format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    .e-bigger .e-tbar-btn .tb-icons {
+        font-size: 18px;
+    }
+
+    .e-settings.e-tooltip-wrap .e-tip-content {
+        padding: 3px;
+    }
+
+    .e-tbar-btn .tb-icons {
+        font-family: 'tbicons';
+        font-size: 16px;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+    }
+
+    .e-copy-icon:before {
+        content: "\e721";
+    }
+
+    #Toolbar {
+        margin: 0 auto;
+    }
+
+    .bootstrap #Toolbar {
+        width: 400px !important;
+    }
+
+    .material #Toolbar {
+        width: 345px !important;
+    }
+
+    .fabric #Toolbar {
+        width: 375px !important;
+    }
+
+    .highcontrast .e-tooltip-wrap .e-arrow-tip-inner.e-tip-top {
+        color: #333 !important;
+    }
+
+    .e-settings.e-tooltip-wrap .e-arrow-tip-inner.e-tip-top {
+        color: white;
+    }
+
+    .e-settings.e-tooltip-wrap.e-popup {
+        background: none;
+        border-radius: 0px;
+    }
+
+    .material .e-settings.e-tooltip-wrap.e-popup,
+    .bootstrap .e-settings.e-tooltip-wrap.e-popup,
+    .highcontrast .e-settings.e-tooltip-wrap.e-popup {
+        border: 1px solid #dddddd;
+    }
+
+    .material .e-settings.e-tooltip-wrap .e-arrow-tip-outer.e-tip-top,
+    .bootstrap .e-settings.e-tooltip-wrap .e-arrow-tip-outer.e-tip-top {
+        border-bottom: 8px solid #dddddd;
+    }
+
+    .highcontrast #listview.e-listview .e-list-item.e-hover {
+        border-color: transparent;
+    }
+
+    .fabric .e-settings.e-tooltip-wrap .e-arrow-tip.e-tip-top {
+        top: -8px !important;
+    }
+
+    .highcontrast .e-settings.e-tooltip-wrap .e-arrow-tip-outer.e-tip-top {
+        border-bottom: 6px solid #dddddd;
+    }
+
+    .fabric .e-settings.e-tooltip-wrap.e-popup {
+        background: white;
+    }
+
+    .highcontrast .e-settings.e-tooltip-wrap.e-popup {
+        background: #333;
+    }
+
+    @@media screen and (max-width: 420px) {
+        .e-bigger .toolbarContainer {
+            width: 75%;
+        }
+    }
+
+    .material #listview.e-listview .e-list-item.e-hover,
+    .bootstrap #listview.e-listview .e-list-item.e-hover {
+        color: black;
+    }
+
+    .material #listview.e-listview .e-list-item.e-active,
+    .bootstrap #listview.e-listview .e-list-item.e-active {
+        color: black;
+    }
+
+    .highcontrast #listview.e-listview .e-list-item.e-active,
+    .highcontrast #listview.e-listview .e-list-item .e-list-icon {
+        color: white !important;
+    }
+
+    .material #listview.e-listview .e-list-item.e-hover .e-list-icon,
+    .material #listview.e-listview .e-list-item.e-active .e-list-icon,
+    .bootstrap #listview.e-listview .e-list-item.e-active .e-list-icon,
+    .bootstrap #listview.e-listview .e-list-item.e-hover .e-list-icon {
+        color: black !important;
+    }
+
+    #container {
+        width: 80%;
+        margin: 0px auto;
+    }
+
+    .fabric #listview .e-list-icon {
+        color: black;
+    }
+
+    @@font-face {
+        font-family: 'e-icons';
+        src: url(data:application/x-font-ttf;charset=utf-8;base64,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) format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
+    #listview .e-list-icon {
+        color: black;
+        float: right;
+        height: inherit;
+        margin-left: 14px;
+        padding-left: 29px;
+        font-size: 14px;
+        font-family: 'e-icons';
+    }
+
+    #listview .wifi:before {
+        content: "\e700";
+    }
+
+    #listview .bluetooth:before {
+        content: "\e702";
+    }
+
+    #listview .sim:before {
+        content: "\e705";
+    }
+
+    .bootstrap4 .e-settings.e-tooltip-wrap.e-popup {
+        border-color: rgba(0, 0, 0, .15);
+    }
+
+        .bootstrap4 .e-settings.e-tooltip-wrap.e-popup .e-listview {
+            border: 0;
+        }
+
+        .bootstrap4 .e-settings.e-tooltip-wrap.e-popup .e-arrow-tip-outer.e-tip-top {
+            border-bottom: 6px solid rgba(0, 0, 0, .15);
+        }*/
+</style>
+
+<script type="text/javascript">
+
+    /*var data1 = [
+        { Name: 'WI-FI', id: '1', icon: 'wifi' },
+        { Name: 'Bluetooth', id: '2', icon: 'bluetooth' },
+        { Name: 'SIM cards', id: '3', icon: 'sim' }
+    ];
+
+    var tooltipObj;
+    var listObjects = [data1];
+
+    //Initialize ListView component
+    var listObj = new ej.lists.ListView({
+        //Map appropriate columns to fields property
+        fields: { text: 'Name', iconCss: 'icon' },
+        //Set true to show icons
+        showIcon: true
+    });
+
+    function onCreated() {
+        tooltipObj = document.getElementById("tooltip").ej2_instances[0];
+        //Attached scroll and click event listners in right pane
+        if (document.getElementById('right-pane')) {
+            document.getElementById('right-pane').addEventListener('click', onClick);
+            document.getElementById('right-pane').addEventListener('scroll', onScroll);
+        }
+    }
+    function onBeforeRender(args) {
+        var data = [
+            { title: 'Opciones' }
+        ];
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].title === args.target.getAttribute('title')) {
+                var list = document.createElement('div');
+                list.id = 'listview';
+                listObj.dataSource = listObjects[i];
+                listObj.appendTo(list);
+                tooltipObj.content = list;
+            }
+        }
+    }*/
+
+
+    //click event handler to close Tooltip while navigating to other tabs in right pane
+    function onClick(args) {
+        if (!args.target.parentNode.parentNode.classList.contains('e-toolbar-item')) {
+            if (document.getElementsByClassName('e-tooltip-wrap').length > 0) {
+                tooltipObj.close();
+            }
+        }
+    }
+
+    //scroll event handler to close Tooltip while perfomring page scroll
+    function onScroll(args) {
+        if (document.getElementsByClassName('e-tooltip-wrap').length > 0) {
+            tooltipObj.close();
+        }
+    }
+
+    $(document).on('click', function (args) {
+        if (!args.target.parentNode.parentNode.classList.contains('e-toolbar-item')) {
+            if (document.getElementsByClassName('e-tooltip-wrap').length > 0) {
+                tooltipObj.close();
+            }
+        }
+    });
+
+
+    @*function accionDetalleServicio(params) {
+        var params = params.value.split("-");
+        var idServicio = params[1];
+
+        var bd = '';
+        if (params[0] == '1') {
+            bd = 'S';
+        }
+        else if (params[0] == '2') {
+            bd = 'A';
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'Boton-DetalleGrilla'
+            }
+
+        });
+
+        var url = '@Url.Action("DetalleServicioView", "DetalleServicio")?IdServicio=' + bd + idServicio;
+        window.location.href = url;
+    }*@
+
+    function accionEditarServicio(params) {
+        var params = params.value.split("-");
+        var idServicio = params[1];
+        var idBDServicio = params[0];
+
+        var bd = '';
+        if (params[0] == '1') {
+            bd = 'S';
+        }
+        else if (params[0] == '2') {
+            bd = 'A';
+        }
+
+        @*$.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 1,
+                NombreVista: 'Boton-EditarGrilla'
+            }
+
+        });*@
+
+        limpiarOcultar();
+        HabilitarOtrosCampos_agregar();
+        LlenarOtrosCampos_agregar(idServicio, idBDServicio);
+        LlenarCamposSensores(idServicio, idBDServicio);
+        $('#ModalEditarContenedor').trigger('click');
+    }
+
+    function accionFinalizarServicio(params) {
+        var params = params.value.split("-");
+        var idServicio = params[1];
+        var idBDServicio = params[0];
+
+        var bd = '';
+        if (params[0] == '1') {
+            bd = 'S';
+        }
+        else if (params[0] == '2') {
+            bd = 'A';
+        }
+
+        var titulo = '¿Deseas finalizar el viaje del contenedor y sus respectivos sensores, esto provocará que el contenedor se vaya a históricos?';
+        var boton1 = 'Sí';
+        var boton2 = 'No';
+        if (lang === 'en') {
+            titulo = 'Do you want to end the journey of the container and its respective sensors, this will cause the container to go to historical?';
+            boton1 = 'Yes';
+            boton2 = 'No';
+        }
+
+        Swal.fire({
+            title: titulo,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: boton1,
+            cancelButtonText: boton2
+        }).then((result) => {
+            if (result.value) {
+
+                @*$.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                    dataType: 'json',
+                    dataSrc: '',
+                    data: {
+                        TipoVista: 1,
+                        NombreVista: 'Boton-FinalizarGrilla'
+                    }
+
+                });*@
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("FinalizarServicioPorId", "TransitoEnCurso")',
+                    dataType: 'json',
+                    data: { idServicio: idServicio, idBD: idBDServicio },
+                    success: function (response) {
+                        if (response > 0) {
+                            var str = window.location.href;
+                            var res = str.split("?");
+                            console.log(res[0]);
+                            var urlString = res[0];
+                            location.href = urlString + "?desplegarMensaje=" + 4;
+                        }
+                    }
+                });
+
+
+
+            }
+        });
+    }
+
+    function accionEliminarServicio(params) {
+        var params = params.value.split("-");
+        var idServicio = params[1];
+        var idBDServicio = params[0];
+
+        var bd = '';
+        if (params[0] == '1') {
+            bd = 'S';
+        }
+        else if (params[0] == '2') {
+            bd = 'A';
+        }
+
+        var titulo = '¿Seguro que deseas eliminar el viaje del contenedor y sus respectivos sensores asociados?';
+        var boton1 = 'Sí';
+        var boton2 = 'No';
+        if (lang === 'en') {
+            titulo = 'Are you sure you want to eliminate the trip of the container and its associated sensors?';
+            boton1 = 'Yes';
+            boton2 = 'No';
+        }
+
+        Swal.fire({
+            title: titulo,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: boton1,
+            cancelButtonText: boton2
+        }).then((result) => {
+            if (result.value) {
+
+                @*$.ajax({
+                    type: "POST",
+                    url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+                    dataType: 'json',
+                    dataSrc: '',
+                    data: {
+                        TipoVista: 1,
+                        NombreVista: 'Boton-EliminarGrilla'
+                    }
+
+                });*@
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("CancelarServicioPorId", "TransitoEnCurso")',
+                    dataType: 'json',
+                    data: { idServicio: idServicio, idBD: idBDServicio },
+                    success: function (response) {
+                        if (response > 0) {
+                            var str = window.location.href;
+                            var res = str.split("?");
+                            console.log(res[0]);
+                            var urlString = res[0];
+                            location.href = urlString + "?desplegarMensaje=" + 3;
+                        }
+                    }
+                });
+
+
+
+            }
+        });
+    }
+
+</script>

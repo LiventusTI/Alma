@@ -1,0 +1,1838 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Syncfusion.EJ2.Inputs;
+@using Syncfusion.EJ2;
+@using ProyectoAlmaInicio.Models;
+@using Syncfusion.EJ2.DropDowns;
+@model ProyectoAlmaInicio.Controllers.ServicioController.TextBoxModal
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=places&key=AIzaSyAmFthGxyCA9bKVIfiTXuRCEYls3hpm6Zs"></script>
+
+<script>
+
+    $(function () {
+        var input_origen_editar = document.getElementById("lugar_origen");
+        input_origen_editar.placeholder = "";
+        var autocomplete_origen_editar = new google.maps.places.Autocomplete(input_origen_editar, {
+            types: ['address']
+        });
+
+        var input_destino_editar = document.getElementById("lugar_destino");
+        input_destino_editar.placeholder = "";
+        var autocomplete_destino_editar = new google.maps.places.Autocomplete(input_destino_editar, {
+            types: ['address']
+        });
+
+        var input_origen_crear = document.getElementById("lugar_origen_agregar");
+        input_origen_crear.placeholder = "";
+        var autocomplete_origen_crear = new google.maps.places.Autocomplete(input_origen_editar, {
+            types: ['address']
+        });
+
+        var input_destino_crear = document.getElementById("lugar_destino_agregar");
+        input_destino_crear.placeholder = "";
+        var autocomplete_destino_crear = new google.maps.places.Autocomplete(input_destino_editar, {
+            types: ['address']
+        });
+    });
+
+</script>
+
+
+<style>
+    .pac-container {
+        z-index: 10000 !important;
+    }
+</style>
+
+
+<div id="myModal1" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="padding: 50px; left:0px; width:60%; min-width:600px">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title h4">Editar Servicio</h4>
+            </div>
+            <div class="modal-body" style="padding: 0px 20px 0px 20px; overflow-y: auto;">
+
+                @using (Html.BeginForm("EditarServicios", "Servicio", FormMethod.Post, new { id = "form" }))
+                {
+                    @Html.ValidationSummary(true)
+                    <div class="col-lg-12 control-section">
+                        <div id="wrapper" style="margin-top: 20px;">
+                            <div class="div1">
+                                <div class="row">
+                                    <div id="div-contenedor" class="col-xs-12 col-sm-12 col-lg-12 col-md-12" style="padding-bottom: 20px">
+                                        @Html.EJS().ComboBox("contenedor").Placeholder("Contenedor").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Filtering("onfilteringContenedor").Enabled(false).Change("contenedorChange").DataSource((IEnumerable<object>)ViewBag.lista_contenedores).NoRecordsTemplate("<div>"
+                                        + "<div id=\"nodata-contenedor\"> El contenedor ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                        + "<button id=\"btn-contenedor\" class=\"e-control e-btn\"> Agregar contenedor</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()
+                                    </div>
+                                    <div hidden>
+                                        @Html.EJS().TextBoxFor(model => model.servicio_app_servicios).Render()
+                                        @Html.EJS().TextBoxFor(model => model.id_servicio).Render()
+                                    </div>
+
+                                    <div id="div-lugar-origen" class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().TextBoxFor(model => model.lugar_origen).Placeholder("Lugar de Origen").FloatLabelType(FloatLabelType.Auto).Enabled(true).Change("origenChange").Render()
+                                        <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                            @Html.ValidationMessageFor(model => model.lugar_origen)
+                                        </div>
+
+                                        <div hidden>
+                                            @Html.EJS().TextBoxFor(model => model.pais_input).Placeholder("País").Render()
+                                            @Html.EJS().TextBoxFor(model => model.region_input).Placeholder("Región").Render()
+                                            @Html.EJS().TextBoxFor(model => model.ciudad_input).Placeholder("Ciudad").Render()
+                                            @Html.EJS().TextBoxFor(model => model.comuna_input).Placeholder("Comuna").Render()
+                                            @Html.EJS().TextBoxFor(model => model.localidad_input).Placeholder("Calle").Render()
+                                            @Html.EJS().TextBoxFor(model => model.numero_input).Placeholder("Número").Render()
+                                            @Html.EJS().TextBoxFor(model => model.codigo_postal_input).Placeholder("Código Postal").Render()
+                                            @Html.EJS().TextBoxFor(model => model.latitude_input).Placeholder("Latitud").Render()
+                                            @Html.EJS().TextBoxFor(model => model.longitude_input).Placeholder("Longitud").Render()
+                                        </div>
+                                    </div>
+                                    <div id="div-lugar-destino" class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().TextBoxFor(model => model.lugar_destino).Placeholder("Lugar de Destino").FloatLabelType(FloatLabelType.Auto).Enabled(true).Change("destinoChange").Render()
+                                        <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                            @Html.ValidationMessageFor(model => model.lugar_destino)
+                                        </div>
+
+                                        <div hidden>
+                                            @Html.EJS().TextBoxFor(model => model.pais_input2).Placeholder("País").Render()
+                                            @Html.EJS().TextBoxFor(model => model.region_input2).Placeholder("Región").Render()
+                                            @Html.EJS().TextBoxFor(model => model.ciudad_input2).Placeholder("Ciudad").Render()
+                                            @Html.EJS().TextBoxFor(model => model.comuna_input2).Placeholder("Comuna").Render()
+                                            @Html.EJS().TextBoxFor(model => model.localidad_input2).Placeholder("Calle").Render()
+                                            @Html.EJS().TextBoxFor(model => model.numero_input2).Placeholder("Número").Render()
+                                            @Html.EJS().TextBoxFor(model => model.codigo_postal_input2).Placeholder("Código Postal").Render()
+                                            @Html.EJS().TextBoxFor(model => model.latitude_input2).Placeholder("Latitud").Render()
+                                            @Html.EJS().TextBoxFor(model => model.longitude_input2).Placeholder("Longitud").Render()
+                                        </div>
+                                    </div>
+
+                                    <div hidden class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                        <p><b>ORIGEN</b></p>
+                                        <p><b>País:</b> <span id="pais_view"></span></p>
+                                        <p><b>Región:</b> <span id="region_view"></span></p>
+                                        <p><b>Provincia / Ciudad:</b> <span id="ciudad_view"></span></p>
+                                        <p><b>Comuna:</b> <span id="comuna_view"></span></p>
+                                        <p><b>Localidad:</b> <span id="localidad_view"></span></p>
+                                        <p><b>Número:</b> <span id="numero_view"></span></p>
+                                        <p><b>Código Postal:</b> <span id="codigo_postal_view"></span></p>
+                                        <p><b>Latitud:</b> <span id="latitude_view"></span></p>
+                                        <p><b>Longitud:</b> <span id="longitude_view"></span></p>
+
+                                    </div>
+                                    <div hidden class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                        <p><b>DESTINO</b></p>
+                                        <p><b>País:</b> <span id="pais_view2"></span></p>
+                                        <p><b>Región:</b> <span id="region_view2"></span></p>
+                                        <p><b>Provincia / Ciudad:</b> <span id="ciudad_view2"></span></p>
+                                        <p><b>Comuna:</b> <span id="comuna_view2"></span></p>
+                                        <p><b>Localidad:</b> <span id="localidad_view2"></span></p>
+                                        <p><b>Número:</b> <span id="numero_view2"></span></p>
+                                        <p><b>Código Postal:</b> <span id="codigo_postal_view2"></span></p>
+                                        <p><b>Latitud:</b> <span id="latitude_view2"></span></p>
+                                        <p><b>Longitud:</b> <span id="longitude_view2"></span></p>
+                                    </div>
+
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().TextBoxFor(model => model.nombre_lugar_origen).Placeholder("Alias del lugar de origen").FloatLabelType(FloatLabelType.Auto).Enabled(true).Render()
+                                        <div>
+                                            @Html.ValidationMessageFor(model => model.nombre_lugar_origen)
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().TextBoxFor(model => model.nombre_lugar_destino).Placeholder("Alias del lugar de destino").FloatLabelType(FloatLabelType.Auto).Enabled(true).Render()
+                                        <div>
+                                            @Html.ValidationMessageFor(model => model.nombre_lugar_destino)
+                                        </div>
+                                    </div>
+
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().DatePicker("etd").Placeholder("ETD Nave").FloatLabelType(FloatLabelType.Auto).Enabled(true).Format("dd/MM/yyyy").Render()
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().DatePicker("eta").Placeholder("ETA POD").FloatLabelType(FloatLabelType.Auto).Enabled(true).Format("dd/MM/yyyy").Render()
+                                    </div>
+
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().TextBoxFor(model => model.booking).Placeholder("Booking").FloatLabelType(FloatLabelType.Auto).Enabled(true).Render()
+                                        <div>
+                                            @Html.ValidationMessageFor(model => model.booking)
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().ComboBox("nave").Placeholder("Nave").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).DataSource((IEnumerable<object>)ViewBag.lista_naves).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(true).Render()
+                                    </div>
+
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().ComboBox("commodity").Placeholder("Commodity").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Filtering("onfilteringCommodity").DataSource((IEnumerable<object>)ViewBag.lista_commodities).NoRecordsTemplate("<div>"
+                                        + "<div id=\"nodata-commodity\"> El commodity ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                        + "<button id=\"btn-commodity\" class=\"e-control e-btn\">Agregar commodity</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(true).Render()
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().ComboBox("naviera").Placeholder("Naviera").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).DataSource((IEnumerable<object>)ViewBag.lista_navieras).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(true).Render()
+                                    </div>
+
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().ComboBox("setpoint_co2").Placeholder("Setpoint CO2 (%)").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Filtering("onfilteringSetpointCO2").DataSource((IEnumerable<object>)ViewBag.lista_setpoint_co2).NoRecordsTemplate("<div>"
+                                        + "<div id=\"nodata-setpoint-co2\"> El setpoint de CO2 ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                        + "<button id=\"btn-setpoint-co2\" class=\"e-control e-btn\">Agregar setpoint CO2</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(true).Render()
+                                    </div>
+                                    <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6" style="padding-bottom: 20px">
+                                        @Html.EJS().ComboBox("setpoint_temp").Placeholder("Setpoint Temperatura (°C)").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Filtering("onfilteringSetpointTemp").DataSource((IEnumerable<object>)ViewBag.lista_setpoint_temp).NoRecordsTemplate("<div>"
+                                        + "<div id=\"nodata-setpoint-temp\"> El setpoint de temperatura ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                        + "<button id=\"btn-setpoint-temp\" class=\"e-control e-btn\">Agregar setpoint temperatura</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(true).Render()
+                                    </div>
+                                    <br />
+                                </div>
+                            </div>
+                            <br />
+
+                            <div id="submitbutton" align="center">
+                                <input id="btn-editar" class="e-control e-btn e-lib" type="button" value="Editar">
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Modal para agregar viaje-->
+<div id="myModalAgregarViaje" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="padding: 50px; left:0px; width:60%; min-width:600px;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title h4">Agregar Viaje</h4>
+            </div>
+            <div class="modal-body" style="padding: 0px 20px 0px 20px; overflow-y: auto;">
+                <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                    @using (Html.BeginForm("AgregarServicio", "Servicio", FormMethod.Post, new { id = "form_agregar" }))
+            {
+                        @Html.ValidationSummary(true)
+                        <div class="col-lg-12 control-section">
+                            <div id="wrapper" style="margin-top: 20px;">
+
+                                <h5 class="h5">NUEVO SENSOR</h5>
+                                <div class="div1">
+                                    <div id="div-tipo-sensor_agregar" style="margin-bottom: 10px;">
+                                        @Html.EJS().ComboBox("sensores_agregar").Change("sensoresChange_agregar").Placeholder("Seleccione un tipo de sensor").DataSource((IEnumerable<object>)ViewBag.lista_sensores).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()
+                                    </div>
+
+                                    <div id="div-numero-serie_agregar">
+                                        @Html.EJS().TextBoxFor(model => model.numero_serie_agregar).Placeholder("Número de Serie").Change("numeroSerieChange_agregar").Render()
+                                    </div>
+                                    <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                        @Html.ValidationMessageFor(model => model.numero_serie_agregar)
+                                    </div>
+                                </div>
+                                <br />
+
+
+                                <h5 class="h5">DATOS DEL SERVICIO</h5>
+                                <div class="div1">
+                                    <div class="row">
+                                        <div id="div-contenedor_agregar" class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                            @Html.EJS().ComboBox("contenedor_agregar").Placeholder("Seleccione un contenedor").AllowFiltering(true).Filtering("onfilteringContenedor_agregar").Change("contenedorChange_agregar").DataSource((IEnumerable<object>)ViewBag.lista_contenedores).NoRecordsTemplate("<div>"
+                                    + "<div id=\"nodata-contenedor_agregar\"> El contenedor ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                    + "<button id=\"btn-contenedor_agregar\" class=\"e-control e-btn\"> Agregar contenedor</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()
+                                        </div>
+                                        <div hidden>
+                                            @Html.EJS().TextBoxFor(model => model.servicio_app_servicios_agregar).Render()
+                                        </div>
+                                        <br /><br />
+
+                                        <div id="div-lugar-origen_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.lugar_origen_agregar).Placeholder("Lugar de Origen").Enabled(false).Change("origenChange_agregar").Render()
+                                            <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                                @Html.ValidationMessageFor(model => model.lugar_origen_agregar)
+                                            </div>
+
+                                            <div hidden>
+                                                @Html.EJS().TextBoxFor(model => model.pais_input_agregar).Placeholder("País").Render()
+                                                @Html.EJS().TextBoxFor(model => model.region_input_agregar).Placeholder("Región").Render()
+                                                @Html.EJS().TextBoxFor(model => model.ciudad_input_agregar).Placeholder("Ciudad").Render()
+                                                @Html.EJS().TextBoxFor(model => model.comuna_input_agregar).Placeholder("Comuna").Render()
+                                                @Html.EJS().TextBoxFor(model => model.localidad_input_agregar).Placeholder("Calle").Render()
+                                                @Html.EJS().TextBoxFor(model => model.numero_input_agregar).Placeholder("Número").Render()
+                                                @Html.EJS().TextBoxFor(model => model.codigo_postal_input_agregar).Placeholder("Código Postal").Render()
+                                                @Html.EJS().TextBoxFor(model => model.latitude_input_agregar).Placeholder("Latitud").Render()
+                                                @Html.EJS().TextBoxFor(model => model.longitude_input_agregar).Placeholder("Longitud").Render()
+                                            </div>
+
+                                        </div>
+                                        <div id="div-lugar-destino_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.lugar_destino_agregar).Placeholder("Lugar de Destino").Enabled(false).Change("destinoChange_agregar").Render()
+                                            <div class="col-xs-12 col-sm-12 col-lg-12 col-md-12">
+                                                @Html.ValidationMessageFor(model => model.lugar_destino_agregar)
+                                            </div>
+
+                                            <div hidden>
+                                                @Html.EJS().TextBoxFor(model => model.pais_input2_agregar).Placeholder("País").Render()
+                                                @Html.EJS().TextBoxFor(model => model.region_input2_agregar).Placeholder("Región").Render()
+                                                @Html.EJS().TextBoxFor(model => model.ciudad_input2_agregar).Placeholder("Ciudad").Render()
+                                                @Html.EJS().TextBoxFor(model => model.comuna_input2_agregar).Placeholder("Comuna").Render()
+                                                @Html.EJS().TextBoxFor(model => model.localidad_input2_agregar).Placeholder("Calle").Render()
+                                                @Html.EJS().TextBoxFor(model => model.numero_input2_agregar).Placeholder("Número").Render()
+                                                @Html.EJS().TextBoxFor(model => model.codigo_postal_input2_agregar).Placeholder("Código Postal").Render()
+                                                @Html.EJS().TextBoxFor(model => model.latitude_input2_agregar).Placeholder("Latitud").Render()
+                                                @Html.EJS().TextBoxFor(model => model.longitude_input2_agregar).Placeholder("Longitud").Render()
+                                            </div>
+                                        </div>
+                                        <br /><br />
+
+                                        <div hidden class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            <p><b>DESTINO</b></p>
+                                            <p><b>País:</b> <span id="pais_view2_agregar"></span></p>
+                                            <p><b>Región:</b> <span id="region_view2_agregar"></span></p>
+                                            <p><b>Provincia / Ciudad:</b> <span id="ciudad_view2_agregar"></span></p>
+                                            <p><b>Comuna:</b> <span id="comuna_view2_agregar"></span></p>
+                                            <p><b>Localidad:</b> <span id="localidad_view2_agregar"></span></p>
+                                            <p><b>Número:</b> <span id="numero_view2_agregar"></span></p>
+                                            <p><b>Código Postal:</b> <span id="codigo_postal_view2_agregar"></span></p>
+                                            <p><b>Latitud:</b> <span id="latitude_view2_agregar"></span></p>
+                                            <p><b>Longitud:</b> <span id="longitude_view2_agregar"></span></p>
+                                        </div>
+
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.nombre_lugar_origen_agregar).Placeholder("Ingrese un alias para el lugar").Enabled(false).Render()
+                                            <div>
+                                                @Html.ValidationMessageFor(model => model.nombre_lugar_origen_agregar)
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.nombre_lugar_destino_agregar).Placeholder("Ingrese un alias para el lugar").Enabled(false).Render()
+                                            <div>
+                                                @Html.ValidationMessageFor(model => model.nombre_lugar_destino_agregar)
+                                            </div>
+                                        </div>
+                                        <br /><br />
+
+                                        <div id="div-etd_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().DatePicker("etd_agregar").Placeholder("ETD Nave").Enabled(false).Format("dd/MM/yyyy").Render()
+                                        </div>
+                                        <div id="div-eta_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().DatePicker("eta_agregar").Placeholder("ETA POD").Enabled(false).Format("dd/MM/yyyy").Render()
+                                        </div>
+                                        <br /><br />
+
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().TextBoxFor(model => model.booking_agregar).Placeholder("Booking_agregar").Enabled(false).Render()
+                                            <div>
+                                                @Html.ValidationMessageFor(model => model.booking_agregar)
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().ComboBox("nave_agregar").Placeholder("Nave").AllowFiltering(true).DataSource((IEnumerable<object>)ViewBag.lista_naves).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()
+                                        </div>
+                                        <br /><br />
+
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().ComboBox("commodity_agregar").Placeholder("Commodity").AllowFiltering(true).Filtering("onfilteringCommodity_agregar").DataSource((IEnumerable<object>)ViewBag.lista_commodities).NoRecordsTemplate("<div>"
+                                    + "<div id=\"nodata-commodity_agregar\"> El commodity ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                    + "<button id=\"btn-commodity_agregar\" class=\"e-control e-btn\">Agregar commodity</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().ComboBox("naviera_agregar").Placeholder("Naviera").AllowFiltering(true).DataSource((IEnumerable<object>)ViewBag.lista_navieras).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()
+                                        </div>
+                                        <br /><br />
+
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().ComboBox("setpoint_co2_agregar").Placeholder("Setpoint CO2 (%)").AllowFiltering(true).Filtering("onfilteringSetpointCO2_agregar").DataSource((IEnumerable<object>)ViewBag.lista_setpoint_co2).NoRecordsTemplate("<div>"
+                                    + "<div id=\"nodata-setpoint-co2_agregar\"> El setpoint de CO2 ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                    + "<button id=\"btn-setpoint-co2_agregar\" class=\"e-control e-btn\">Agregar setpoint CO2</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()
+                                        </div>
+                                        <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                            @Html.EJS().ComboBox("setpoint_temp_agregar").Placeholder("Setpoint Temperatura (°C)").AllowFiltering(true).Filtering("onfilteringSetpointTemp_agregar").DataSource((IEnumerable<object>)ViewBag.lista_setpoint_temp).NoRecordsTemplate("<div>"
+                                    + "<div id=\"nodata-setpoint-temp_agregar\"> El setpoint de temperatura ingresado no existe, ¿Desea agregarlo?</div><br />"
+                                    + "<button id=\"btn-setpoint-temp_agregar\" class=\"e-control e-btn\">Agregar setpoint temperatura</button></div>").Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Enabled(false).Render()
+                                        </div>
+                                        <br />
+                                    </div>
+                                </div>
+                                <br />
+
+
+                                <div id="submitbutton" align="center">
+                                    <input id="btn-guardar_agregar" class="e-control e-btn e-lib" type="button" value="Guardar">
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal1" id="EditarServicioTrigger" style="display:none;"></button>
+<button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModalAgregarViaje" id="AgregarViajeTrigger" style="display:none;"></button>
+
+
+<div class="main-content" id="main-text">
+    <div class="sidebar-content">
+
+        <div class="col-lg-12 control-section toast-default-section" hidden>
+            <div class="control_wrapper">
+                @Html.EJS().Toast("toast_type").Position(p => p.X("Right")).TimeOut(5000).Close("onclose").Created("created").BeforeOpen("onBeforeOpen").Render()
+                <div id="toast_types">
+                    <div>
+                        @Html.EJS().Button("info_Toast").CssClass("e-btn e-control e-info").Content("Info Message").Render()
+                        @Html.EJS().Button("success_Toast").CssClass("e-btn e-contro e-success").Content("Success Message").Render()
+                        @Html.EJS().Button("warning_Toast").CssClass("e-btn e-control e-warning").Content("Warning Message").Render()
+                        @Html.EJS().Button("error_Toast").CssClass("e-btn e-control e-danger").Content("Danger Message").Render()
+                    </div>
+                    <div style="padding-top: 15px">
+                        @Html.EJS().Button("hideToast").CssClass("e-btn e-control").Content("Hide All").Render()
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+
+        <h4 class="h4">PROGRAMACIÓN DE SENSORES  sadasdasdas</h4>
+        <hr style="border-width: medium;" />
+        <div class="row col-lg-12">
+            <button type="button" class="btn btn-success" id="AgregarViaje">Agregar Viaje</button>
+        </div>
+        <div class="row">
+            <div class="control-section col-lg-12">
+                <span id='msg'></span>
+
+                @(Html.EJS().Grid<Clases.Servicio>("SensoresProgramados").DataSource((IEnumerable<Clases.Servicio>)ViewBag.DataSource).FilterSettings(filter => filter.Type(Syncfusion.EJ2.Grids.FilterType.Menu)).AllowReordering().AllowResizing(true).AllowSelection().DetailTemplate("#detailtemplate").Columns(col =>
+                {
+                    col.Field("").HeaderText("").Width("55").Template("#coltemplateEditar").Add();
+                    col.Field("").HeaderText("").Width("55").Template("#coltemplateEliminar").Add();
+                    col.Field(p => p.Contenedor).HeaderText("Contenedor").Width("140").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.Commodity).HeaderText("Commodity").Width("130").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.FechaProgramacion).HeaderText("Fecha Programación").Width("120").Filter(new { type = "Excel" }).TextAlign(Syncfusion.EJ2.Grids.TextAlign.Right).Format(new { type = "datetime", format = "dd/MM/y" }).Add();
+                    col.Field(p => p.Etd).HeaderText("ETD NAVE").Width("120").Filter(new { type = "Excel" }).TextAlign(Syncfusion.EJ2.Grids.TextAlign.Right).Format(new { type = "datetime", format = "dd/MM/y" }).Add();
+                    col.Field(p => p.EtaPuerto).HeaderText("ETA POD").Width("120").Filter(new { type = "Excel" }).TextAlign(Syncfusion.EJ2.Grids.TextAlign.Right).Format(new { type = "datetime", format = "dd/MM/y" }).Add();
+                    col.Field(p => p.Origen).HeaderText("Origen").Width("140").Filter(new { type = "Excel" }).Template("#coltemplateOrigen").Add();
+                    col.Field(p => p.Destino).HeaderText("Destino").Width("180").Filter(new { type = "Excel" }).Template("#coltemplateDestino").Add();
+                    col.Field(p => p.Booking).HeaderText("Booking").Width("150").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.Naviera).HeaderText("Naviera").Width("120").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.Nave).HeaderText("Nave").Width("160").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.SetpointAC).HeaderText("Setpoint CO2").Width("140").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.SetpointT).HeaderText("Setpoint T°").Width("130").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.CO2Ext).HeaderText("C/Sensor CO2").Width("140").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.TemperaturaExt).HeaderText("C/Sensor T°").Width("130").Filter(new { type = "Excel" }).Add();
+                    col.Field(p => p.AperturaPuerta).HeaderText("C/Sensor Luz").Width("140").Filter(new { type = "Excel" }).Add();
+                }).AllowSorting(true).AllowPaging(true).PageSettings(page => page.PageCount(5)).AllowFiltering(true).SelectionSettings(select => select.CellSelectionMode(Syncfusion.EJ2.Grids.CellSelectionMode.Flow).Mode(Syncfusion.EJ2.Grids.SelectionMode.Cell).Type(Syncfusion.EJ2.Grids.SelectionType.Single)).CellSelected("onCellSelected").Render())
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<style type="text/css" class="cssStyles">
+    .detailtable td {
+        font-size: 13px;
+        padding: 4px;
+        max-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .photo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50px;
+        box-shadow: inset 0 0 1px #e0e0e0, inset 0 0 14px rgba(0, 0, 0, 0.2);
+    }
+</style>
+<script type="text/x-template" id="detailtemplate">
+    <table class="detailtable" width="100%">
+        <colgroup>
+            <col width="35%" />
+            <col width="35%" />
+            <col width="30%" />
+        </colgroup>
+        <tbody>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Contenedor: </span> ${Contenedor}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Commodity: </span> ${Commodity}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Fecha Programación: </span> ${FechaProgramacion}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">ETD NAVE: </span> ${Etd}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">ETA POD: </span> ${EtaPuerto}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Origen: </span> ${Origen}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Destino: </span> ${Destino}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Booking: </span> ${Booking}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Naviera: </span> ${Naviera}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Nave: </span> ${Nave}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Setpoint CO2: </span> ${SetpointAC}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">Setpoint T°: </span> ${SetpointT}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor CO2: </span> ${CO2Ext}
+                </td>
+                
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">&nbsp;&nbsp;&nbsp;  N° Serie Sensor CO2: </span> 9999999
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">&nbsp;&nbsp;&nbsp;    Estado Sensor: </span>  PENDING
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">&nbsp;&nbsp;&nbsp;    Usuario Programador: </span> RCONTRERAS
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">&nbsp;&nbsp;&nbsp;    Fecha Programación: </span> 24-01-2020
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor T°: </span> ${TemperaturaExt}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">&nbsp;&nbsp;&nbsp;  N° Serie Sensor T°: </span> 9999999
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">&nbsp;&nbsp;&nbsp;    Estado Sensor: </span>  PENDING
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">&nbsp;&nbsp;&nbsp;    Usuario Programador: </span> RCONTRERAS
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">&nbsp;&nbsp;&nbsp;    Fecha Programación: </span> 24-01-2020
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-weight: 500;">C/Sensor Luz: </span> ${AperturaPuerta}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+
+<script type="text/javascript">
+
+    // TOAS FUNCTIONS
+    var toasts = [
+            { title: 'Advertencia!', content: 'Advertencia.', cssClass: 'e-toast-warning', icon: 'e-warning toast-icons' },
+            { title: 'Muy bien!', content: 'El servicio fue creado exitosamente.', cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+            { title: 'Muy bien!', content: 'El servicio fue editado exitosamente.', cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+            { title: 'Muy bien!', content: 'El servicio fue eliminado exitosamente.', cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+            { title: 'Error!', content: 'El servicio no pudo ser creado.', cssClass: 'e-toast-danger', icon: 'e-error toast-icons' },
+            { title: 'Información!', content: 'Información.', cssClass: 'e-toast-info', icon: 'e-info toast-icons' }];
+
+    var btnEleHide = document.getElementById('hideToast');
+    var toastObj;
+    var infoBtn = document.getElementById('info_Toast');
+    var warnBtn = document.getElementById('warning_Toast');
+    var successBtn = document.getElementById('success_Toast');
+    var errorBtn = document.getElementById('error_Toast');
+    document.onclick = function (e) {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        if (e.target !== infoBtn && e.target !== warnBtn && e.target !== successBtn && e.target !== errorBtn) {
+            toastObj.hide('All');
+        }
+    };
+
+    document.getElementById('hideToast').onclick = function () {
+        toastObj.hide('All');
+    };
+    infoBtn.onclick = function () {
+        toastObj.show(toasts[3]);
+    };
+    warnBtn.onclick = function () {
+        toastObj.show(toasts[0]);
+    };
+    successBtn.onclick = function () {
+        toastObj.show(toasts[1]);
+    };
+    errorBtn.onclick = function () {
+        toastObj.show(toasts[2]);
+    };
+
+    var toastObj;
+    function created() {
+        toastObj = this;
+    }
+    function onclose(e) {
+        if (e.toastContainer.childElementCount === 0) {
+            btnEleHide.style.display = 'none';
+        }
+    }
+    function onBeforeOpen() {
+        btnEleHide.style.display = 'inline-block';
+    }
+
+    $(document).ready(function () {
+        var urlString = window.location.href;
+        let url = new URL(urlString);
+        let searchString = url.search.slice(1);
+        let searchParams = new URLSearchParams(searchString);
+        let inputParam = 'desplegarMensaje';
+
+        if (searchParams.has(inputParam)) {
+            if (searchParams.get(inputParam) == 1) {
+                desplegarMensaje();
+            }
+            else if (searchParams.get(inputParam) == 2) {
+                desplegarMensajeEditar();
+            }
+            else if (searchParams.get(inputParam) == 3) {
+                desplegarMensajeEliminar();
+            }
+        }
+    });
+
+
+    function desplegarMensaje() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[1]);
+        }, 500);
+    }
+    function desplegarMensajeEditar() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[2]);
+        }, 500);
+    }
+    function desplegarMensajeEliminar() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[3]);
+        }, 500);
+    }
+
+
+
+
+    function FormatDate(data) {
+        var dateString = data.substr(6);
+        var currentTime = new Date(parseInt(dateString));
+        var month = currentTime.getMonth() + 1;
+        var day = currentTime.getDate();
+        var year = currentTime.getFullYear();
+
+        if (month < 10) {
+            month = "0" + month;
+        } else {
+            month;
+        }
+
+        if (day < 10) {
+            day = "0" + day;
+        } else {
+            day;
+        }
+
+        var date = day + "-" + month + "-" + year;
+        return date;
+    }
+
+    //Funciones para agregar Viaje
+
+    $("#contenedor_agregar").blur(function () {
+        if ($("#contenedor_agregar").val() != "") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ValidarNumeroContenedor", "Servicio")',
+                data: { containerNumberToCheck: $("#contenedor_agregar").val() },
+                success: function (response) {
+                    if (response == "False") {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: '¡Número contenedor inválido!',
+                        });
+                        $("#contenedor_agregar").val("");
+                        return false;
+                    }
+                }
+            });
+        }
+    });
+
+    function contenedorChange_agregar() {
+
+        var div_contenedor_agregar = document.getElementById("div-contenedor_agregar").childNodes;
+        div_contenedor_agregar[1].style.borderColor = "#ced4da";
+
+        /*var contenedor = document.getElementById('contenedor').ej2_instances[0];
+        habilitar_campos = false;
+        contenedor.dataSource.forEach(validarContenedor);
+        if (habilitar_campos) {
+            var div_lugar_origen = document.getElementById("div-lugar-origen").childNodes;
+            div_lugar_origen[1].style.borderColor = "#ced4da";
+            var div_lugar_destino = document.getElementById("div-lugar-destino").childNodes;
+            div_lugar_destino[1].style.borderColor = "#ced4da";
+
+            HabilitarOtrosCampos();
+            LlenarOtrosCampos();
+        }
+        else {
+            DeshabilitarOtrosCampos();
+        }*/
+    }
+
+
+
+    var habilitar_campos_agregar = false;
+
+    function onfilteringContenedor_agregar(e) {
+        document.getElementById('contenedor_agregar').value = document.getElementById('contenedor_agregar').value.toUpperCase();
+        var contenedor_agregar = document.getElementById('contenedor_agregar').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(contenedor_agregar.dataSource, query);
+
+        if (document.getElementById('nodata-contenedor_agregar')) {
+            document.getElementById('btn-contenedor_agregar').onclick = function () {
+
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("ValidarNumeroContenedor", "Servicio")',
+                    data: { containerNumberToCheck: $("#contenedor_agregar").val() },
+                    success: function (response) {
+                        if (response == "False") {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: '¡Número contenedor inválido!',
+                            });
+                            $("#contenedor_agregar").val("");
+                            return false;
+                        }
+                        else {
+                            var customValue = (document.getElementById('contenedor_agregar')).value;
+                            var newItem = { 'Name': customValue, 'Code': customValue };
+                            (contenedor_agregar.dataSource).push(newItem);
+                            contenedor_agregar.hidePopup();
+                            contenedor_agregar.addItem(newItem);
+                            contenedor_agregar.value = customValue;
+                            HabilitarOtrosCampos_agregar();
+                            return false;
+                        }
+                    }
+                });
+
+            };
+        }
+    }
+
+    function contenedorChange_agregar() {
+
+        var div_contenedor_agregar = document.getElementById("div-contenedor_agregar").childNodes;
+        div_contenedor_agregar[1].style.borderColor = "#ced4da";
+
+        var contenedor_agregar = document.getElementById('contenedor_agregar').ej2_instances[0];
+        habilitar_campos_agregar = false;
+        contenedor_agregar.dataSource.forEach(validarContenedor_agregar);
+        if (habilitar_campos_agregar) {
+            var div_lugar_origen_agregar = document.getElementById("div-lugar-origen_agregar").childNodes;
+            div_lugar_origen_agregar[1].style.borderColor = "#ced4da";
+            var div_lugar_destino_agregar = document.getElementById("div-lugar-destino_agregar").childNodes;
+            div_lugar_destino_agregar[1].style.borderColor = "#ced4da";
+
+            HabilitarOtrosCampos_agregar();
+            LlenarOtrosCampos_agregar();
+        }
+        else {
+            DeshabilitarOtrosCampos_agregar();
+        }
+    }
+
+    function validarContenedor_agregar(item, index) {
+        if (document.getElementById('contenedor_agregar').value == item.Name) {
+            habilitar_campos_agregar = true;
+        }
+    }
+
+    function sensoresChange_agregar() {
+        var div_tipo_sensor_agregar = document.getElementById("div-tipo-sensor_agregar").childNodes;
+        div_tipo_sensor_agregar[1].style.borderColor = "#ced4da";
+    }
+    function numeroSerieChange_agregar() {
+        var div_numero_serie_agregar = document.getElementById("div-numero-serie_agregar").childNodes;
+        div_numero_serie_agregar[1].style.borderColor = "#ced4da";
+    }
+    function origenChange_agregar() {
+        var div_lugar_origen_agregar = document.getElementById("div-lugar-origen_agregar").childNodes;
+        div_lugar_origen_agregar[1].style.borderColor = "#ced4da";
+    }
+    function destinoChange_agregar() {
+        var div_lugar_destino_agregar = document.getElementById("div-lugar-destino_agregar").childNodes;
+        div_lugar_destino_agregar[1].style.borderColor = "#ced4da";
+    }
+
+
+    function HabilitarOtrosCampos_agregar() {
+        var campo1_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+        var campo2_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+        var campo3_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+        var campo4_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+        var campo5_agregar = document.getElementById("booking_agregar").ej2_instances[0];
+        var campo6_agregar = document.getElementById("nave_agregar").ej2_instances[0];
+        var campo7_agregar = document.getElementById("commodity_agregar").ej2_instances[0];
+        var campo8_agregar = document.getElementById("naviera_agregar").ej2_instances[0];
+        var campo9_agregar = document.getElementById("setpoint_co2_agregar").ej2_instances[0];
+        var campo10_agregar = document.getElementById("setpoint_temp_agregar").ej2_instances[0];
+        var campo11_agregar = document.getElementById("nombre_lugar_origen_agregar").ej2_instances[0];
+        var campo12_agregar = document.getElementById("nombre_lugar_destino_agregar").ej2_instances[0];
+        campo1_agregar.enabled = true;
+        campo2_agregar.enabled = true;
+        campo3_agregar.enabled = true;
+        campo4_agregar.enabled = true;
+        campo5_agregar.enabled = true;
+        campo6_agregar.enabled = true;
+        campo7_agregar.enabled = true;
+        campo8_agregar.enabled = true;
+        campo9_agregar.enabled = true;
+        campo10_agregar.enabled = true;
+        campo11_agregar.enabled = true;
+        campo12_agregar.enabled = true;
+        campo1_agregar.dataBind();
+        campo2_agregar.dataBind();
+        campo3_agregar.dataBind();
+        campo4_agregar.dataBind();
+        campo5_agregar.dataBind();
+        campo6_agregar.dataBind();
+        campo7_agregar.dataBind();
+        campo8_agregar.dataBind();
+        campo9_agregar.dataBind();
+        campo10_agregar.dataBind();
+        campo11_agregar.dataBind();
+        campo12_agregar.dataBind();
+    }
+
+    function DeshabilitarOtrosCampos_agregar() {
+        var campo1_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+        var campo2_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+        var campo3_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+        var campo4_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+        var campo5_agregar = document.getElementById("booking_agregar").ej2_instances[0];
+        var campo6_agregar = document.getElementById("nave_agregar").ej2_instances[0];
+        var campo7_agregar = document.getElementById("commodity_agregar").ej2_instances[0];
+        var campo8_agregar = document.getElementById("naviera_agregar").ej2_instances[0];
+        var campo9_agregar = document.getElementById("setpoint_co2_agregar").ej2_instances[0];
+        var campo10_agregar = document.getElementById("setpoint_temp_agregar").ej2_instances[0];
+        var campo11_agregar = document.getElementById("nombre_lugar_origen_agregar").ej2_instances[0];
+        var campo12_agregar = document.getElementById("nombre_lugar_destino_agregar").ej2_instances[0];
+        campo1_agregar.value = "";
+        campo2_agregar.value = "";
+        campo3_agregar.value = "";
+        campo4_agregar.value = "";
+        campo5_agregar.value = "";
+        campo6_agregar.value = "";
+        campo7_agregar.value = "";
+        campo8_agregar.value = "";
+        campo9_agregar.value = "";
+        campo10_agregar.value = "";
+        campo11_agregar.value = "";
+        campo12_agregar.value = "";
+        campo1_agregar.enabled = false;
+        campo2_agregar.enabled = false;
+        campo3_agregar.enabled = false;
+        campo4_agregar.enabled = false;
+        campo5_agregar.enabled = false;
+        campo6_agregar.enabled = false;
+        campo7_agregar.enabled = false;
+        campo8_agregar.enabled = false;
+        campo9_agregar.enabled = false;
+        campo10_agregar.enabled = false;
+        campo11_agregar.enabled = false;
+        campo12_agregar.enabled = false;
+        campo1_agregar.dataBind();
+        campo2_agregar.dataBind();
+        campo3_agregar.dataBind();
+        campo4_agregar.dataBind();
+        campo5_agregar.dataBind();
+        campo6_agregar.dataBind();
+        campo7_agregar.dataBind();
+        campo8_agregar.dataBind();
+        campo9_agregar.dataBind();
+        campo10_agregar.dataBind();
+        campo11_agregar.dataBind();
+        campo12_agregar.dataBind();
+    }
+
+    function LlenarOtrosCampos_agregar() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ObtenerDatosServicio", "Servicio")',
+            dataType: 'json',
+            data: { contenedor: $("#contenedor_agregar").val() },
+            success: function (response) {
+                if (response.id > 0) {
+                    document.getElementById('servicio_app_servicios_agregar').value = 1;
+                    //DeshabilitarOtrosCampos_agregar();
+                    var origen_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+                    var destino_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+                    var eta_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+                    var etd_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+                    var booking_agregar = document.getElementById("booking_agregar").ej2_instances[0];
+                    var nave_agregar = document.getElementById("nave_agregar").ej2_instances[0];
+                    var commodity_agregar = document.getElementById("commodity_agregar").ej2_instances[0];
+                    var naviera_agregar = document.getElementById("naviera_agregar").ej2_instances[0];
+                    var setpoint_co2_agregar = document.getElementById("setpoint_co2_agregar").ej2_instances[0];
+                    var setpoint_temp_agregar = document.getElementById("setpoint_temp_agregar").ej2_instances[0];
+                    var nombre_lugar_origen_agregar = document.getElementById("nombre_lugar_origen_agregar").ej2_instances[0];
+                    var nombre_lugar_destino_agregar = document.getElementById("nombre_lugar_destino_agregar").ej2_instances[0];
+                    origen_agregar.value = response.lugar_origen;
+                    destino_agregar.value = response.lugar_destino;
+                    eta_agregar.value = formatDate(response.eta_string);
+                    etd_agregar.value = formatDate(response.etd_string);
+                    booking_agregar.value = response.booking;
+                    nave_agregar.text = response.nave;
+                    commodity_agregar.text = response.commodity;
+                    naviera_agregar.text = response.naviera;
+                    //setpoint_co2.value = "Sin Datos";
+                    //setpoint_temp.value = "Sin Datos";
+                    //nombre_lugar_origen.value = "Sin Datos";
+                    //nombre_lugar_destino.value = "Sin Datos";
+                }
+                else {
+                    document.getElementById('servicio_app_servicios_agregar').value = 0;
+                }
+            }
+        });
+    }
+
+    function onfilteringCommodity_agregar(e) {
+        var commodity_agregar = document.getElementById('commodity_agregar').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(commodity_agregar.dataSource, query);
+
+        if (document.getElementById('nodata-commodity_agregar')) {
+            document.getElementById('btn-commodity_agregar').onclick = function () {
+                var customValue = (document.getElementById('commodity_agregar')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (commodity_agregar.dataSource).push(newItem);
+                commodity_agregar.hidePopup();
+                commodity_agregar.addItem(newItem);
+                commodity_agregar.value = customValue;
+            };
+        }
+    }
+
+    function onfilteringSetpointCO2_agregar(e) {
+        var setpoint_co2_agregar = document.getElementById('setpoint_co2_agregar').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(setpoint_co2_agregar.dataSource, query);
+
+        if (document.getElementById('nodata-setpoint-co2_agregar')) {
+            document.getElementById('btn-setpoint-co2_agregar').onclick = function () {
+                var customValue = (document.getElementById('setpoint_co2_agregar')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (setpoint_co2_agregar.dataSource).push(newItem);
+                setpoint_co2_agregar.hidePopup();
+                setpoint_co2_agregar.addItem(newItem);
+                setpoint_co2_agregar.value = customValue;
+            };
+        }
+    }
+
+    function onfilteringSetpointTemp_agregar(e) {
+        var setpoint_temp_agregar = document.getElementById('setpoint_temp_agregar').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(setpoint_temp_agregar.dataSource, query);
+
+        if (document.getElementById('nodata-setpoint-tem_agregarp')) {
+            document.getElementById('btn-setpoint-temp_agregar').onclick = function () {
+                var customValue = (document.getElementById('setpoint_temp_agregar')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (setpoint_temp_agregar.dataSource).push(newItem);
+                setpoint_temp_agregar.hidePopup();
+                setpoint_temp_agregar.addItem(newItem);
+                setpoint_temp_agregar.value = customValue;
+            };
+        }
+    }
+
+
+
+
+
+
+
+    var boton_guardar_agregar = document.getElementById('btn-guardar_agregar');
+    boton_guardar_agregar.addEventListener("click", function () {
+        var tipo_sensor_agregar = document.getElementById('sensores_agregar').ej2_instances[0];
+        var numero_serie_agregar = document.getElementById('numero_serie_agregar').ej2_instances[0];
+        var contenedor_agregar = document.getElementById('contenedor_agregar').ej2_instances[0];
+        var origen_agregar = document.getElementById("lugar_origen_agregar").ej2_instances[0];
+        var destino_agregar = document.getElementById("lugar_destino_agregar").ej2_instances[0];
+        var etd_agregar = document.getElementById("etd_agregar").ej2_instances[0];
+        var eta_agregar = document.getElementById("eta_agregar").ej2_instances[0];
+
+        if (tipo_sensor_agregar.value == null || numero_serie_agregar.value == "" || contenedor_agregar.value == null || origen_agregar.value == "" || destino_agregar.value == "" || etd_agregar.value == "" || eta_agregar.value == "") {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '¡Faltan algunos campos obligatorios!',
+            });
+
+            if (tipo_sensor_agregar.value == null) {
+                var div_tipo_sensor_agregar = document.getElementById("div-tipo-sensor_agregar").childNodes;
+                div_tipo_sensor_agregar[1].style.borderColor = "red";
+            }
+            if (numero_serie_agregar.value == "") {
+                var div_numero_serie_agregar = document.getElementById("div-numero-serie_agregar").childNodes;
+                div_numero_serie_agregar[1].style.borderColor = "red";
+            }
+            if (contenedor_agregar.value == null) {
+                var div_contenedor_agregar = document.getElementById("div-contenedor_agregar").childNodes;
+                div_contenedor_agregar[1].style.borderColor = "red";
+            }
+            if (origen_agregar.value == "") {
+                var div_lugar_origen_agregar = document.getElementById("div-lugar-origen_agregar").childNodes;
+                div_lugar_origen_agregar[1].style.borderColor = "red";
+            }
+            if (destino_agregar.value == "") {
+                var div_lugar_destino_agregar = document.getElementById("div-lugar-destino_agregar").childNodes;
+                div_lugar_destino_agregar[1].style.borderColor = "red";
+            }
+            if (etd_agregar.value == "") {
+                var div_etd_agregar = document.getElementById("div-etd_agregar").childNodes;
+                div_etd_agregar[1].style.borderColor = "red";
+            }
+            if (eta_agregar.value == "") {
+                var div_eta_agregar = document.getElementById("div-eta_agregar").childNodes;
+                div_eta_agregar[1].style.borderColor = "red";
+            }
+        }
+        else {
+            Swal.fire({
+                title: '¿Seguro que deseas guardar el servicio?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById('form_agregar').submit();
+                }
+            });
+        }
+    });
+
+
+    $("#AgregarViaje").click(function () {
+
+        
+
+
+        function formatDate(date) {
+            if (date != null) {
+                var fecha = date.substring(0, 10);
+                var dia = date.substring(0, 2);
+                var mes = date.substring(3, 5);
+                var ano = date.substring(6, 10);
+                return dia + "/" + mes + "/" + ano;
+            } else {
+                return "";
+            }
+        }
+
+        $('#AgregarViajeTrigger').trigger('click');
+    });
+
+
+    // INPUTS FUNCTIONS //
+    $("#contenedor").blur(function () {
+        if ($("#contenedor").val() != "") {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ValidarNumeroContenedor", "Servicio")',
+                data: { containerNumberToCheck: $("#contenedor").val() },
+                success: function (response) {
+                    if (response == "False") {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: '¡Número contenedor inválido!',
+                        });
+                        $("#contenedor").val("");
+                        return false;
+                    }
+                }
+            });
+        }
+    });
+
+
+
+    var habilitar_campos = false;
+
+    function onfilteringContenedor(e)
+    {
+        document.getElementById('contenedor').value = document.getElementById('contenedor').value.toUpperCase();
+        var contenedor = document.getElementById('contenedor').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(contenedor.dataSource, query);
+
+        if (document.getElementById('nodata-contenedor'))
+        {
+            document.getElementById('btn-contenedor').onclick = function ()
+            {
+
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("ValidarNumeroContenedor", "Servicio")',
+                    data: { containerNumberToCheck: $("#contenedor").val() },
+                    success: function (response) {
+                        if (response == "False") {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: '¡Número contenedor inválido!',
+                            });
+                            $("#contenedor").val("");
+                            return false;
+                        }
+                        else {
+                            var customValue = (document.getElementById('contenedor')).value;
+                            var newItem = { 'Name': customValue, 'Code': customValue };
+                            (contenedor.dataSource).push(newItem);
+                            contenedor.hidePopup();
+                            contenedor.addItem(newItem);
+                            contenedor.value = customValue;
+                            return false;
+                        }
+                    }
+                });
+
+            };
+        }
+    }
+
+    function contenedorChange() {
+
+        var div_contenedor = document.getElementById("div-contenedor").childNodes;
+        div_contenedor[1].style.borderColor = "#ced4da";
+
+        /*var contenedor = document.getElementById('contenedor').ej2_instances[0];
+        habilitar_campos = false;
+        contenedor.dataSource.forEach(validarContenedor);
+        if (habilitar_campos) {
+            var div_lugar_origen = document.getElementById("div-lugar-origen").childNodes;
+            div_lugar_origen[1].style.borderColor = "#ced4da";
+            var div_lugar_destino = document.getElementById("div-lugar-destino").childNodes;
+            div_lugar_destino[1].style.borderColor = "#ced4da";
+
+            HabilitarOtrosCampos();
+            LlenarOtrosCampos();
+        }
+        else {
+            DeshabilitarOtrosCampos();
+        }*/
+    }
+
+    function validarContenedor(item, index) {
+        if (document.getElementById('contenedor').value == item.Name) {
+            habilitar_campos = true;
+        }
+    }
+
+    function origenChange() {
+        var input_origen = document.getElementById("lugar_origen");
+        input_origen.style.borderColor = "#ced4da";
+    }
+    function destinoChange() {
+        var input_destino = document.getElementById("lugar_destino");
+        input_destino.style.borderColor = "#ced4da";
+    }
+
+
+    function HabilitarOtrosCampos()
+    {
+        var campo1 = document.getElementById("lugar_origen").ej2_instances[0];
+        var campo2 = document.getElementById("lugar_destino").ej2_instances[0];
+        var campo3 = document.getElementById("eta").ej2_instances[0];
+        var campo4 = document.getElementById("etd").ej2_instances[0];
+        var campo5 = document.getElementById("booking").ej2_instances[0];
+        var campo6 = document.getElementById("nave").ej2_instances[0];
+        var campo7 = document.getElementById("commodity").ej2_instances[0];
+        var campo8 = document.getElementById("naviera").ej2_instances[0];
+        var campo9 = document.getElementById("setpoint_co2").ej2_instances[0];
+        var campo10 = document.getElementById("setpoint_temp").ej2_instances[0];
+        var campo11 = document.getElementById("nombre_lugar_origen").ej2_instances[0];
+        var campo12 = document.getElementById("nombre_lugar_destino").ej2_instances[0];
+        campo1.enabled = true;
+        campo2.enabled = true;
+        campo3.enabled = true;
+        campo4.enabled = true;
+        campo5.enabled = true;
+        campo6.enabled = true;
+        campo7.enabled = true;
+        campo8.enabled = true;
+        campo9.enabled = true;
+        campo10.enabled = true;
+        campo11.enabled = true;
+        campo12.enabled = true;
+        campo1.dataBind();
+        campo2.dataBind();
+        campo3.dataBind();
+        campo4.dataBind();
+        campo5.dataBind();
+        campo6.dataBind();
+        campo7.dataBind();
+        campo8.dataBind();
+        campo9.dataBind();
+        campo10.dataBind();
+        campo11.dataBind();
+        campo12.dataBind();
+    }
+
+    function DeshabilitarOtrosCampos() {
+        var campo1 = document.getElementById("lugar_origen").ej2_instances[0];
+        var campo2 = document.getElementById("lugar_destino").ej2_instances[0];
+        var campo3 = document.getElementById("eta").ej2_instances[0];
+        var campo4 = document.getElementById("etd").ej2_instances[0];
+        var campo5 = document.getElementById("booking").ej2_instances[0];
+        var campo6 = document.getElementById("nave").ej2_instances[0];
+        var campo7 = document.getElementById("commodity").ej2_instances[0];
+        var campo8 = document.getElementById("naviera").ej2_instances[0];
+        var campo9 = document.getElementById("setpoint_co2").ej2_instances[0];
+        var campo10 = document.getElementById("setpoint_temp").ej2_instances[0];
+        var campo11 = document.getElementById("nombre_lugar_origen").ej2_instances[0];
+        var campo12 = document.getElementById("nombre_lugar_destino").ej2_instances[0];
+        campo1.value = "";
+        campo2.value = "";
+        campo3.value = "";
+        campo4.value = "";
+        campo5.value = "";
+        campo6.value = "";
+        campo7.value = "";
+        campo8.value = "";
+        campo9.value = "";
+        campo10.value = "";
+        campo11.value = "";
+        campo12.value = "";
+        campo1.enabled = false;
+        campo2.enabled = false;
+        campo3.enabled = false;
+        campo4.enabled = false;
+        campo5.enabled = false;
+        campo6.enabled = false;
+        campo7.enabled = false;
+        campo8.enabled = false;
+        campo9.enabled = false;
+        campo10.enabled = false;
+        campo11.enabled = false;
+        campo12.enabled = false;
+        campo1.dataBind();
+        campo2.dataBind();
+        campo3.dataBind();
+        campo4.dataBind();
+        campo5.dataBind();
+        campo6.dataBind();
+        campo7.dataBind();
+        campo8.dataBind();
+        campo9.dataBind();
+        campo10.dataBind();
+        campo11.dataBind();
+        campo12.dataBind();
+    }
+
+    function LlenarOtrosCampos() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ObtenerDatosServicio", "Servicio")',
+            dataType: 'json',
+            data: { contenedor: $("#contenedor").val() },
+            success: function (response) {
+                if (response.id > 0) {
+                    document.getElementById('servicio_app_servicios').value = 1;
+                    //DeshabilitarOtrosCampos();
+
+                    var origen = document.getElementById("lugar_origen").ej2_instances[0];
+                    var destino = document.getElementById("lugar_destino").ej2_instances[0];
+                    var eta = document.getElementById("eta").ej2_instances[0];
+                    var etd = document.getElementById("etd").ej2_instances[0];
+                    var booking = document.getElementById("booking").ej2_instances[0];
+                    var nave = document.getElementById("nave").ej2_instances[0];
+                    var commodity = document.getElementById("commodity").ej2_instances[0];
+                    var naviera = document.getElementById("naviera").ej2_instances[0];
+                    var setpoint_co2 = document.getElementById("setpoint_co2").ej2_instances[0];
+                    var setpoint_temp = document.getElementById("setpoint_temp").ej2_instances[0];
+                    var nombre_lugar_origen = document.getElementById("nombre_lugar_origen").ej2_instances[0];
+                    var nombre_lugar_destino = document.getElementById("nombre_lugar_destino").ej2_instances[0];
+
+                    origen.value = response.lugar_origen;
+                    destino.value = response.lugar_destino;
+                    eta.value = formatDate(response.eta_string);
+                    etd.value = formatDate(response.etd_string);
+                    booking.value = response.booking;
+                    nave.value = response.nave;
+                    commodity.value = response.commodity;
+                    naviera.value = response.naviera;
+                    setpoint_co2.value = "Sin Datos";
+                    setpoint_temp.value = "Sin Datos";
+                    nombre_lugar_origen.value = "Sin Datos";
+                    nombre_lugar_destino.value = "Sin Datos";
+                }
+                else {
+                    document.getElementById('servicio_app_servicios').value = 0;
+                }
+            }
+        });
+    }
+
+    function onfilteringCommodity(e) {
+        var commodity = document.getElementById('commodity').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(commodity.dataSource, query);
+
+        if (document.getElementById('nodata-commodity')) {
+            document.getElementById('btn-commodity').onclick = function () {
+                var customValue = (document.getElementById('commodity')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (commodity.dataSource).push(newItem);
+                commodity.hidePopup();
+                commodity.addItem(newItem);
+                commodity.value = customValue;
+            };
+        }
+    }
+
+    function onfilteringSetpointCO2(e) {
+        var setpoint_co2 = document.getElementById('setpoint_co2').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(setpoint_co2.dataSource, query);
+
+        if (document.getElementById('nodata-setpoint-co2')) {
+            document.getElementById('btn-setpoint-co2').onclick = function () {
+                var customValue = (document.getElementById('setpoint_co2')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (setpoint_co2.dataSource).push(newItem);
+                setpoint_co2.hidePopup();
+                setpoint_co2.addItem(newItem);
+                setpoint_co2.value = customValue;
+            };
+        }
+    }
+
+    function onfilteringSetpointTemp(e) {
+        var setpoint_temp = document.getElementById('setpoint_temp').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(setpoint_temp.dataSource, query);
+
+        if (document.getElementById('nodata-setpoint-temp')) {
+            document.getElementById('btn-setpoint-temp').onclick = function () {
+                var customValue = (document.getElementById('setpoint_temp')).value;
+                var newItem = { 'Name': customValue, 'Code': customValue };
+                (setpoint_temp.dataSource).push(newItem);
+                setpoint_temp.hidePopup();
+                setpoint_temp.addItem(newItem);
+                setpoint_temp.value = customValue;
+            };
+        }
+    }
+
+
+    var boton_editar = document.getElementById('btn-editar');
+    boton_editar.addEventListener("click", function ()
+    {
+        var contenedor = document.getElementById('contenedor').ej2_instances[0];
+        var origen = document.getElementById("lugar_origen").ej2_instances[0];
+        var destino = document.getElementById("lugar_destino").ej2_instances[0];
+        var etd = document.getElementById("etd").ej2_instances[0];
+        var eta = document.getElementById("eta").ej2_instances[0];
+
+        if (contenedor.value == null || origen.value == "" || destino.value == "" || etd.value == "" || eta.value == "") {
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '¡Faltan algunos campos obligatorios!',
+            });
+
+            if (contenedor.value == null) {
+                var input_contenedor = document.getElementById("contenedor")
+                input_contenedor.style.borderColor = "red";
+            }
+            if (origen.value == "") {
+                var input_origen = document.getElementById("lugar_origen")
+                input_origen.style.borderColor = "red";
+            }
+            if (destino.value == "") {
+                var input_destino = document.getElementById("lugar_destino")
+                input_destino.style.borderColor = "red";
+            }
+            if (etd.value == "") {
+                var div_etd = document.getElementById("div-etd").childNodes;
+                div_etd[1].style.borderColor = "red";
+            }
+            if (eta.value == "") {
+                var div_eta = document.getElementById("div-eta").childNodes;
+                div_eta[1].style.borderColor = "red";
+            }
+        }
+        else {
+            Swal.fire({
+                title: '¿Seguro que deseas editar el servicio?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.value) {
+                    document.getElementById('form').submit();
+                }
+            });
+        }
+    });
+
+
+    function formatDate(date) {
+        if (date != null) {
+            var fecha = date.substring(0, 10);
+            var dia = date.substring(0, 2);
+            var mes = date.substring(3, 5);
+            var ano = date.substring(6, 10);
+            return dia + "/" + mes + "/" + ano;
+        } else {
+            return "";
+        }
+    }
+
+    //Para agregar viaje
+
+
+
+</script>
+
+
+<script src="~/build/js/Perfiles.js"></script>
+
+<script id="coltemplateOrigen" type="text/x-template">
+    <div class="image">
+        <img src="@Url.Content("~/Content/grid/Map.png")" class="e-image" alt="${Origen}" /> &nbsp
+        <span id="locationtext">${Origen}</span>
+    </div>
+</script>
+
+<script id="coltemplateEditar" type="text/x-template">
+    <div class="image">
+        <button class="btn fa fa-edit" style="background:white;border:1px gray solid;"></button>
+    </div>
+</script>
+
+<script id="coltemplateEliminar" type="text/x-template">
+    <div class="image">
+        <button class="btn fa fa-trash" style="background:white;border:1px gray solid;"></button>
+    </div>
+</script>
+
+<script id="coltemplateDestino" type="text/x-template">
+    <div class="image">
+        <img src="@Url.Content("~/Content/grid/Map.png")" class="e-image" alt="${Destino}" /> &nbsp
+        <span id="locationtext">${Destino}</span>
+    </div>
+</script>
+
+<style>
+    .e-card {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab-text {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-control {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-treeview.e-list-text {
+        color: white !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .e-float-text {
+        font-family: Gotham Medium !important;
+    }
+
+    p {
+        margin: 0 0 0px;
+        margin-bottom: 0px;
+    }
+
+    .h4 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .main-content {
+        background: #F7F7F7 !important;
+        font-family: Gotham Medium !important;
+    }
+
+    #Emptext {
+        top: -12px;
+        left: 41px;
+        position: relative;
+    }
+
+    .e-grid.e-rtl #Emptext {
+        top: -12px;
+        left: -41px;
+        position: relative;
+    }
+
+    .empimg {
+        height: 27px;
+        width: 29px;
+        border-radius: 14px;
+    }
+
+    .gm-style-iw {
+        height: 95px;
+        width: 60%;
+        padding-left: 20px;
+        margin-left: 40px;
+        float: left;
+        line-height: 25px;
+    }
+
+
+    td.e-rowcell.e-selectionbackground.e-active {
+        background-color: transparent;
+    }
+
+    .e-hightheme td.e-rowcell.e-selectionbackground.e-active {
+        background-color: transparent;
+        color: white;
+    }
+
+    .e-bigger .e-grid .statustxt {
+        position: relative;
+        top: -2px;
+    }
+
+    .rating .star {
+        font-size: 132%;
+        color: lightgrey;
+    }
+
+        .rating .star.checked {
+            color: #ffa600;
+        }
+
+    td.e-rowcell .statustxt.e-activecolor {
+        color: #00cc00;
+        position: relative;
+        top: 9px;
+    }
+
+    td.e-rowcell .statustxt.e-inactivecolor {
+        color: #e60000;
+        position: relative;
+        top: 9px;
+    }
+
+    .statustemp.e-inactivecolor {
+        background-color: #ffd7cc;
+    }
+
+    .statustemp.e-activecolor {
+        background-color: #ccffcc;
+    }
+
+    .statustxt.e-activecolor {
+        color: #00cc00;
+    }
+
+    .statustxt.e-inactivecolor {
+        color: #e60000;
+    }
+
+    #Trusttext {
+        position: relative;
+        top: 1px;
+    }
+
+    .e-image {
+        height: 13px;
+        width: 14px;
+    }
+
+    .statustemp.e-inactivecolor {
+        width: 64px;
+    }
+
+    .statustemp.e-activecolor {
+        width: 57px;
+    }
+
+    .statustemp {
+        position: relative;
+        height: 19px;
+        border-radius: 5px;
+        text-align: center;
+    }
+
+    .highcontrast #msg {
+        color: #FFFFFF;
+    }
+
+
+    #msg {
+        font-family: "Segoe UI", "GeezaPro", "DejaVu Serif", sans-serif;
+        font-size: 14px;
+        font-weight: 400;
+        opacity: 0.95;
+        color: #333;
+        float: right;
+        margin-top: 3px;
+    }
+
+    @@media only screen and (max-width: 370px) {
+        #msg {
+            float: left;
+            margin-top: 3px;
+        }
+
+        #GridOverview {
+            margin-top: 36px;
+        }
+    }
+
+    #samplecontainer {
+        padding-top: 5px;
+    }
+
+    #myProgress {
+        position: relative;
+        height: 18px;
+        width: 10em;
+        text-align: left;
+        background-color: white;
+    }
+
+    .highcontrast .e-grid #myProgress {
+        background-color: black;
+    }
+
+    #myBar {
+        position: absolute;
+        width: 10%;
+        height: 100%;
+        background-color: #00b300;
+    }
+
+        #myBar.progressdisable {
+            background-color: #df2222;
+        }
+
+    #label {
+        position: relative;
+        left: 10px;
+        line-height: 18px;
+        font-size: 10px;
+        color: white;
+    }
+</style>
+
+
+
+<script>
+    function onCellSelected(args) {
+        var idServicio = args.data["IdServicio"];
+        var BDOrigen = args.data["BDOrigen"];
+        var cellIndex = args.cellIndex.cellIndex;
+        if (cellIndex == 0) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("ConsultarServiciosPorId", "Servicio")',
+                dataType: 'json',
+                data: { id_servicio: idServicio, id_bd: BDOrigen },
+                success: function (response) {
+
+                    if (response.id > 0) {
+                        document.getElementById('servicio_app_servicios').value = 0;
+                        document.getElementById('id_servicio').value = idServicio;
+                        var contenedor = document.getElementById("contenedor").ej2_instances[0];
+                        var origen = document.getElementById("lugar_origen").ej2_instances[0];
+                        var destino = document.getElementById("lugar_destino").ej2_instances[0];
+                        var eta = document.getElementById("eta").ej2_instances[0];
+                        var etd = document.getElementById("etd").ej2_instances[0];
+                        var booking = document.getElementById("booking").ej2_instances[0];
+                        var nave = document.getElementById("nave").ej2_instances[0];
+                        var commodity = document.getElementById("commodity").ej2_instances[0];
+                        var naviera = document.getElementById("naviera").ej2_instances[0];
+                        var setpoint_co2 = document.getElementById("setpoint_co2").ej2_instances[0];
+                        var setpoint_temp = document.getElementById("setpoint_temp").ej2_instances[0];
+                        var nombre_lugar_origen = document.getElementById("nombre_lugar_origen").ej2_instances[0];
+                        var nombre_lugar_destino = document.getElementById("nombre_lugar_destino").ej2_instances[0];
+                        contenedor.value = response.contenedor;
+                        origen.value = "Sin Datos";
+                        destino.value = "Sin Datos";
+                        eta.value = formatDate(response.eta_string);
+                        etd.value = formatDate(response.etd_string);
+                        booking.value = response.booking;
+                        nave.text = response.nave;
+                        commodity.value = response.commodity;
+                        naviera.text = response.naviera;
+                        setpoint_co2.text = response.setpoint_co2;
+                        setpoint_temp.text = response.setpoint_temp;
+                        nombre_lugar_origen.value = "Sin Datos";
+                        nombre_lugar_destino.value = "Sin Datos";
+                    }
+                    else {
+                        document.getElementById('servicio_app_servicios').value = 0;
+                    }
+
+                }
+            });
+
+
+
+
+            $('#EditarServicioTrigger').trigger('click');
+
+
+            /*var searchInput2 = 'lugar_destino';
+            var autocomplete2;
+
+            autocomplete2 = new google.maps.places.Autocomplete((document.getElementById(searchInput2)), {
+                types: ['address']
+            });*/
+
+            //var url = '@Url.Action("DetalleServicioView", "DetalleServicio")?IdServicio=' + idServicio;
+            //window.location.href = url;
+        }
+        if (cellIndex == 1) {
+            Swal.fire({
+                title: '¿Seguro que deseas eliminar el servicio?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("EliminarServicioPorId", "Servicio")',
+                        dataType: 'json',
+                        data: { id_servicio: idServicio, id_bd: BDOrigen },
+                        success: function (response) {
+                            if (response.id > 0) {
+                                var str = window.location.href;
+                                var res = str.split("?");
+                                console.log(res[0]);
+                                var urlString = res[0];
+                                location.href = urlString + "?desplegarMensaje=" + 3;
+                            }
+                        }
+                    });
+
+
+
+                }
+            });
+        }
+    }
+</script>

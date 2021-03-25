@@ -1,0 +1,356 @@
+﻿@{
+    ViewBag.Title = "MasterPage";
+
+    int Perfil = Convert.ToInt32(Session["Perfil"]);
+    int PerfilInterior = Convert.ToInt32(Session["PerfilInterior"]);
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Alma Web Application</title>
+
+
+    <!--SweetAlert-->
+    <script src="~/Vendors/sweetalert/sweetalert2.min.js"></script>
+    <link rel="stylesheet" href="~/Vendors/sweetalert/sweetalert2.min.css">
+    <script src="~/Vendors/sweetalert/core.js"></script>
+    <!-- Bootstrap -->
+    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="../vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    <!-- bootstrap-progressbar -->
+    <link href="../vendors/bootstrap-progressbar/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet">
+    <!-- JQVMap -->
+    <link href="../vendors/jqvmap/dist/jqvmap.min.css" rel="stylesheet" />
+    <!-- bootstrap-daterangepicker -->
+    <link href="../vendors/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="../build/css/custom.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/Vendors/bootstrap-select.min.css" />
+
+    <!-- jQuery -->
+    <script src="~/vendors/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/Vendors/jquery/dist/jquery-ui.css">
+    <link rel="stylesheet" href="~/build/css/prueba.css">
+    <script src="~/Vendors/jquery/jquery-1.12.4.js"></script>
+    <script src="~/Vendors/jquery/dist/jquery-ui.js"></script>
+    <script src="~/build/js/idioma.js?12"></script>
+    <script src="~/build/js/TimeOut.js"></script>
+
+
+    <script src="~/Vendors/boostrap-select.min.js"></script>
+
+
+
+
+
+    <style>
+        #dvLoading {
+            background: url(../images/loader.gif) no-repeat center center;
+            height: 50px;
+            width: 50px;
+        }
+
+        #loader {
+            background: #ffffff;
+            opacity: 0.7;
+            bottom: 0;
+            height: 100%;
+            left: 0;
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 100%;
+            z-index: 9999;
+            float: left;
+            clear: none;
+        }
+
+        #loaderInner {
+            background: url(../images/loading.gif) center center no-repeat;
+            height: 100px;
+            left: 45%;
+            position: absolute;
+            top: 40%;
+            width: 200px;
+        }
+
+        #logoaplicacion {
+            left: 45%;
+            position: absolute;
+            top: 50%;
+        }
+
+        .ui-datepicker table tbody .ui-datepicker-week-col {
+            cursor: pointer;
+            color: red;
+        }
+    </style>
+
+
+</head>
+
+<body class="nav-md">
+    <div class="container body">
+        <div class="main_container">
+            <!--menu lateral-->
+            <div class="col-md-3 left_col">
+                <div class="left_col scroll-view">
+                    <div class="navbar nav_title" style="border: 0;">
+                        <a href="" class="site_title"><img src="~/images/alma-blanco.png" /></a> <!-- href="Url.Action("Index","Home")"     ~/images/logo.png -->
+                    </div>
+                    <!-- /menu profile quick info -->
+                    <div class="clearfix"></div>
+                    <div class="divider"></div>
+                    <!-- sidebar menu -->
+                    <div id="sidebar-menu" class="main_menu_side main_menu">
+                        <div class="menu_section">
+                            <ul class="mcd-menu nav side-menu">
+                                <li id="Servicios">
+                                    <a href=""><i class="fa fa-ship"></i><span class="tr" key="AplicacionWeb">Mis Servicios Alma</span></a>
+                                    <ul>
+                                        <li class="misserviciosOngoing"><a class="tr" key="misserviciosOngoing" href="@Url.Action("OnGoingView", "Servicio")">On Going</a></li>
+                                        <li class="misserviciosHistorico"><a class="tr" key="misserviciosHistorico" href="@Url.Action("HistoricosView", "Servicio")">Historicos</a></li>
+                                        <!--<li class="misservicios"><a class="tr" href="Url.Action("RelacionarSensoresView", "Servicio")">Relacionar Sensor</a></li>-->
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--menu lateral-->
+            <!-- top navigation -->
+            <div class="top_nav">
+                <div class="nav_menu">
+                    <nav>
+                        <ul class="nav navbar-nav navbar-right">
+                            <li>
+                                <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-user fa-4x" aria-hidden="true"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-usermenu pull-right">
+                                    <li id="ContactoComercial"><a><b class="tr" key="ContactoComercial">Contactar a Equipo de Soporte</b></a></li>
+                                    <li id="ModificarDatos"><a href="@Url.Action("ModificarDatosView","Usuario")" class="tr" key="ModificarDatos">Modificar Contraseña</a></li>
+                                    <li><a href="@Url.Action("Login","Home")" class="tr" key="CerrarSesion"><i class="fa fa-sign-out pull-right"></i>Cerrar Sesión</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a class="user-profile"><b> @Session["Nombre"].ToString() </b></a>
+
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+            <!-- /top navigation -->
+            <!--Modal datos [ModalFormulario] -->
+            <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="margin-left:80px; margin-right:10px;">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content" style="width:90%">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h5 class="tr modal-title" id="myModalLabel3" key="FormularioContacto">FORMULARIO CONTACTO</h5>
+                        </div>
+                        <div class="alert alert-danger" id="alertaComentario">
+                            <!--<button type="button" class="hidden" >&times;</button>-->
+                            <strong>¡ </strong><label class="tr" key="añadeComentario">Es importante que añadas un comentario para enviar Formulario</label><strong> !</strong>
+                        </div>
+                        <div class="alert alert-info" id="alertaEnvioOK">
+                            <!--<button type="button" class="close" data-dismiss="toast">&times;</button>-->
+                            <strong>¡ </strong><label class="tr" key="comentarioEnviado">Su comentario ha sido enviado para la asistencia</label><strong> !</strong>
+                        </div>
+                        <div class="modal-body">
+                            <div class="x_content">
+                                <form class="form-horizontal">
+                                    <div class="row">
+                                        <label id="Email" class="control-label col-sm-5 tr">Este formulario será enviado al soporte de Alma. </label> <!--&nbsp;&nbsp;&nbsp;&nbsp; <b>soportealma@liventusglobal.com</b>-->
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <label for="Comentario" class="control-label col-sm-3 tr" key="Comentarios">Comentarios: </label>
+                                        <div class="col-sm-8">
+                                            <textarea id="Comentario" class="form-control" style="resize:none;" rows="10"></textarea>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <br><br>
+                            <div align="center">
+                                <button type="button" id="EnvioEmailContacto" class="tr btn btn-primary btn-sm" key="enviar">ENVIAR</button>
+                                <!--<button type="button" class="btn btn-primary btn-sm">CANCELAR</button>-->
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- page content -->
+            <div class="right_col" role="main">
+                <div class="row">
+                    @RenderBody()
+                </div>
+            </div>
+            <div id="loader">
+                <div id="loaderInner"></div>
+                <div>
+                    <img id="logoaplicacion" src="~/images/logologin.png" />
+                </div>
+            </div>
+            <!-- /page content -->
+            <!-- footer content -->
+            <footer>
+                <div class="pull-right">
+                    Application Developed by <a href=""><b>Proyecto Alma</b><span class="fa fa-registered"></span></a>
+                </div>
+                <div class="clearfix"></div>
+            </footer>
+            <!-- /footer content -->
+            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal1" id="ModalFormularioContacto" style="display:none;"></button>
+        </div>
+    </div>
+
+    <!-- Bootstrap -->
+    <script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="../vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress
+    <script src="../vendors/nprogress/nprogress.js"></script>-->
+    <!-- Chart.js -->
+    <script src="../vendors/Chart.js/dist/Chart.min.js"></script>
+    <!-- gauge.js -->
+    <script src="../vendors/gauge.js/dist/gauge.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="../vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- iCheck -->
+    <script src="../vendors/iCheck/icheck.min.js"></script>
+    <!-- Skycons -->
+    <script src="../vendors/skycons/skycons.js"></script>
+    <!-- Flot -->
+    <script src="../vendors/Flot/jquery.flot.js"></script>
+    <script src="../vendors/Flot/jquery.flot.pie.js"></script>
+    <script src="../vendors/Flot/jquery.flot.time.js"></script>
+    <script src="../vendors/Flot/jquery.flot.stack.js"></script>
+    <script src="../vendors/Flot/jquery.flot.resize.js"></script>
+    <!-- Flot plugins -->
+    <script src="../vendors/flot.orderbars/js/jquery.flot.orderBars.js"></script>
+    <script src="../vendors/flot-spline/js/jquery.flot.spline.min.js"></script>
+    <script src="../vendors/flot.curvedlines/curvedLines.js"></script>
+    <!-- DateJS -->
+    <script src="../vendors/DateJS/build/date.js"></script>
+    <!-- JQVMap -->
+    <script src="../vendors/jqvmap/dist/jquery.vmap.js"></script>
+    <script src="../vendors/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+    <script src="../vendors/jqvmap/examples/js/jquery.vmap.sampledata.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="../vendors/moment/min/moment.min.js"></script>
+    <script src="../vendors/bootstrap-daterangepicker/daterangepicker.js"></script>
+    <!--DataTables-->
+    <script src="../vendors/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="../vendors/datatables.net-bs/js/dataTables.bootstrap.min.js"></script>
+    <script src="../vendors/datatables.net-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="../vendors/datatables.net-buttons/js/buttons.colVis.min.js"></script>
+    <script src="../vendors/datatables.net-buttons-bs/js/buttons.bootstrap.min.js"></script>
+    <script src="../vendors/jszip/dist/jszip.min.js"></script>
+    <script src="../vendors/pdfmake/build/pdfmake.min.js"></script>
+    <script src="../vendors/pdfmake/build/vfs_fonts.js"></script>
+    <script src="../vendors/datatables.net-buttons/js/buttons.flash.min.js"></script>
+    <script src="../vendors/datatables.net-buttons/js/buttons.html5.min.js"></script>
+    <script src="../vendors/datatables.net-buttons/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="../vendors/dataTables.checkboxes.min.js"></script>
+    <script type="text/javascript" src="../vendors/dataTables.fixedColumns.min.js"></script>
+
+    <script type="text/javascript" src="../vendors/jquery.datetimepicker.full.js"></script>
+    <script type="text/javascript" src="../vendors/jquery.datetimepicker.full.min.js"></script>
+    <script type="text/javascript" src="../vendors/jquery.datetimepicker.min.js"></script>
+    <link type="text/css" href="../vendors/jquery.datetimepicker.min.css" rel="stylesheet" />
+
+    <!--DataTables CSS-->
+    <link type="text/css" href="../vendors/dataTables.checkboxes.css" rel="stylesheet" />
+    <link href="../Vendors/datatables.net/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="../Vendors/datatables.net/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="../Vendors/datatables.net/css/fixedHeader.dataTables.min.css" rel="stylesheet">
+    <script src="~/build/js/Perfiles.js"></script>
+
+    <!--RANGOS-->
+    <!--<script type="text/javascript" src="../vendors/rango/jquery.dataTables.yadcf.js"></script>
+    <link type="text/css" href="../vendors/rango/jquery.dataTables.yadcf.css" rel="stylesheet" />                    NO ESTAN!!! -->
+    <!-- Custom Theme Scripts -->
+    <script src="../build/js/custom.min.js"></script>
+
+    <script type="text/javascript">
+
+        var alertaEnvioOK = $('#alertaEnvioOK').hide();
+        var alertaComentario = $('#alertaComentario').hide();
+        var loading = $('#loader').hide();
+        var loader = $('#loaderInner').hide();
+
+        $(document).ajaxStart(function () {
+            loading.show();
+            loader.show();
+        });
+
+        $(document).ajaxStop(function () {
+            loading.hide();
+            loader.hide();
+        });
+
+        $("#ContactoComercial").on('click', function () {
+            $('#ModalFormularioContacto').trigger('click');
+            alertaComentario.hide();
+
+        });
+
+        $("#EnvioEmailContacto").on('click', function () {
+
+            if ($("#Comentario").val() != '') {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("EmailContactoComercial", "Email")',
+                    dataType: 'json',
+                    dataSrc: '',
+                    data: {
+                        Comentario: $("#Comentario").val()
+                    }
+
+                });
+                alertaComentario.hide();
+                alertaEnvioOK.show();
+                $("#Comentario").val('');
+                $("#Comentario").selectpicker('refresh');
+                //$('#myModal1').modal('hide');
+
+            } else {
+                alertaEnvioOK.hide();
+                alertaComentario.show();
+            }
+        });
+
+
+        ej.base.setCulture('es');
+        var ajax = new ej.base.Ajax('/build/es.json', 'GET', true);
+        console.log('paso');
+        console.log(ajax);
+        ajax.onSuccess = function (value) {
+            //Assigning locale text value for Essential JS 2 components
+            ej.base.L10n.load(value);
+        };
+        ajax.send();
+
+    </script>
+</body>
+</html>
+
+

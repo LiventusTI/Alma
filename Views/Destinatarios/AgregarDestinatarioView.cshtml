@@ -1,0 +1,832 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using Syncfusion.EJ2.Inputs;
+@using Syncfusion.EJ2;
+@using Syncfusion.EJ2.DropDowns;
+@model ProyectoAlmaInicio.Controllers.Destinatario.DestinatariosController.TextBoxModal
+
+<div class="main-content e-responsive" id="main-text">
+    <div class="sidebar-content sidebar" style="display:flow-root; min-height:600px;">
+
+        <div class="control-section col-lg-12" style="height: 1000px;">
+
+
+            <div class="col-lg-12 control-section toast-default-section" hidden>
+                <div class="control_wrapper">
+                    @Html.EJS().Toast("toast_type").Position(p => p.X("Right")).TimeOut(5000).Close("onclose").Created("created").BeforeOpen("onBeforeOpen").Render()
+                    <div id="toast_types">
+                        <div>
+                            @Html.EJS().Button("info_Toast").CssClass("e-btn e-control e-info").Content("Info Message").Render()
+                            @Html.EJS().Button("success_Toast").CssClass("e-btn e-contro e-success").Content("Success Message").Render()
+                            @Html.EJS().Button("warning_Toast").CssClass("e-btn e-control e-warning").Content("Warning Message").Render()
+                            @Html.EJS().Button("error_Toast").CssClass("e-btn e-control e-danger").Content("Danger Message").Render()
+                        </div>
+                        <div style="padding-top: 15px">
+                            @Html.EJS().Button("hideToast").CssClass("e-btn e-control").Content("Hide All").Render()
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+            <h4 class="h4 tr" key="documentosComercial">NUEVO DESTINATARIO</h4>
+            <hr style="border-width: medium;" />
+
+
+            <div>
+                @using (Html.BeginForm("AgregarDestinatario", "Destinatarios", FormMethod.Post, new { id = "form_agregar" }))
+                {
+
+                    @Html.ValidationSummary(true)
+                    <div class="col-lg-12 control-section">
+                        <div id="wrapper">
+
+                            <div class="alert alert-info">
+                                <i class="glyphicon glyphicon-info-sign fa-2x" style="vertical-align:middle;"></i>
+                                <span style="vertical-align:middle; margin-left:10px" class="tr" key="camposObligatorios">Los campos que poseen un (*) son obligatorios.</span>
+                            </div>
+
+
+                            @**** SECCION INPUT DESTINATARIO / ACTIVIDAD ****@
+                            <div class="row">
+                                <div id="div-empresa_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    @Html.EJS().TextBoxFor(model => model.empresa_destinatario).Placeholder("Nombre Empresa Destinatario (*)").FloatLabelType(FloatLabelType.Auto).Change("changeEmpresa").Render()
+                                    <div>
+                                        @Html.ValidationMessageFor(model => model.empresa_destinatario)
+                                    </div>
+                                </div>
+                                <div id="divActividad" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    @Html.EJS().ComboBox("actividad_empresa").Placeholder("Actividad (*)").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Change("changeActividad").Filtering("onfiltering_ActividadEmpresa").DataSource((IEnumerable<object>)ViewBag.lista_actividades_empresa).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()
+
+                                </div>
+                            </div>
+                            <br />
+
+
+                            @**** SECCION INPUT PAIS / PUERTO ****@
+                            <div class="row">
+                                <div id="div-pais_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    @Html.EJS().ComboBox("pais_contacto").Placeholder("País Destino (*)").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Change("changePais").Filtering("onfiltering_Pais").DataSource((IEnumerable<object>)ViewBag.lista_paises).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()
+                                </div>
+                                <div id="div-puerto_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    @Html.EJS().ComboBox("puerto_contacto").Placeholder("Puerto Destino (*)").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Change("changePuerto").Filtering("onfiltering_Puerto").DataSource((IEnumerable<object>)ViewBag.lista_puertos).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()
+                                </div>
+                            </div>
+                            <br />
+
+
+                            @**** SECCION INPUT LISTA COMMODITIES ****@
+                            <div class="row">
+                                <div id="div-commodity_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    @Html.EJS().ComboBox("commodity_empresa").Placeholder("Commodity que Trabaja").FloatLabelType(FloatLabelType.Auto).AllowFiltering(true).Change("onchange_commodity").Filtering("onfiltering_commodity").DataSource((IEnumerable<object>)ViewBag.lista_commodities).Fields(new ComboBoxFieldSettings { Text = "Name", Value = "Code" }).Render()
+                                </div>
+                                <div class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    <div hidden><input type="text" id="lista_commodities" /></div>
+
+                                    <div id="div-tabla-commodities" style="display:none">
+                                        <div class="container col-lg-6" style="margin: 10px 0px 10px 0px">
+                                            <p style="margin: 5px 5px 0px 0px; text-align: right;">Commodities</p>
+                                            <p style="text-align: right;">Seleccionados:</p>
+                                        </div>
+                                        <div class="col-lg-6" style="overflow-y: auto; height: 100px; margin-bottom: 10px;">
+                                            <table id="tableCommodities" style="margin: 10px 0px 10px 0px;"></table>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <br />
+
+                            @**** SECCION INPUT NOMBRE CONTACTO ****@
+                            <div class="row">
+                                <div id="div-contacto_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    @Html.EJS().TextBoxFor(model => model.nombre_contacto).Placeholder("Nombre Contacto Destino").FloatLabelType(FloatLabelType.Auto).Render()
+                                    <div>
+                                        @Html.ValidationMessageFor(model => model.nombre_contacto)
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+
+                            @**** SECCION INPUT EMAIL / TELEFONO ****@
+                            <div class="row">
+                                <div id="div-email_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    @Html.EJS().TextBoxFor(model => model.email_contacto).Placeholder("Email Contacto Destino").FloatLabelType(FloatLabelType.Auto).Render()
+                                    <div>
+                                        @Html.ValidationMessageFor(model => model.email_contacto)
+                                    </div>
+                                </div>
+                                <div id="div-telefono_agregar" class="col-xs-6 col-sm-6 col-lg-6 col-md-6">
+                                    @Html.EJS().TextBoxFor(model => model.telefono_contacto).Placeholder("Telefono Contacto Destino").FloatLabelType(FloatLabelType.Auto).Render()
+                                    <div>
+                                        @Html.ValidationMessageFor(model => model.telefono_contacto)
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+
+                            <div id="submitbutton" align="center">
+                                <input id="btn-guardar" class="e-control e-btn e-success tr" key="botonGuardar" type="button" value="Guardar">
+                                <input id="btn-limpiar" class="e-control e-btn e-lib tr" key="botonLimpiar" type="button" value="Limpiar">
+                            </div>
+                        </div>
+                    </div>
+
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+
+
+    var lang = getCookie("Lenguaje");
+
+    document.addEventListener('DOMContentLoaded', function () {
+        //loadCultureFiles(lang);
+        //datepicker = document.getElementById('inicio_temporada').ej2_instances[0];
+        //datepicker2 = document.getElementById('fin_temporada').ej2_instances[0];
+        //console.log(datepicker);
+        //datepicker.locale = lang;
+        //datepicker2.locale = lang;
+    });
+
+    /*function loadCultureFiles(name) {
+        var files = ['ca-gregorian.json', 'numbers.json', 'timeZoneNames.json'];
+        if (name === 'ar') {
+            files.push('numberingSystems.json');
+        }
+        var loader = ej.base.loadCldr;
+        var loadCulture = function (prop) {
+            var val, ajax;
+            if (name === 'ar' && prop === files.length - 1) {
+                ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../ProyectoAlma/build/node_modules/cldr-data/supplemental/' + files[prop], 'GET', false);
+            } else {
+                ajax = new ej.base.Ajax(location.origin + location.pathname + '/../../ProyectoAlma/build/node_modules/cldr-data/main/' + name + '/' + files[prop], 'GET', false);
+            }
+            ajax.onSuccess = function (value) {
+                val = value;
+            };
+            ajax.send();
+            loader(JSON.parse(val));
+        };
+        for (var prop = 0; prop < files.length; prop++) {
+            loadCulture(prop);
+        }
+
+
+    }*/
+
+    var toast_titulo1 = '¡Advertencia!';
+    var toast_titulo2 = '¡Muy bien!';
+    var toast_titulo3 = '¡Error!';
+    var toast_titulo4 = '¡Información!';
+    var toast_content1 = 'El destinatario fue creado exitosamente.';
+    var toast_content2 = 'El destinatario fue editado exitosamente.';
+    var toast_content3 = 'El destinatario fue eliminado exitosamente.';
+    var toast_content4 = 'Error al asignar/programar destinatario.';
+    var toast_content5 = 'El destinatario no pudo ser creado.';
+
+    if (lang === 'en') {
+        toast_titulo1 = 'Warnings!';
+        toast_titulo2 = 'Well done!';
+        toast_titulo3 = 'Error!';
+        toast_titulo4 = 'Information';
+        toast_content1 = 'The addressee was created successfully.';
+        toast_content2 = 'The addressee was edited successfully.';
+        toast_content3 = 'The addressee was deleted successfully.';
+        toast_content4 = 'Error assigning / programming sensor to the container, the possible reasons for the error are: Serial number wrongly typed, there is no connection to Emerson servers, the sensor has an active trip created from another application, or an unidentified error.';
+        toast_content5 = 'The addressee could not be created.';
+    }
+
+    // TOAS FUNCTIONS
+    var toasts = [
+        { title: toast_titulo1, content: 'Advertencia.', cssClass: 'e-toast-warning', icon: 'e-warning toast-icons' },
+        { title: toast_titulo2, content: toast_content1, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo2, content: toast_content2, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo2, content: toast_content3, cssClass: 'e-toast-success', icon: 'e-success toast-icons' },
+        { title: toast_titulo3, content: toast_content4, cssClass: 'e-toast-danger', icon: 'e-error toast-icons' },
+        { title: toast_titulo3, content: toast_content5, cssClass: 'e-toast-danger', icon: 'e-error toast-icons' },
+        { title: toast_titulo4, content: 'Información.', cssClass: 'e-toast-info', icon: 'e-error toast-icons' }];
+
+    var btnEleHide = document.getElementById('hideToast');
+    var toastObj;
+    var infoBtn = document.getElementById('info_Toast');
+    var warnBtn = document.getElementById('warning_Toast');
+    var successBtn = document.getElementById('success_Toast');
+    var errorBtn = document.getElementById('error_Toast');
+
+    document.onclick = function (e) {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        if (e.target !== infoBtn && e.target !== warnBtn && e.target !== successBtn && e.target !== errorBtn) {
+            toastObj.hide('All');
+        }
+    };
+
+    document.getElementById('hideToast').onclick = function () {
+        toastObj.hide('All');
+    };
+    infoBtn.onclick = function () {
+        toastObj.show(toasts[1]);
+        toastObj.show(toasts[2]);
+        toastObj.show(toasts[3]);
+        toastObj.show(toasts[4]);
+        toastObj.show(toasts[5]);
+    };
+    warnBtn.onclick = function () {
+        toastObj.show(toasts[0]);
+    };
+    successBtn.onclick = function () {
+        toastObj.show(toasts[1]);
+    };
+    errorBtn.onclick = function () {
+        toastObj.show(toasts[2]);
+    };
+
+    var toastObj;
+    function created() {
+        toastObj = this;
+    }
+    function onclose(e) {
+        if (e.toastContainer.childElementCount === 0) {
+            btnEleHide.style.display = 'none';
+        }
+    }
+    function onBeforeOpen() {
+        btnEleHide.style.display = 'inline-block';
+    }
+
+    $(document).ready(function () {
+
+        @*$.ajax({
+            type: "POST",
+            url: '@Url.Action("SetTrazabilidadVista", "Trazabilidad")',
+            dataType: 'json',
+            dataSrc: '',
+            data: {
+                TipoVista: 6,
+                NombreVista: 'AgregarContenedorView'
+            }
+
+        });*@
+
+        var urlString = window.location.href;
+        let url = new URL(urlString);
+        let searchString = url.search.slice(1);
+        let searchParams = new URLSearchParams(searchString);
+        let inputParam = 'desplegarMensaje';
+
+        if (searchParams.has(inputParam)) {
+            if (searchParams.get(inputParam) == 1) {
+                desplegarMensaje();
+            }
+            else if (searchParams.get(inputParam) == 2) {
+                desplegarMensajeEditar();
+            }
+            else if (searchParams.get(inputParam) == 3) {
+                desplegarMensajeEliminar();
+            } else if (searchParams.get(inputParam) == 4) {
+                desplegarMensajeError();
+            }
+        }
+    });
+
+
+    function desplegarMensaje() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[1]);
+        }, 500);
+    }
+    function desplegarMensajeEditar() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[2]);
+        }, 500);
+    }
+    function desplegarMensajeEliminar() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[3]);
+        }, 500);
+    }
+    function desplegarMensajeError() {
+        var toastObj = document.getElementById('toast_type').ej2_instances[0];
+        setTimeout(function () {
+            toastObj.target = document.body;
+            toastObj.show(toasts[4]);
+        }, 500);
+    }
+
+
+    function changeEmpresa(e) {
+
+        var empresa_destinatario = document.getElementById("empresa_destinatario").ej2_instances[0];
+        if (empresa_destinatario.value != null && empresa_destinatario.value != "") {
+            $("#empresa_destinatario").css("border", "");
+        }
+    }
+
+    function changeActividad(e) {
+        var actividad_empresa = document.getElementById("actividad_empresa").ej2_instances[0];
+        if (actividad_empresa.value != null && actividad_empresa.value != "") {
+            $("#actividad_empresa").css("border", "");
+        }
+    }
+    function onfiltering_ActividadEmpresa(e) {
+        var actividad_empresa = document.getElementById('actividad_empresa').ej2_instances[0];
+        console.log('actividad_empresa: ' + actividad_empresa.value);
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(actividad_empresa.dataSource, query);
+
+    }
+
+    function changePais(e) {
+        var pais_contacto = document.getElementById("pais_contacto").ej2_instances[0];
+        if (pais_contacto.value != null && pais_contacto.value != "") {
+            $("#pais_contacto").css("border", "");
+        }
+    }
+    function onfiltering_Pais(e) {
+        var pais_contacto = document.getElementById('pais_contacto').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(pais_contacto.dataSource, query);
+    }
+
+    function changePuerto(e) {
+        var puerto_contacto = document.getElementById("puerto_contacto").ej2_instances[0];
+        if (puerto_contacto.value != null && puerto_contacto.value != "") {
+            $("#puerto_contacto").css("border", "");
+        }
+    }
+    function onfiltering_Puerto(e) {
+        var puerto_contacto = document.getElementById('puerto_contacto').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(puerto_contacto.dataSource, query);
+    }
+
+    function onfiltering_Ciudad(e) {
+        var ciudad_contacto = document.getElementById('ciudad_contacto').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(ciudad_contacto.dataSource, query);
+    }
+
+
+
+
+
+
+    function onfiltering_commodity(e) {
+        var commodity_empresa = document.getElementById('commodity_empresa').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(commodity_empresa.dataSource, query);
+    }
+    function onchange_commodity(e) {
+        var commodity_empresa = document.getElementById('commodity_empresa').ej2_instances[0];
+        if (commodity_empresa.value != null && commodity_empresa.value != "")
+        {
+            // SE AGREGA COMMODITY A LA TABLA
+            var div_tabla_contendores = document.getElementById('div-tabla-commodities');
+            div_tabla_contendores.style.display = "block";
+            var tabla = document.getElementById('tableCommodities');
+            tabla.innerHTML = tabla.innerHTML
+                + "<tr>"
+                + "<td>"
+                + commodity_empresa.value
+                + "</td>"
+                + "<td><button onclick=\"borrarCommodity('" + commodity_empresa.value + "')\" class=\"close\"><span style=\"margin-left: 5px\">&times;</span></button></td>"
+                + "</tr>";
+        }
+    }
+
+    var contenido_nuevo_tabla_commodities = "<tbody>";
+    var commodity_a_borrar = "";
+    var contador_commodities = 0;
+
+    function borrarCommodity(commodity) {
+
+        console.log('borrarCommodity');
+        commodity_a_borrar = commodity;
+        var tabla_commodities = document.getElementById('tableCommodities');
+
+        var str = tabla_commodities.innerHTML;
+        var res = str.split("tr");
+        contenido_nuevo_tabla_commodities = "<tbody>";
+        contador_commodities = 0;
+        res.forEach(recorrerTablaCommodities);
+
+        if (contador_commodities == 1) {
+            var div_tabla_commodities = document.getElementById('div-tabla-commodities');
+            div_tabla_commodities.style.display = "none";
+        }
+        contenido_nuevo_tabla_commodities = contenido_nuevo_tabla_commodities + "</tbody>";
+        tabla_commodities.innerHTML = contenido_nuevo_tabla_commodities;
+    }
+
+    function recorrerTablaCommodities(element, index, array) {
+        var res = element.substring(0, 5);
+        if (res == '><td>') {
+            contador_commodities++;
+            var res2 = element.split("<td>");
+            var res3 = res2[1].split("</td>");
+            if (res3[0] != commodity_a_borrar) {
+                if (contador_commodities > 1) {
+                    contenido_nuevo_tabla_commodities = contenido_nuevo_tabla_commodities + "</tbody><tbody>";
+                }
+                contenido_nuevo_tabla_commodities = contenido_nuevo_tabla_commodities + "<tr" + element + "tr>";
+            }
+        }
+    }
+
+
+
+
+
+    function onfiltering_commodity2(e) {
+        var commodity_empresa_2 = document.getElementById('commodity_empresa2').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(commodity_empresa_2.dataSource, query);
+    }
+    function onfiltering_commodity3(e) {
+        var commodity_empresa_3 = document.getElementById('commodity_empresa3').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(commodity_empresa_3.dataSource, query);
+    }
+    function onfiltering_commodity4(e) {
+        var commodity_empresa_4 = document.getElementById('commodity_empresa4').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(commodity_empresa_4.dataSource, query);
+    }
+    function onfiltering_commodity5(e) {
+        var commodity_empresa_5 = document.getElementById('commodity_empresa5').ej2_instances[0];
+        var query = new ej.data.Query();
+        query = (e.text !== '') ? query.where('Name', 'startswith', e.text, true) : query;
+        e.updateData(commodity_empresa_5.dataSource, query);
+    }
+
+
+
+    var boton_limpiar = document.getElementById('btn-limpiar');
+    boton_limpiar.addEventListener("click", function () {
+        var empresa_destinatario = document.getElementById("empresa_destinatario").ej2_instances[0];
+        empresa_destinatario.value = "";
+        $("#empresa_destinatario").css("border", "");
+
+        var actividad_empresa = document.getElementById("actividad_empresa").ej2_instances[0];
+        actividad_empresa.value = "";
+        $("#actividad_empresa").css("border", "");
+
+        var pais_contacto = document.getElementById("pais_contacto").ej2_instances[0];
+        pais_contacto.value = "";
+        $("#pais_contacto").css("border", "");
+
+        var puerto_contacto = document.getElementById("puerto_contacto").ej2_instances[0];
+        puerto_contacto.value = "";
+        $("#puerto_contacto").css("border", "");
+
+        var nombre_contacto = document.getElementById("nombre_contacto").ej2_instances[0];
+        nombre_contacto.value = "";
+
+        var email_contacto = document.getElementById("email_contacto").ej2_instances[0];
+        email_contacto.value = "";
+
+        var telefono_contacto = document.getElementById("telefono_contacto").ej2_instances[0];
+        telefono_contacto.value = "";
+
+        var commodity_empresa = document.getElementById("commodity_empresa").ej2_instances[0];
+        commodity_empresa.value = "";
+
+        var div_tabla_commodities = document.getElementById('div-tabla-commodities');
+        div_tabla_commodities.style.display = "none";
+        var tabla_commodities = document.getElementById('tableCommodities');
+        tabla_commodities.innerHTML = "";
+
+    });
+
+
+    var texto_commodities = '';
+
+    var boton_guardar = document.getElementById('btn-guardar');
+    boton_guardar.addEventListener("click", function () {
+        var empresa_destinatario = document.getElementById("empresa_destinatario").ej2_instances[0];
+        var actividad_empresa = document.getElementById("actividad_empresa").ej2_instances[0];
+        var pais_contacto = document.getElementById("pais_contacto").ej2_instances[0];
+        var puerto_contacto = document.getElementById("puerto_contacto").ej2_instances[0];
+        var nombre_contacto = document.getElementById("nombre_contacto").ej2_instances[0];
+        var email_contacto = document.getElementById("email_contacto").ej2_instances[0];
+        var telefono_contacto = document.getElementById("telefono_contacto").ej2_instances[0];
+        var commodity_empresa = document.getElementById("commodity_empresa").ej2_instances[0];
+
+        if ((empresa_destinatario.value == null || empresa_destinatario.value == "")
+            || (actividad_empresa.value == null || actividad_empresa.value == "")
+            || (pais_contacto.value == null || pais_contacto.value == "")
+            || (puerto_contacto.value == null || puerto_contacto.value == "")
+        ) {
+
+            if (empresa_destinatario.value == null || empresa_destinatario.value == "") {
+                $("#empresa_destinatario").css("border", "1px solid red");
+            }
+            if (actividad_empresa.value == null || actividad_empresa.value == "") {
+                //var divActividad = document.getElementById('divActividad').childNodes;
+                //divActividad[0].style.borderColor = 'red';
+                $("#actividad_empresa").css("border", "1px solid red");
+            }
+            if (pais_contacto.value == null || pais_contacto.value == "") {
+                $("#pais_contacto").css("border", "1px solid red");
+            }
+            if (puerto_contacto.value == null || puerto_contacto.value == "") {
+                $("#puerto_contacto").css("border", "1px solid red");
+            }
+
+            var texto = '¡Faltan algunos campos obligatorios!';
+            if (lang === 'en') {
+                texto = '¡Some mandatory fields are missing!';
+            }
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: texto,
+                confirmButtonColor: '#4ab973',
+            });
+        }
+        else {
+            var titulo = '¿Seguro que deseas guardar el destinatario?';
+            var boton1 = 'Sí';
+            var boton2 = 'No';
+            if (lang === 'en') {
+                titulo = 'Are you sure you want to save the addressee?';
+                boton1 = 'Yes';
+                boton2 = 'No';
+            }
+
+            Swal.fire({
+                title: titulo,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#4ab973',
+                cancelButtonColor: '#d33',
+                confirmButtonText: boton1,
+                cancelButtonText: boton2
+            }).then((result) => {
+                if (result.value) {
+
+                    var tabla_commodities = document.getElementById('tableCommodities');
+                    var str = tabla_commodities.innerHTML;
+                    var res = str.split("tr");
+                    contador_commodities = 0;
+                    commodities = [];
+                    texto_commodities = '';
+                    res.forEach(recorrerTablaCommodities2);
+
+                    var textBox_commodities = new ej.inputs.TextBox({
+                        value: texto_commodities
+                    });
+                    textBox_commodities.appendTo('#lista_commodities');
+
+                    document.getElementById('form_agregar').submit();
+                }
+            });
+        }
+    });
+
+
+    function recorrerTablaCommodities2(element, index, array) {
+        var res = element.substring(0, 5);
+        if (res == '><td>') {
+            contador_commodities++;
+            var res2 = element.split("<td>");
+            var res3 = res2[1].split("</td>");
+            commodities.push(res3[0]);
+
+            if (contador_commodities == 1) {
+                texto_commodities = res3[0];
+            } else {
+                texto_commodities = texto_commodities + ', ' + res3[0];
+            }
+        }
+    }
+
+
+
+
+    /*var boton_agregar_commodity = document.getElementById('btn-agregar_commodity');
+    boton_agregar_commodity.addEventListener("click", function () {
+
+        var esVisible1 = $("#div-commodity_agregar").is(":hidden");
+        if (esVisible1 == true) {
+
+            document.getElementById("div-commodity_agregar").style.display = 'block';
+            document.getElementById("div-inicio-temporada_agregar").style.display = 'block';
+            document.getElementById("div-fin-temporada_agregar").style.display = 'block';
+
+            document.getElementById('div-eliminar_commodity').style.display = 'block';
+
+        } else {
+            var esVisible2 = $("#div-commodity_agregar2").is(":hidden");
+            if (esVisible2 == true) {
+
+                document.getElementById("div-commodity_agregar2").style.display = 'block';
+                document.getElementById("div-inicio-temporada_agregar2").style.display = 'block';
+                document.getElementById("div-fin-temporada_agregar2").style.display = 'block';
+
+            } else {
+                var esVisible3 = $("#div-commodity_agregar3").is(":hidden");
+                if (esVisible3 == true) {
+
+                    document.getElementById("div-commodity_agregar3").style.display = 'block';
+                    document.getElementById("div-inicio-temporada_agregar3").style.display = 'block';
+                    document.getElementById("div-fin-temporada_agregar3").style.display = 'block';
+
+                } else {
+                    var esVisible4 = $("#div-commodity_agregar4").is(":hidden");
+                    if (esVisible4 == true) {
+
+                        document.getElementById("div-commodity_agregar4").style.display = 'block';
+                        document.getElementById("div-inicio-temporada_agregar4").style.display = 'block';
+                        document.getElementById("div-fin-temporada_agregar4").style.display = 'block';
+
+                    } else {
+                        document.getElementById("div-commodity_agregar5").style.display = 'block';
+                        document.getElementById("div-inicio-temporada_agregar5").style.display = 'block';
+                        document.getElementById("div-fin-temporada_agregar5").style.display = 'block';
+
+                        document.getElementById("div-agregar_commodity").style.display = 'none';
+                    }
+                }
+            }
+        }
+    });*/
+
+    /*var boton_eliminar_commodity = document.getElementById('btn-eliminar_commodity');
+    boton_eliminar_commodity.addEventListener("click", function () {
+
+        var esVisible5 = $("#div-commodity_agregar5").is(":visible");
+        if (esVisible5 == true) {
+
+            document.getElementById("div-agregar_commodity").style.display = 'block';
+
+            document.getElementById("div-commodity_agregar5").style.display = 'none';
+            document.getElementById("div-inicio-temporada_agregar5").style.display = 'none';
+            document.getElementById("div-fin-temporada_agregar5").style.display = 'none';
+
+            var commodity_empresa5 = document.getElementById("commodity_empresa5").ej2_instances[0];
+            var inicio_temporada5 = document.getElementById("inicio_temporada5").ej2_instances[0];
+            var fin_temporada5 = document.getElementById("fin_temporada5").ej2_instances[0];
+
+            commodity_empresa5.value = "";
+            inicio_temporada5.value = "";
+            fin_temporada5.value = "";
+
+        } else {
+
+            var esVisible4 = $("#div-commodity_agregar4").is(":visible");
+            if (esVisible4 == true) {
+
+                document.getElementById("div-commodity_agregar4").style.display = 'none';
+                document.getElementById("div-inicio-temporada_agregar4").style.display = 'none';
+                document.getElementById("div-fin-temporada_agregar4").style.display = 'none';
+
+                var commodity_empresa4 = document.getElementById("commodity_empresa4").ej2_instances[0];
+                var inicio_temporada4 = document.getElementById("inicio_temporada4").ej2_instances[0];
+                var fin_temporada4 = document.getElementById("fin_temporada4").ej2_instances[0];
+
+                commodity_empresa4.value = "";
+                inicio_temporada4.value = "";
+                fin_temporada4.value = "";
+
+            } else {
+                var esVisible3 = $("#div-commodity_agregar3").is(":visible");
+                if (esVisible3 == true) {
+
+                    document.getElementById("div-commodity_agregar3").style.display = 'none';
+                    document.getElementById("div-inicio-temporada_agregar3").style.display = 'none';
+                    document.getElementById("div-fin-temporada_agregar3").style.display = 'none';
+
+                    var commodity_empresa3 = document.getElementById("commodity_empresa3").ej2_instances[0];
+                    var inicio_temporada3 = document.getElementById("inicio_temporada3").ej2_instances[0];
+                    var fin_temporada3 = document.getElementById("fin_temporada3").ej2_instances[0];
+
+                    commodity_empresa3.value = "";
+                    inicio_temporada3.value = "";
+                    fin_temporada3.value = "";
+
+                } else {
+                    var esVisible2 = $("#div-commodity_agregar2").is(":visible");
+                    if (esVisible2 == true) {
+
+                        document.getElementById("div-commodity_agregar2").style.display = 'none';
+                        document.getElementById("div-inicio-temporada_agregar2").style.display = 'none';
+                        document.getElementById("div-fin-temporada_agregar2").style.display = 'none';
+
+                        var commodity_empresa2 = document.getElementById("commodity_empresa2").ej2_instances[0];
+                        var inicio_temporada2 = document.getElementById("inicio_temporada2").ej2_instances[0];
+                        var fin_temporada2 = document.getElementById("fin_temporada2").ej2_instances[0];
+
+                        commodity_empresa2.value = "";
+                        inicio_temporada2.value = "";
+                        fin_temporada2.value = "";
+
+                    } else {
+
+                        document.getElementById("div-commodity_agregar").style.display = 'none';
+                        document.getElementById("div-inicio-temporada_agregar").style.display = 'none';
+                        document.getElementById("div-fin-temporada_agregar").style.display = 'none';
+
+                        document.getElementById('div-eliminar_commodity').style.display = 'none';
+
+                        var commodity_empresa = document.getElementById("commodity_empresa").ej2_instances[0];
+                        var inicio_temporada = document.getElementById("inicio_temporada").ej2_instances[0];
+                        var fin_temporada = document.getElementById("fin_temporada").ej2_instances[0];
+
+                        commodity_empresa.value = "";
+                        inicio_temporada.value = "";
+                        fin_temporada.value = "";
+                    }
+                }
+            }
+        }
+
+        //$("#div1").refresh();
+
+    });*/
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+
+<style>
+    p {
+        margin: 0 0 0px;
+        margin-bottom: 0px;
+    }
+
+    .h4 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .h5 {
+        color: black !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .main-content {
+        background: #F7F7F7 !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .e-card {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-tab-text {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-control {
+        font-family: Gotham Medium !important;
+    }
+
+    .e-treeview.e-list-text {
+        color: white !important;
+        font-family: Gotham Medium !important;
+    }
+
+    .e-float-text {
+        font-family: Gotham Medium !important;
+    }
+</style>
